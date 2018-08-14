@@ -14,7 +14,7 @@ Please note that this project is not affiliated with Ansible project. It's just 
 * [ ] You can set basic metadata: env vars, labels, user, cmd
 * [ ] You can do volume mounts during build
 * [ ] README
-* [ ] Functional tests
+* [x] Functional tests
 
 
 ## TODO post MVP

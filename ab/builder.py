@@ -102,6 +102,7 @@ def create_buildah_container(
 
 
 def buildah(command, args_and_opts):
+    # TODO: make sure buildah command is present on system
     command = ["buildah", command] + args_and_opts
     logger.debug("running command: %s", command)
     return subprocess.check_call(command)

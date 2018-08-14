@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 def run_playbook(playbook_path, inventory_path, connection, extra_variables=None,
                  ansible_args=None, debug=False):
+    # TODO: make sure a-p is present on system
     cmd_args = [
         "ansible-playbook",
         "-i", inventory_path,

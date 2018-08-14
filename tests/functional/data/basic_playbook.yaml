@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+  - name: Run a sample command
+    command: 'ls -lha'
+  - name: create a file
+    copy:
+      src: /etc/passwd
+      dest: /etc/passwd-lol
