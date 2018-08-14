@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Builder:
     ansible_connection = "default-value"
+    name = "default-value"
 
     def __init__(self, name):
         self.name = name
@@ -118,6 +119,7 @@ def buildah_with_output(command, args_and_opts):
 
 class BuildahBuilder(Builder):
     ansible_connection = "buildah"
+    name = "buildah"
 
     def __init__(self, base_image, target_image):
         super().__init__(base_image)
@@ -126,7 +128,20 @@ class BuildahBuilder(Builder):
 
     def create(self):
         # FIXME: pick a container name which does not exist
+        # TODO: pull image if not present
         create_buildah_container(self.name, self.ansible_host)
 
     def commit(self):
         buildah("commit", [self.ansible_host, self.target_image])
+
+
+BUILDERS = {
+    BuildahBuilder.name: BuildahBuilder
+}
+
+
+def get_builder(builder_name):
+    try:
+        return BUILDERS[builder_name]
+    except KeyError:
+        raise RuntimeError("No such builder %s", builder_name)
