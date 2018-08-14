@@ -68,7 +68,8 @@ def test_build_basic_image_with_wrong_env_vars():
     cmd = ["build", "-e", la_la_la, "--", basic_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError) as exc:
         ab(cmd)
-        e = ("Environment variable {} doesn't seem to be "
+        e = ("There was an error during execution: "
+             "Environment variable {} doesn't seem to be "
              "specified in format 'KEY=VALUE'.".format(la_la_la))
         assert e in exc.value.message
 

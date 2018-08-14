@@ -53,7 +53,8 @@ class CLI:
                         '# create your container images with Ansible! ',
             epilog="Please use '--' to separate options and arguments."
         )
-        self.parser.add_argument("-v", "--verbose", action="store_true")
+        self.parser.add_argument("-v", "--verbose", action="store_true",
+                                 help="run verbosely, also print possible tracebacks")
         subparsers = self.parser.add_subparsers( help='commands')
         self.build_parser = subparsers.add_parser(
             name="build",
@@ -91,37 +92,46 @@ class CLI:
         self.args = self.parser.parse_args()
         if self.args.verbose:
             set_logging(level=logging.DEBUG)
+        else:
+            set_logging(level=logging.INFO)
+
+    def _build(self):
+        metadata = ImageMetadata()
+        if self.args.env_var:
+            for e_v in self.args.env_var:
+                try:
+                    k, v = e_v.split("=", 1)
+                except ValueError:
+                    raise RuntimeError(
+                        "Environment variable {} doesn't seem to be "
+                        "specified in format 'KEY=VALUE'.".format(e_v))
+                metadata.env_vars[k] = v
+        if self.args.label:
+            for label in self.args.label:
+                try:
+                    k, v = label.split("=", 1)
+                except ValueError:
+                    raise RuntimeError(
+                        "Label variable {} doesn't seem to be "
+                        "specified in format 'KEY=VALUE'.".format(label))
+                metadata.labels[k] = v
+        app = Application(
+            self.args.playbook_path, self.args.base_image, self.args.target_image,
+            self.args.builder, metadata
+        )
+        app.build()
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
-        # FIXME UX: catch ^c
-        # FIXME: catch exc unless debug
-        if subcommand == "build":
-            metadata = ImageMetadata()
-            if self.args.env_var:
-                for e_v in self.args.env_var:
-                    try:
-                        k, v = e_v.split("=", 1)
-                    except ValueError:
-                        raise RuntimeError(
-                            "Environment variable {} doesn't seem to be " 
-                            "specified in format 'KEY=VALUE'.".format(e_v))
-                    metadata.env_vars[k] = v
-            if self.args.label:
-                for label in self.args.label:
-                    try:
-                        k, v = label.split("=", 1)
-                    except ValueError:
-                        raise RuntimeError(
-                            "Label variable {} doesn't seem to be "
-                            "specified in format 'KEY=VALUE'.".format(label))
-                    metadata.labels[k] = v
-            app = Application(
-                self.args.playbook_path, self.args.base_image, self.args.target_image,
-                self.args.builder, metadata
-            )
-            app.build()
-            return 0
+        try:
+            if subcommand == "build":
+                self._build()
+                return 0
+        except KeyboardInterrupt:
+            return 133
+        except Exception as ex:
+            print("There was an error during execution: %s" % ex, file=sys.stderr)
+            return 2
         self.parser.print_help()
         return 1
 
