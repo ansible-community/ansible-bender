@@ -15,7 +15,10 @@ class Application:
         self.a_runner = AnsibleRunner(playbook_path, self.builder)
 
     def build(self):
-        # TODO: clean working container, also make that configurable
         self.builder.create()
-        self.a_runner.build()
-        self.builder.commit()
+        try:
+            self.a_runner.build()
+            self.builder.commit()
+        finally:
+            # TODO: make cleanup configurable
+            self.builder.clean()

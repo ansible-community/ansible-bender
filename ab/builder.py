@@ -33,14 +33,16 @@ class Builder:
     def create(self):
         """
         create an environment where the build would take place
-
-        :return:
         """
 
     def commit(self):
         """
         snapshot the artifact and create an image
-        :return:
+        """
+
+    def clean(self):
+        """
+        clean working container
         """
 
 
@@ -160,6 +162,12 @@ class BuildahBuilder(Builder):
 
     def commit(self):
         buildah("commit", [self.ansible_host, self.target_image])
+
+    def clean(self):
+        """
+        clean working container
+        """
+        buildah("rm", [self.ansible_host])
 
 
 BUILDERS = {
