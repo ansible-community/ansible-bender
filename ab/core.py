@@ -26,6 +26,7 @@ def run_playbook(playbook_path, inventory_path, connection, extra_variables=None
                     )]
     cmd_args += [playbook_path]
     logger.debug("%s", " ".join(cmd_args))
+    # TODO: pick up output from ansible and "make it easy to be processed"
     subprocess.check_call(cmd_args)
 
 
