@@ -8,7 +8,7 @@ import subprocess
 
 import pytest
 
-from ab.builder import buildah, buildah_with_output, inspect_buildah_resource
+from ab.builder import buildah, inspect_buildah_resource
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(os.path.dirname(this_dir))
@@ -34,6 +34,7 @@ def ab(args):
 def test_build_basic_image():
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
     # TODO: make sure the image is present or pull it
+    # TODO: pick smaller image
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", basic_playbook_path, base_image, target_image]
@@ -70,3 +71,20 @@ def test_build_basic_image_with_wrong_env_vars():
         e = ("Environment variable {} doesn't seem to be "
              "specified in format 'KEY=VALUE'.".format(la_la_la))
         assert e in exc.value.message
+
+
+def test_build_basic_image_with_labels():
+    a_b = "A=B"
+    x_y = "x=y"
+    basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
+    # TODO: make sure the image is present or pull it
+    base_image = "registry.fedoraproject.org/fedora:28"
+    target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
+    cmd = ["build", "-l", a_b, x_y, "--",
+           basic_playbook_path, base_image, target_image]
+    ab(cmd)
+    out = inspect_buildah_resource("image", target_image)
+    assert out["OCIv1"]["config"]["Labels"]["A"] == "B"
+    assert out["OCIv1"]["config"]["Labels"]["x"] == "y"
+    # TODO: also run container and make sure that the env var is set inside the container
+    buildah("rmi", [target_image])

@@ -65,8 +65,14 @@ class CLI:
         # docker allows -e KEY and it is inherited from the current env
         self.build_parser.add_argument(
             "-e", "--env-var",
-            help="add environment variable to the metadata of the image, "
+            help="add an environment variable to the metadata of the image, "
                  "should be specified as 'KEY=VALUE'",
+            nargs="*"
+        )
+        self.build_parser.add_argument(
+            "-l", "--label",
+            help="add a label to the metadata of the image, "
+                 "should be specified as 'key=value'",
             nargs="*"
         )
         self.build_parser.set_defaults(subcommand="build")
@@ -89,6 +95,15 @@ class CLI:
                             "Environment variable {} doesn't seem to be " 
                             "specified in format 'KEY=VALUE'.".format(e_v))
                     metadata.env_vars[k] = v
+            if self.args.label:
+                for label in self.args.label:
+                    try:
+                        k, v = label.split("=", 1)
+                    except ValueError:
+                        raise RuntimeError(
+                            "Label variable {} doesn't seem to be "
+                            "specified in format 'KEY=VALUE'.".format(label))
+                    metadata.labels[k] = v
             app = Application(
                 self.args.playbook_path, self.args.base_image, self.args.target_image,
                 self.args.builder, metadata

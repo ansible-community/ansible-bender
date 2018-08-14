@@ -93,13 +93,14 @@ def create_buildah_container(container_image, container_name):
     buildah("from", args)
 
 
-def configure_buildah_container(container_name,
-                                working_dir=None, env_vars=None, user=None, volumes=None):
+def configure_buildah_container(container_name, working_dir=None, env_vars=None,
+                                labels=None, user=None, volumes=None):
     """
     apply metadata on the container so they get inherited in an image
 
     :param container_name: name of the container to work in
     :param working_dir:
+    :param labels: dict with labels
     :param env_vars: dict with env vars
     :param user:
     :param volumes:
@@ -110,6 +111,9 @@ def configure_buildah_container(container_name,
     if env_vars:
         for k, v in env_vars.items():
             config_args += ["-e", "%s=%s" % (k, v)]
+    if labels:
+        for k, v in labels.items():
+            config_args += ["-l", "%s=%s" % (k, v)]
     if volumes:
         for v in volumes:
             config_args += ["-v", v]
@@ -151,7 +155,7 @@ class BuildahBuilder(Builder):
         # let's apply configuration before execing the playbook
         configure_buildah_container(
             self.ansible_host, working_dir=None, env_vars=self.image_metadata.env_vars,
-            user=self.image_metadata.user
+            labels=self.image_metadata.labels, user=self.image_metadata.user
         )
 
     def commit(self):

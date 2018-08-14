@@ -23,7 +23,7 @@ care only about image builds.
 * [ ] You can build images with docker
 * [ ] You can set basic metadata:
   * [x] env vars
-  * [ ] labels
+  * [x] labels
   * [ ] user
   * [ ] cmd
 * [ ] You can do volume mounts during build
