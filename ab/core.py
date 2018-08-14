@@ -35,6 +35,7 @@ class AnsibleRunner:
     Run ansible on provided artifact using the Builder interface
     """
 
+    # TODO: try to find the python interpreter inside
     def __init__(self, playbook_path, builder, python_interpreter="/usr/bin/python3"):
         self.pb = playbook_path
         self.builder = builder

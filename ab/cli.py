@@ -47,18 +47,30 @@ def set_logging(
 
 class CLI:
     def __init__(self):
-        # TODO: fill in desc and help
         self.parser = argparse.ArgumentParser(
             prog='ab',
-            description='ansible builder',
+            description='Ansible builder = ansible-playbook + {buildah,docker}  '
+                        '# create your container images with Ansible! ',
             epilog="Please use '--' to separate options and arguments."
         )
         self.parser.add_argument("-v", "--verbose", action="store_true")
-        subparsers = self.parser.add_subparsers(help='commands')
-        self.build_parser = subparsers.add_parser(name="build")
-        self.build_parser.add_argument("playbook_path")
-        self.build_parser.add_argument("base_image")
-        self.build_parser.add_argument("target_image")
+        subparsers = self.parser.add_subparsers( help='commands')
+        self.build_parser = subparsers.add_parser(
+            name="build",
+            epilog="Please use '--' to separate options and arguments."
+        )
+        self.build_parser.add_argument(
+            "playbook_path", metavar="PLAYBOOK_PATH",
+            help="path to Ansible playbook"
+        )
+        self.build_parser.add_argument(
+            "base_image", metavar="BASE_IMAGE",
+            help="name of a container image to use as a base"
+        )
+        self.build_parser.add_argument(
+            "target_image", metavar="TARGET_IMAGE",
+            help="name of the built container image"
+        )
         self.build_parser.add_argument("--builder", help="pick preferred builder backend",
                                        default="buildah",
                                        choices=["docker", "buildah"])
