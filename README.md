@@ -10,7 +10,7 @@ by ansible-container tool: the main distinction is that ansible-container
 covers the complete lifecycle of a containerized application while ab takes
 care only about image builds.
 
-** Please note that this project is not affiliated with Ansible project. It's just using Ansible to do something magical. **
+**Please note that this project is not affiliated with Ansible project. It's just using Ansible to do something magical.**
 
 
 ## Installation
