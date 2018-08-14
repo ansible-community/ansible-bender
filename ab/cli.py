@@ -53,17 +53,20 @@ class CLI:
         self.build_parser.add_argument("playbook_path")
         self.build_parser.add_argument("base_image")
         self.build_parser.add_argument("target_image")
+        self.build_parser.set_defaults(subcommand="build")
         self.args = self.parser.parse_args()
         if self.args.verbose:
             set_logging(level=logging.DEBUG)
 
     def run(self):
-        # TODO: respect subcommand
-        app = Application(
-            self.args.playbook_path, self.args.base_image, self.args.target_image)
-        app.build()
-
-        return 0
+        subcommand = getattr(self.args, "subcommand", "nope")
+        if subcommand == "build":
+            app = Application(
+                self.args.playbook_path, self.args.base_image, self.args.target_image)
+            app.build()
+            return 0
+        self.parser.print_help()
+        return 1
 
 
 if __name__ == '__main__':
