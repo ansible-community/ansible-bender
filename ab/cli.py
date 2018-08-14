@@ -7,6 +7,7 @@ import logging
 import sys
 
 from ab.api import Application
+from ab.builder import ImageMetadata
 
 
 def set_logging(
@@ -47,7 +48,11 @@ def set_logging(
 class CLI:
     def __init__(self):
         # TODO: fill in desc and help
-        self.parser = argparse.ArgumentParser(prog='ab', description='ansible builder')
+        self.parser = argparse.ArgumentParser(
+            prog='ab',
+            description='ansible builder',
+            epilog="Please use '--' to separate options and arguments."
+        )
         self.parser.add_argument("-v", "--verbose", action="store_true")
         subparsers = self.parser.add_subparsers(help='commands')
         self.build_parser = subparsers.add_parser(name="build")
@@ -57,6 +62,13 @@ class CLI:
         self.build_parser.add_argument("--builder", help="pick preferred builder backend",
                                        default="buildah",
                                        choices=["docker", "buildah"])
+        # docker allows -e KEY and it is inherited from the current env
+        self.build_parser.add_argument(
+            "-e", "--env-var",
+            help="add environment variable to the metadata of the image, "
+                 "should be specified as 'KEY=VALUE'",
+            nargs="*"
+        )
         self.build_parser.set_defaults(subcommand="build")
         self.args = self.parser.parse_args()
         if self.args.verbose:
@@ -64,10 +76,22 @@ class CLI:
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
+        # FIXME UX: catch ^c
+        # FIXME: catch exc unless debug
         if subcommand == "build":
+            metadata = ImageMetadata()
+            if self.args.env_var:
+                for e_v in self.args.env_var:
+                    try:
+                        k, v = e_v.split("=", 1)
+                    except ValueError:
+                        raise RuntimeError(
+                            "Environment variable {} doesn't seem to be " 
+                            "specified in format 'KEY=VALUE'.".format(e_v))
+                    metadata.env_vars[k] = v
             app = Application(
                 self.args.playbook_path, self.args.base_image, self.args.target_image,
-                self.args.builder
+                self.args.builder, metadata
             )
             app.build()
             return 0

@@ -21,7 +21,11 @@ care only about image builds.
 
 * [x] You can build images with buildah
 * [ ] You can build images with docker
-* [ ] You can set basic metadata: env vars, labels, user, cmd
+* [ ] You can set basic metadata:
+  * [x] env vars
+  * [ ] labels
+  * [ ] user
+  * [ ] cmd
 * [ ] You can do volume mounts during build
 * [ ] README
 * [x] Functional tests
