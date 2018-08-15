@@ -27,7 +27,7 @@ while ab takes care of image builds only.
   * [x] labels
   * [ ] user
   * [ ] cmd
-* [ ] You can do volume mounts during build
+* [x] You can do volume mounts during build
 * [ ] README
 * [x] Functional tests
 * [ ] python packaging

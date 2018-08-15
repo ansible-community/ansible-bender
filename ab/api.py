@@ -14,8 +14,13 @@ class Application:
         self.builder = get_builder(builder_name)(base_image, target_image, metadata)
         self.a_runner = AnsibleRunner(playbook_path, self.builder)
 
-    def build(self):
-        self.builder.create()
+    def build(self, build_volumes=None):
+        """
+        build container image
+
+        :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
+        """
+        self.builder.create(build_volumes=build_volumes)
         try:
             self.a_runner.build()
             self.builder.commit()

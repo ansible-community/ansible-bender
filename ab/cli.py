@@ -45,6 +45,22 @@ def set_logging(
     return logger
 
 
+def split_once_or_fail_with(strink, pattern, error_message):
+    """
+    split selected string (string is a builtin, hence strink) using the given pattern;
+    raise RuntimeError with provided error message if that fails
+
+    :param strink: str, string to split
+    :param pattern: str, pattern to split on
+    :param error_message: str, error message to raise in case of split fails
+    :return: (str, str)
+    """
+    try:
+        return strink.split(pattern, 1)
+    except ValueError:
+        raise RuntimeError(error_message)
+
+
 class CLI:
     def __init__(self):
         self.parser = argparse.ArgumentParser(
@@ -88,6 +104,12 @@ class CLI:
                  "should be specified as 'key=value'",
             nargs="*"
         )
+        self.build_parser.add_argument(
+            "-v", "--build-volume",
+            help="mount selected directory inside the container during build, "
+                 "should be specified as '/host/dir:/container/dir'",
+            nargs="*"
+        )
         self.build_parser.set_defaults(subcommand="build")
         self.args = self.parser.parse_args()
         if self.args.verbose:
@@ -99,27 +121,21 @@ class CLI:
         metadata = ImageMetadata()
         if self.args.env_var:
             for e_v in self.args.env_var:
-                try:
-                    k, v = e_v.split("=", 1)
-                except ValueError:
-                    raise RuntimeError(
-                        "Environment variable {} doesn't seem to be "
-                        "specified in format 'KEY=VALUE'.".format(e_v))
+                err_msg = "Environment variable {} doesn't seem to be " + \
+                    "specified in format 'KEY=VALUE'.".format(e_v)
+                k, v = split_once_or_fail_with(e_v, "=", err_msg)
                 metadata.env_vars[k] = v
         if self.args.label:
             for label in self.args.label:
-                try:
-                    k, v = label.split("=", 1)
-                except ValueError:
-                    raise RuntimeError(
-                        "Label variable {} doesn't seem to be "
-                        "specified in format 'KEY=VALUE'.".format(label))
+                err_msg = "Label variable {} doesn't seem to be " + \
+                    "specified in format 'KEY=VALUE'.".format(label)
+                k, v = split_once_or_fail_with(label, "=", err_msg)
                 metadata.labels[k] = v
         app = Application(
             self.args.playbook_path, self.args.base_image, self.args.target_image,
             self.args.builder, metadata
         )
-        app.build()
+        app.build(build_volumes=self.args.build_volume)
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")

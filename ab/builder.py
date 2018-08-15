@@ -30,9 +30,9 @@ class Builder:
         self.ansible_host = None
         self.image_metadata = metadata
 
-    def create(self):
+    def create(self, build_volumes=None):
         """
-        create an environment where the build would take place
+        :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
 
     def commit(self):
@@ -83,14 +83,18 @@ def pull_image(container_image):
     return get_image_id(container_image)
 
 
-def create_buildah_container(container_image, container_name):
+def create_buildah_container(container_image, container_name, build_volumes=None):
     """
     Create new buildah container according to spec.
 
     :param container_image: name of the image
     :param container_name: name of the container to work in
+    :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
     """
-    args = ["--name", container_name, container_image]
+    args = []
+    if build_volumes:
+        args += ["-v"] + build_volumes
+    args += ["--name", container_name, container_image]
     # will pull the image by default if it's not present in buildah's storage
     buildah("from", args)
 
@@ -150,10 +154,13 @@ class BuildahBuilder(Builder):
         self.target_image = target_image
         self.ansible_host = target_image + "-cont"
 
-    def create(self):
+    def create(self, build_volumes=None):
+        """
+        :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
+        """
         # FIXME: pick a container name which does not exist
         # TODO: pull image if not present
-        create_buildah_container(self.name, self.ansible_host)
+        create_buildah_container(self.name, self.ansible_host, build_volumes=build_volumes)
         # let's apply configuration before execing the playbook
         configure_buildah_container(
             self.ansible_host, working_dir=None, env_vars=self.image_metadata.env_vars,

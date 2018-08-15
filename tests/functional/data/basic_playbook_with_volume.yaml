@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+  - name: Stat a file in volume
+    stat:
+      path: /asdqwe/file.txt
