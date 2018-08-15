@@ -38,3 +38,5 @@ while ab takes care of image builds only.
 
 * [ ] Explicit layering
 * [ ] Explicit caching
+* [ ] A fancy name!
+* [ ] You can build images with podman (needs Ansible connection plugin for podman)
