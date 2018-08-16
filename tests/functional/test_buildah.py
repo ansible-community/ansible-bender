@@ -8,7 +8,7 @@ import subprocess
 
 import pytest
 
-from ab.builder import buildah, inspect_buildah_resource
+from ab.builders.buildah_builder import buildah, inspect_buildah_resource
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(os.path.dirname(this_dir))

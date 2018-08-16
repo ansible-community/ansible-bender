@@ -7,7 +7,7 @@ import logging
 import sys
 
 from ab.api import Application
-from ab.builder import ImageMetadata
+from ab.builders.base import ImageMetadata
 
 
 def set_logging(
