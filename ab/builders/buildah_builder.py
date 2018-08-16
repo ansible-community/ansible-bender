@@ -19,7 +19,7 @@ def inspect_buildah_resource(resource_type, resource_id):
     return metadata
 
 
-def get_image_id(container_image):
+def get_buildah_image_id(container_image):
     metadata = inspect_buildah_resource(container_image, "image")
     return graceful_get(metadata, "image-id")
 
@@ -105,7 +105,6 @@ class BuildahBuilder(Builder):
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
         # FIXME: pick a container name which does not exist
-        # TODO: pull image if not present
         create_buildah_container(self.name, self.ansible_host, build_volumes=build_volumes)
         # let's apply configuration before execing the playbook
         configure_buildah_container(
@@ -122,4 +121,15 @@ class BuildahBuilder(Builder):
         """
         buildah("rm", [self.ansible_host])
 
+    def is_image_present(self, image_reference):
+        """
+        :return: True when the selected image is present, False otherwise
+        """
+        return bool(get_buildah_image_id(image_reference))
 
+    def pull(self):
+        """
+        pull base image
+        """
+        logger.info("pull base image: %s", self.name)
+        pull_image(self.name)

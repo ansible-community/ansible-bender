@@ -20,6 +20,8 @@ class Application:
 
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
+        if not self.builder.is_base_image_present():
+            self.builder.pull()
         self.builder.create(build_volumes=build_volumes)
         try:
             self.a_runner.build()

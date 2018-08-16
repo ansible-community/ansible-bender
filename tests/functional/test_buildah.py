@@ -33,8 +33,7 @@ def ab(args):
 
 def test_build_basic_image():
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    # TODO: make sure the image is present or pull it
-    # TODO: pick smaller image
+    # TODO: pick smaller image: python3 & alpine
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", basic_playbook_path, base_image, target_image]
@@ -47,7 +46,6 @@ def test_build_basic_image_with_env_vars():
     a_b = "A=B"
     x_y = "X=Y"
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    # TODO: make sure the image is present or pull it
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "-e", a_b, x_y, "--",
@@ -78,7 +76,6 @@ def test_build_basic_image_with_labels():
     a_b = "A=B"
     x_y = "x=y"
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    # TODO: make sure the image is present or pull it
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "-l", a_b, x_y, "--",
@@ -98,7 +95,6 @@ def test_build_basic_image_with_build_volumes(tmpdir):
     container_mount = "/asdqwe"
     vol_spec = "%s:%s" % (real_tmp, container_mount)
     basic_playbook_path = os.path.join(data_dir, "basic_playbook_with_volume.yaml")
-    # TODO: make sure the image is present or pull it
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "-v", vol_spec, "--",

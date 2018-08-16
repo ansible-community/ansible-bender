@@ -38,3 +38,19 @@ class Builder:
         """
         clean working container
         """
+
+    def is_image_present(self, image_reference):
+        """
+        :return: True when the selected image is present, False otherwise
+        """
+
+    def is_base_image_present(self):
+        """
+        :return: True when the base image is present, False otherwise
+        """
+        return self.is_image_present(self.name)
+
+    def pull(self):
+        """
+        pull base image
+        """
