@@ -22,11 +22,13 @@ while ab takes care of image builds only.
 
 * [x] You can build images with buildah
 * [ ] You can build images with docker
-* [ ] You can set basic metadata:
+* [x] You can set basic metadata:
+  * [x] work dir
   * [x] env vars
   * [x] labels
-  * [ ] user
-  * [ ] cmd
+  * [x] user
+  * [x] cmd
+  * [x] ports
 * [x] You can do volume mounts during build
 * [ ] README
 * [x] Functional tests

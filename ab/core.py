@@ -8,16 +8,18 @@ import shutil
 logger = logging.getLogger(__name__)
 
 
-def run_playbook(playbook_path, inventory_path, connection, extra_variables=None,
+def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
                  ansible_args=None, debug=False):
     # TODO: make sure a-p is present on system
     cmd_args = [
         "ansible-playbook",
         "-i", inventory_path,
         "-c", connection,
+
     ]
-    if debug:
-        cmd_args += ["-vvvvv"]
+    # TODO: implement this
+    # if debug:
+    cmd_args += ["-vvvvv"]
     if extra_variables:
         cmd_args += ["--extra-vars"] + \
                     [" ".join(
@@ -27,7 +29,11 @@ def run_playbook(playbook_path, inventory_path, connection, extra_variables=None
     cmd_args += [playbook_path]
     logger.debug("%s", " ".join(cmd_args))
     # TODO: pick up output from ansible and "make it easy to be processed"
-    subprocess.check_call(cmd_args)
+    subprocess.check_call(
+        cmd_args,
+        # FIXME: fails with 'exec: \"runc\": executable file not found in $PATH'
+        # env={"ANSIBLE_CONFIG": a_cfg_path}
+    )
 
 
 class AnsibleRunner:
@@ -50,6 +56,16 @@ class AnsibleRunner:
             )
         )
 
+    def _create_ansible_cfg(self, fd):
+        fd.write(
+            """
+            [defaults]
+            retry_files_enabled = False
+            # when user is changed, ansible might not be able to write to /.ansible
+            remote_tmp = /tmp
+            """
+        )
+
     def build(self):
         """
         perform the build
@@ -61,6 +77,9 @@ class AnsibleRunner:
             inv_path = os.path.join(tmp, "inventory")
             with open(inv_path, "w") as fd:
                 self._create_inventory_file(fd)
-            run_playbook(self.pb, inv_path, self.builder.ansible_connection)
+            a_cfg_path = os.path.join(tmp, "ansible.cfg")
+            with open(a_cfg_path, "w") as fd:
+                self._create_ansible_cfg(fd)
+            run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection)
         finally:
             shutil.rmtree(tmp)

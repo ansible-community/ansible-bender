@@ -20,13 +20,12 @@ def inspect_buildah_resource(resource_type, resource_id):
 
 
 def get_buildah_image_id(container_image):
-    metadata = inspect_buildah_resource(container_image, "image")
-    return graceful_get(metadata, "image-id")
+    metadata = inspect_buildah_resource("image", container_image)
+    return graceful_get(metadata, "FromImageID")
 
 
-def pull_image(container_image):
+def pull_buildah_image(container_image):
     subprocess.check_call(["podman", "pull", container_image])
-    return get_image_id(container_image)
 
 
 def create_buildah_container(container_image, container_name, build_volumes=None):
@@ -46,16 +45,19 @@ def create_buildah_container(container_image, container_name, build_volumes=None
 
 
 def configure_buildah_container(container_name, working_dir=None, env_vars=None,
-                                labels=None, user=None, volumes=None):
+                                labels=None, user=None, cmd=None, ports=None, volumes=None):
     """
     apply metadata on the container so they get inherited in an image
 
     :param container_name: name of the container to work in
-    :param working_dir:
+    :param working_dir: str, path to a working directory within container image
     :param labels: dict with labels
     :param env_vars: dict with env vars
-    :param user:
-    :param volumes:
+    :param cmd: str, command to run by default in the container
+    :param user: str, username or uid; the container gets invoked with this user by default
+    :param ports: list of str, ports to expose from container by default
+    :param volumes: list of str; paths within the container which has data stored outside
+                    of the container
     """
     config_args = []
     if working_dir:
@@ -66,11 +68,16 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     if labels:
         for k, v in labels.items():
             config_args += ["-l", "%s=%s" % (k, v)]
+    if user:
+        config_args += ["--user", user]
+    if cmd:
+        config_args += ["--cmd", cmd]
+    if ports:
+        for p in ports:
+            config_args += ["-p", p]
     if volumes:
         for v in volumes:
             config_args += ["-v", v]
-    if user:
-        config_args += ["--user", user]
     if config_args:
         buildah("config", config_args + [container_name])
     return container_name
@@ -106,13 +113,22 @@ class BuildahBuilder(Builder):
         """
         # FIXME: pick a container name which does not exist
         create_buildah_container(self.name, self.ansible_host, build_volumes=build_volumes)
-        # let's apply configuration before execing the playbook
+        # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
-            self.ansible_host, working_dir=None, env_vars=self.image_metadata.env_vars,
-            labels=self.image_metadata.labels, user=self.image_metadata.user
+            self.ansible_host, working_dir=self.image_metadata.working_dir,
+            env_vars=self.image_metadata.env_vars,
+            ports=self.image_metadata.ports,
         )
 
     def commit(self):
+        if self.image_metadata.user:
+            # change user if needed
+            configure_buildah_container(
+                self.ansible_host, user=self.image_metadata.user,
+                cmd=self.image_metadata.cmd,
+                volumes=self.image_metadata.volumes,
+                labels=self.image_metadata.labels,
+            )
         buildah("commit", [self.ansible_host, self.target_image])
 
     def clean(self):
@@ -132,4 +148,4 @@ class BuildahBuilder(Builder):
         pull base image
         """
         logger.info("pull base image: %s", self.name)
-        pull_image(self.name)
+        pull_buildah_image(self.name)

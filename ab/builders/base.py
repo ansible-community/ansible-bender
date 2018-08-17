@@ -4,11 +4,24 @@ Base class for builders
 
 
 class ImageMetadata:
+    """
+    working_dir: str, path to a working directory within container image
+    labels: dict with labels
+    env_vars: dict with env vars
+    cmd: str, command to run by default in the container
+    user: str, username or uid; the container gets invoked with this user by default
+    ports: list of str, ports to expose from container by default
+    volumes: list of str; paths within the container which has data stored outside
+             of the container
+    """
     def __init__(self):
-        self.env_vars = {}
+        self.working_dir = None
         self.labels = {}
+        self.env_vars = {}
+        self.cmd = None
         self.user = None
-        self.command = []
+        self.ports = []
+        self.volumes = []
 
 
 class Builder:

@@ -84,7 +84,6 @@ def test_build_basic_image_with_labels():
     out = inspect_buildah_resource("image", target_image)
     assert out["OCIv1"]["config"]["Labels"]["A"] == "B"
     assert out["OCIv1"]["config"]["Labels"]["x"] == "y"
-    # TODO: also run container and make sure that the env var is set inside the container
     buildah("rmi", [target_image])
 
 
@@ -101,3 +100,44 @@ def test_build_basic_image_with_build_volumes(tmpdir):
            basic_playbook_path, base_image, target_image]
     ab(cmd)
     buildah("rmi", [target_image])
+
+
+def test_build_basic_image_with_all_params(tmpdir):
+    workdir_path = "/etc"
+    l_a_b = "A=B"
+    l_x_y = "x=y"
+    e_a_b = "A=B"
+    e_x_y = "X=Y"
+    cmd, cmd_e = "ls -lha", ["ls", "-lha"]
+    user = "1000123"
+    p_80, p_443 = "80", "443"
+    runtime_volume = "/var/lib/asdqwe"
+    basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
+    base_image = "registry.fedoraproject.org/fedora:28"
+    target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
+    cmd = ["build", "-v",
+           "-w", workdir_path,
+           "-l", l_a_b, l_x_y,
+           "-e", e_a_b, e_x_y,
+           "--cmd", cmd,
+           "-u", user,
+           "-p", p_80, p_443,
+           "--runtime-volumes", runtime_volume,
+           "--",
+           basic_playbook_path, base_image, target_image]
+    ab(cmd)
+    try:
+        out = inspect_buildah_resource("image", target_image)
+        co = out["OCIv1"]["config"]
+        assert co["WorkingDir"] == workdir_path
+        assert co["Labels"]["A"] == "B"
+        assert co["Labels"]["x"] == "y"
+        assert e_a_b in co["Env"]
+        assert e_x_y in co["Env"]
+        assert co["Cmd"] == cmd_e
+        assert co["User"] == user
+        assert p_80 in co["ExposedPorts"]
+        assert p_443 in co["ExposedPorts"]
+        # assert runtime_volume in co["Volumes"]  # FIXME: figure out how to check this
+    finally:
+        buildah("rmi", [target_image])

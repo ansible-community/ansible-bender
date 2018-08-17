@@ -91,23 +91,45 @@ class CLI:
         self.build_parser.add_argument("--builder", help="pick preferred builder backend",
                                        default="buildah",
                                        choices=["docker", "buildah"])
+        self.build_parser.add_argument(
+            "-v", "--build-volumes",
+            help="mount selected directory inside the container during build, "
+                 "should be specified as '/host/dir:/container/dir'",
+            nargs="*"
+        )
+        self.build_parser.add_argument(
+            "-w", "--workdir",
+            help="path to an implicit working directory in the container"
+        )
+        self.build_parser.add_argument(
+            "-l", "--labels",
+            help="add a label to the metadata of the image, "
+                 "should be specified as 'key=value'",
+            nargs="*"
+        )
         # docker allows -e KEY and it is inherited from the current env
         self.build_parser.add_argument(
-            "-e", "--env-var",
+            "-e", "--env-vars",
             help="add an environment variable to the metadata of the image, "
                  "should be specified as 'KEY=VALUE'",
             nargs="*"
         )
         self.build_parser.add_argument(
-            "-l", "--label",
-            help="add a label to the metadata of the image, "
-                 "should be specified as 'key=value'",
+            "--cmd",
+            help="command to run by default in the container"
+        )
+        self.build_parser.add_argument(
+            "-u", "--user",
+            help="the container gets invoked with this user by default"
+        )
+        self.build_parser.add_argument(
+            "-p", "--ports",
+            help="ports to expose from container by default",
             nargs="*"
         )
         self.build_parser.add_argument(
-            "-v", "--build-volume",
-            help="mount selected directory inside the container during build, "
-                 "should be specified as '/host/dir:/container/dir'",
+            "--runtime-volumes",
+            help="path a directory which has daata stored outside of the container",
             nargs="*"
         )
         self.build_parser.set_defaults(subcommand="build")
@@ -119,23 +141,33 @@ class CLI:
 
     def _build(self):
         metadata = ImageMetadata()
-        if self.args.env_var:
-            for e_v in self.args.env_var:
+        if self.args.workdir:
+            metadata.working_dir = self.args.workdir
+        if self.args.labels:
+            for label in self.args.labels:
+                err_msg = "Label variable {} doesn't seem to be " + \
+                          "specified in format 'KEY=VALUE'.".format(label)
+                k, v = split_once_or_fail_with(label, "=", err_msg)
+                metadata.labels[k] = v
+        if self.args.env_vars:
+            for e_v in self.args.env_vars:
                 err_msg = "Environment variable {} doesn't seem to be " + \
                     "specified in format 'KEY=VALUE'.".format(e_v)
                 k, v = split_once_or_fail_with(e_v, "=", err_msg)
                 metadata.env_vars[k] = v
-        if self.args.label:
-            for label in self.args.label:
-                err_msg = "Label variable {} doesn't seem to be " + \
-                    "specified in format 'KEY=VALUE'.".format(label)
-                k, v = split_once_or_fail_with(label, "=", err_msg)
-                metadata.labels[k] = v
+        if self.args.cmd:
+            metadata.cmd = self.args.cmd
+        if self.args.user:
+            metadata.user = self.args.user
+        if self.args.ports:
+            metadata.ports = self.args.ports
+        if self.args.runtime_volumes:
+            metadata.volumes = self.args.runtime_volumes
         app = Application(
             self.args.playbook_path, self.args.base_image, self.args.target_image,
             self.args.builder, metadata
         )
-        app.build(build_volumes=self.args.build_volume)
+        app.build(build_volumes=self.args.build_volumes)
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
