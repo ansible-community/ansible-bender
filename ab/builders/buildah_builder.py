@@ -26,6 +26,16 @@ def get_buildah_image_id(container_image):
 def pull_buildah_image(container_image):
     run_cmd(["podman", "pull", container_image])
 
+def podman_run_cmd(container_image, cmd):
+    """
+    run provided command in selected container image using podman; raise exc when command fails
+
+    :param container_image: str
+    :param cmd: list of str
+    :return: stdout output
+    """
+    return run_cmd(["podman", "run", "--rm", container_image] + cmd, return_output=True)
+
 
 def create_buildah_container(container_image, container_name, build_volumes=None):
     """
@@ -149,3 +159,24 @@ class BuildahBuilder(Builder):
         """
         logger.info("pull base image: %s", self.name)
         pull_buildah_image(self.name)
+
+    def find_python_interpreter(self):
+        """
+        find python executable in the base image, order:
+         * /usr/bin/python3
+         * /usr/bin/python2
+         * /usr/bin/python
+
+        :return: str, path to python interpreter
+        """
+        for i in self.python_interpr_prio:
+            cmd = ["ls", i]
+            try:
+                podman_run_cmd(self.name, cmd)
+            except subprocess.CalledProcessError:
+                logger.info("python interpreter %s does not exist", i)
+                continue
+            else:
+                logger.info("using python interpreter %s", i)
+                return i
+        raise RuntimeError("no python interpreter found in image %s" % self.name)

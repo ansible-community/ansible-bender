@@ -38,6 +38,14 @@ class Builder:
         self.ansible_host = None
         self.image_metadata = metadata
         self.debug = debug
+        self.python_interpr_prio = (
+            "/usr/bin/python3",
+            "/usr/local/bin/python3",
+            "/usr/bin/python2",
+            "/usr/local/bin/python2",
+            "/usr/bin/python",
+            "/usr/local/bin/python",
+        )
 
     def create(self, build_volumes=None):
         """
@@ -68,4 +76,11 @@ class Builder:
     def pull(self):
         """
         pull base image
+        """
+
+    def find_python_interpreter(self):
+        """
+        find python executable in the base image, for prio order see constructor
+
+        :return: str, path to python interpreter
         """

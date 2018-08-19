@@ -13,6 +13,7 @@ class Application:
         :param metadata: instance of ImageMetadata
         :param debug: bool, provide debug output if True
         """
+        # TODO: I think people will want to pick python interpreter via CLI
         self.debug = debug
         self.builder = get_builder(builder_name)(base_image, target_image, metadata, debug=debug)
         self.a_runner = AnsibleRunner(playbook_path, self.builder, debug=debug)
@@ -27,7 +28,7 @@ class Application:
             self.builder.pull()
         self.builder.create(build_volumes=build_volumes)
         try:
-            self.a_runner.build()
+            self.a_runner.build(python_interpreter=self.builder.find_python_interpreter())
             self.builder.commit()
         finally:
             # TODO: make cleanup configurable

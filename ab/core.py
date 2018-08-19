@@ -40,23 +40,17 @@ class AnsibleRunner:
     Run ansible on provided artifact using the Builder interface
     """
 
-    # TODO: try to find the python interpreter inside
-    def __init__(self, playbook_path, builder, python_interpreter="/usr/bin/python3",
-                 debug=False):
-        """
-        :param debug: bool, provide debug output if True
-        """
+    def __init__(self, playbook_path, builder, debug=False):
         self.pb = playbook_path
         self.builder = builder
-        self.python_interpreter = python_interpreter
         self.debug = debug
 
-    def _create_inventory_file(self, fd):
+    def _create_inventory_file(self, fd, python_interpreter):
         fd.write(
             '%s ansible_connection="%s" ansible_python_interpreter="%s"\n' % (
                 self.builder.ansible_host,
                 self.builder.ansible_connection,
-                self.python_interpreter
+                python_interpreter
             )
         )
 
@@ -70,7 +64,7 @@ class AnsibleRunner:
             """
         )
 
-    def build(self):
+    def build(self, python_interpreter="/usr/bin/python3"):
         """
         perform the build
 
@@ -80,7 +74,7 @@ class AnsibleRunner:
         try:
             inv_path = os.path.join(tmp, "inventory")
             with open(inv_path, "w") as fd:
-                self._create_inventory_file(fd)
+                self._create_inventory_file(fd, python_interpreter)
             a_cfg_path = os.path.join(tmp, "ansible.cfg")
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
