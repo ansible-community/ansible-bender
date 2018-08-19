@@ -17,9 +17,8 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
         "-c", connection,
 
     ]
-    # TODO: implement this
-    # if debug:
-    cmd_args += ["-vvvvv"]
+    if debug:
+        cmd_args += ["-vvvvv"]
     if extra_variables:
         cmd_args += ["--extra-vars"] + \
                     [" ".join(
@@ -42,10 +41,15 @@ class AnsibleRunner:
     """
 
     # TODO: try to find the python interpreter inside
-    def __init__(self, playbook_path, builder, python_interpreter="/usr/bin/python3"):
+    def __init__(self, playbook_path, builder, python_interpreter="/usr/bin/python3",
+                 debug=False):
+        """
+        :param debug: bool, provide debug output if True
+        """
         self.pb = playbook_path
         self.builder = builder
         self.python_interpreter = python_interpreter
+        self.debug = debug
 
     def _create_inventory_file(self, fd):
         fd.write(
@@ -80,6 +84,7 @@ class AnsibleRunner:
             a_cfg_path = os.path.join(tmp, "ansible.cfg")
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
-            run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection)
+            run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
+                         debug=self.debug)
         finally:
             shutil.rmtree(tmp)

@@ -28,14 +28,16 @@ class Builder:
     ansible_connection = "default-value"
     name = "default-value"
 
-    def __init__(self, name, metadata):
+    def __init__(self, name, metadata, debug=False):
         """
         :param name: name of the base image
         :param metadata: instance of ImageMetadata
+        :param debug: bool, provide debug output if True
         """
         self.name = name
         self.ansible_host = None
         self.image_metadata = metadata
+        self.debug = debug
 
     def create(self, build_volumes=None):
         """

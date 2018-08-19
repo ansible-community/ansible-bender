@@ -101,8 +101,8 @@ class BuildahBuilder(Builder):
     ansible_connection = "buildah"
     name = "buildah"
 
-    def __init__(self, base_image, target_image, metadata):
-        super().__init__(base_image, metadata)
+    def __init__(self, base_image, target_image, metadata, debug=False):
+        super().__init__(base_image, metadata, debug=debug)
         self.target_image = target_image
         self.ansible_host = target_image + "-cont"
 

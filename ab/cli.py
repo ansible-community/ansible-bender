@@ -70,7 +70,9 @@ class CLI:
             epilog="Please use '--' to separate options and arguments."
         )
         self.parser.add_argument("-v", "--verbose", action="store_true",
-                                 help="run verbosely, also print possible tracebacks")
+                                 help="provide verbose output")
+        self.parser.add_argument("--debug", action="store_true",
+                                 help="provide all the output")
         subparsers = self.parser.add_subparsers( help='commands')
         self.build_parser = subparsers.add_parser(
             name="build",
@@ -92,7 +94,7 @@ class CLI:
                                        default="buildah",
                                        choices=["docker", "buildah"])
         self.build_parser.add_argument(
-            "-v", "--build-volumes",
+            "--build-volumes",
             help="mount selected directory inside the container during build, "
                  "should be specified as '/host/dir:/container/dir'",
             nargs="*"
@@ -134,10 +136,12 @@ class CLI:
         )
         self.build_parser.set_defaults(subcommand="build")
         self.args = self.parser.parse_args()
-        if self.args.verbose:
+        if self.args.debug:
             set_logging(level=logging.DEBUG)
-        else:
+        elif self.args.verbose:
             set_logging(level=logging.INFO)
+        else:
+            set_logging(level=logging.WARNING)
 
     def _build(self):
         metadata = ImageMetadata()
@@ -165,7 +169,7 @@ class CLI:
             metadata.volumes = self.args.runtime_volumes
         app = Application(
             self.args.playbook_path, self.args.base_image, self.args.target_image,
-            self.args.builder, metadata
+            self.args.builder, metadata, debug=self.args.debug
         )
         app.build(build_volumes=self.args.build_volumes)
 
@@ -178,6 +182,8 @@ class CLI:
         except KeyboardInterrupt:
             return 133
         except Exception as ex:
+            if self.args.debug:
+                raise
             print("There was an error during execution: %s" % ex, file=sys.stderr)
             return 2
         self.parser.print_help()

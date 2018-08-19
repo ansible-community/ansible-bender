@@ -28,7 +28,7 @@ def ab(args):
 
     :return:
     """
-    cmd = ["python3", "-m", "ab.cli", "-v"]
+    cmd = ["python3", "-m", "ab.cli", "--debug"]
     run_cmd(cmd + args, cwd=project_dir)
 
 
