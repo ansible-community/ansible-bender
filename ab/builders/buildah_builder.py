@@ -3,15 +3,14 @@ import logging
 import subprocess
 
 from ab.builders.base import Builder
-from ab.utils import graceful_get
-
+from ab.utils import graceful_get, run_cmd
 
 logger = logging.getLogger(__name__)
 
 
 def inspect_buildah_resource(resource_type, resource_id):
     try:
-        i = subprocess.check_output(["buildah", "inspect", "-t", resource_type, resource_id])
+        i = run_cmd(["buildah", "inspect", "-t", resource_type, resource_id], return_output=True)
     except subprocess.CalledProcessError:
         logger.info("no such %s %s", resource_type, resource_id)
         return None
@@ -25,7 +24,7 @@ def get_buildah_image_id(container_image):
 
 
 def pull_buildah_image(container_image):
-    subprocess.check_call(["podman", "pull", container_image])
+    run_cmd(["podman", "pull", container_image])
 
 
 def create_buildah_container(container_image, container_name, build_volumes=None):
@@ -87,13 +86,13 @@ def buildah(command, args_and_opts):
     # TODO: make sure buildah command is present on system
     command = ["buildah", command] + args_and_opts
     logger.debug("running command: %s", command)
-    return subprocess.check_call(command)
+    return run_cmd(command)
 
 
 def buildah_with_output(command, args_and_opts):
     command = ["buildah", command] + args_and_opts
     logger.debug("running command: %s", command)
-    output = subprocess.check_output(command)
+    output = run_cmd(command, return_output=True)
     logger.debug("output: %s", output)
     return output
 

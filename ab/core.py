@@ -1,9 +1,9 @@
 import os
 import logging
-import subprocess
 import tempfile
 import shutil
 
+from ab.utils import run_cmd
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +28,8 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
                     )]
     cmd_args += [playbook_path]
     logger.debug("%s", " ".join(cmd_args))
-    # TODO: pick up output from ansible and "make it easy to be processed"
-    subprocess.check_call(
+    # TODO: does ansible have an API?
+    run_cmd(
         cmd_args,
         # FIXME: fails with 'exec: \"runc\": executable file not found in $PATH'
         # env={"ANSIBLE_CONFIG": a_cfg_path}

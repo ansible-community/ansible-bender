@@ -9,6 +9,7 @@ import subprocess
 import pytest
 
 from ab.builders.buildah_builder import buildah, inspect_buildah_resource
+from ab.utils import run_cmd
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(os.path.dirname(this_dir))
@@ -27,8 +28,8 @@ def ab(args):
 
     :return:
     """
-    cmd = ["python3", "-m", "ab.cli"]
-    subprocess.check_call(cmd + args, cwd=project_dir)
+    cmd = ["python3", "-m", "ab.cli", "-v"]
+    run_cmd(cmd + args, cwd=project_dir)
 
 
 def test_build_basic_image():
