@@ -36,6 +36,7 @@ while ab takes care of image builds only.
 * [ ] user experience
   * [ ] print ansible output by default
 * [ ] important TODO/FIXME resolved from code
+  * [ ] check for presence of binaries
 
 
 ## TODO post MVP
