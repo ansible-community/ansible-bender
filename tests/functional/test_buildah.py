@@ -97,7 +97,7 @@ def test_build_basic_image_with_build_volumes(tmpdir):
     basic_playbook_path = os.path.join(data_dir, "basic_playbook_with_volume.yaml")
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
-    cmd = ["build", "-v", vol_spec, "--",
+    cmd = ["build", "--build-volumes", vol_spec, "--",
            basic_playbook_path, base_image, target_image]
     ab(cmd)
     buildah("rmi", [target_image])
@@ -116,7 +116,7 @@ def test_build_basic_image_with_all_params(tmpdir):
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
     base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
-    cmd = ["build", "-v",
+    cmd = ["build",
            "-w", workdir_path,
            "-l", l_a_b, l_x_y,
            "-e", e_a_b, e_x_y,
