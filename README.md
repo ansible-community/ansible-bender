@@ -33,6 +33,8 @@ while ab takes care of image builds only.
 * [ ] README
 * [x] Functional tests
 * [ ] python packaging
+* [ ] user experience
+  * [ ] print ansible output by default
 * [ ] important TODO/FIXME resolved from code
 
 
