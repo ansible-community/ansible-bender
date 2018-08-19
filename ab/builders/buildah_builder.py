@@ -117,6 +117,8 @@ class BuildahBuilder(Builder):
             self.ansible_host, working_dir=self.image_metadata.working_dir,
             env_vars=self.image_metadata.env_vars,
             ports=self.image_metadata.ports,
+            labels=self.image_metadata.labels,  # labels are not applied when they are configured
+                                                # before doing commit
         )
 
     def commit(self):
@@ -126,7 +128,6 @@ class BuildahBuilder(Builder):
                 self.ansible_host, user=self.image_metadata.user,
                 cmd=self.image_metadata.cmd,
                 volumes=self.image_metadata.volumes,
-                labels=self.image_metadata.labels,
             )
         buildah("commit", [self.ansible_host, self.target_image])
 
