@@ -21,7 +21,6 @@ while ab takes care of image builds only.
 ## TODO for MVP
 
 * [x] You can build images with buildah
-* [ ] You can build images with docker
 * [x] You can set basic metadata:
   * [x] work dir
   * [x] env vars
@@ -35,6 +34,7 @@ while ab takes care of image builds only.
 * [ ] python packaging
 * [ ] user experience
   * [ ] print ansible output by default
+  * [ ] tinker default and verbose outputs
 * [ ] important TODO/FIXME resolved from code
   * [ ] check for presence of binaries
 
@@ -45,3 +45,4 @@ while ab takes care of image builds only.
 * [ ] Explicit caching
 * [ ] A fancy name!
 * [ ] You can build images with podman (needs Ansible connection plugin for podman)
+* [ ] You can build images with docker (incubator maybe?)
