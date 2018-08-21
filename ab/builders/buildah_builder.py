@@ -26,6 +26,7 @@ def get_buildah_image_id(container_image):
 def pull_buildah_image(container_image):
     run_cmd(["podman", "pull", container_image])
 
+
 def podman_run_cmd(container_image, cmd):
     """
     run provided command in selected container image using podman; raise exc when command fails
@@ -37,24 +38,26 @@ def podman_run_cmd(container_image, cmd):
     return run_cmd(["podman", "run", "--rm", container_image] + cmd, return_output=True)
 
 
-def create_buildah_container(container_image, container_name, build_volumes=None):
+def create_buildah_container(container_image, container_name, build_volumes=None, debug=False):
     """
     Create new buildah container according to spec.
 
     :param container_image: name of the image
     :param container_name: name of the container to work in
     :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
+    :param debug: bool, make buildah print debug info
     """
     args = []
     if build_volumes:
         args += ["-v"] + build_volumes
     args += ["--name", container_name, container_image]
     # will pull the image by default if it's not present in buildah's storage
-    buildah("from", args)
+    buildah("from", args, debug=debug)
 
 
 def configure_buildah_container(container_name, working_dir=None, env_vars=None,
-                                labels=None, user=None, cmd=None, ports=None, volumes=None):
+                                labels=None, user=None, cmd=None, ports=None, volumes=None,
+                                debug=False):
     """
     apply metadata on the container so they get inherited in an image
 
@@ -67,6 +70,7 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     :param ports: list of str, ports to expose from container by default
     :param volumes: list of str; paths within the container which has data stored outside
                     of the container
+    :param debug: bool, make buildah print debug info
     """
     config_args = []
     if working_dir:
@@ -88,21 +92,25 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
         for v in volumes:
             config_args += ["-v", v]
     if config_args:
-        buildah("config", config_args + [container_name])
+        buildah("config", config_args + [container_name], debug=debug)
     return container_name
 
 
-def buildah(command, args_and_opts):
-    # TODO: make sure buildah command is present on system
-    command = ["buildah", command] + args_and_opts
+def buildah(command, args_and_opts, print_output=False, debug=False):
+    cmd = ["buildah"]
+    if debug:
+        cmd += ["--debug"]
+    cmd += [command] + args_and_opts
     logger.debug("running command: %s", command)
-    return run_cmd(command)
+    return run_cmd(cmd, print_output=print_output)
 
 
-def buildah_with_output(command, args_and_opts):
-    command = ["buildah", command] + args_and_opts
-    logger.debug("running command: %s", command)
-    output = run_cmd(command, return_output=True)
+def buildah_with_output(command, args_and_opts, debug=False):
+    cmd = ["buildah"]
+    if debug:
+        cmd += ["--debug"]
+    cmd += [command] + args_and_opts
+    output = run_cmd(cmd, return_output=True)
     logger.debug("output: %s", output)
     return output
 
@@ -122,7 +130,8 @@ class BuildahBuilder(Builder):
         """
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
-        create_buildah_container(self.name, self.ansible_host, build_volumes=build_volumes)
+        create_buildah_container(
+            self.name, self.ansible_host, build_volumes=build_volumes, debug=self.debug)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
             self.ansible_host, working_dir=self.image_metadata.working_dir,
@@ -130,6 +139,7 @@ class BuildahBuilder(Builder):
             ports=self.image_metadata.ports,
             labels=self.image_metadata.labels,  # labels are not applied when they are configured
                                                 # before doing commit
+            debug=self.debug
         )
 
     def commit(self):
@@ -140,13 +150,14 @@ class BuildahBuilder(Builder):
                 cmd=self.image_metadata.cmd,
                 volumes=self.image_metadata.volumes,
             )
-        buildah("commit", [self.ansible_host, self.target_image])
+        buildah("commit", [self.ansible_host, self.target_image], print_output=True,
+                debug=self.debug)
 
     def clean(self):
         """
         clean working container
         """
-        buildah("rm", [self.ansible_host])
+        buildah("rm", [self.ansible_host], debug=self.debug)
 
     def is_image_present(self, image_reference):
         """

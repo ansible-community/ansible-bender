@@ -6,7 +6,10 @@ import shutil
 import subprocess
 import threading
 
+from ab.constants import OUT_LOGGER
+
 logger = logging.getLogger(__name__)
+out_logger = logging.getLogger(OUT_LOGGER)
 
 
 def graceful_get(d, *keys):
@@ -27,22 +30,25 @@ def graceful_get(d, *keys):
 
 
 class StreamLogger(threading.Thread):
-    def __init__(self, stream):
+    def __init__(self, stream, print_output=False):
         super().__init__(daemon=True)  # the threads should not linger
         self.stream = stream
         self.output = []
+        self.print_output = print_output
 
     def run(self):
         for line in self.stream:
             line = line.rstrip("\n")
             self.output.append(line)
             logger.debug(line)
+            if self.print_output:
+                out_logger.info(line)
 
     def get_output(self):
         return "\n".join(self.output)
 
 
-def run_cmd(cmd, return_output=False, ignore_status=False, **kwargs):
+def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, **kwargs):
     """
     run provided command on host system using the same user as you invoked this code, raises
     subprocess.CalledProcessError if it fails
@@ -52,13 +58,15 @@ def run_cmd(cmd, return_output=False, ignore_status=False, **kwargs):
     :param ignore_status: bool, do not fail in case nonzero return code
     :param kwargs: pass keyword arguments to subprocess.check_* functions; for more info,
             please check `help(subprocess.Popen)`
+    :param print_output: bool, print output via print()
     :return: None or str
     """
-    logger.debug('command: "%s"' % ' '.join(cmd))
+    logger.info('running command: "%s"', cmd)
+    logger.debug('%s', " ".join(cmd))  # so you can easily copy/paste
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, **kwargs)
-    o = StreamLogger(process.stdout)
-    e = StreamLogger(process.stderr)
+    o = StreamLogger(process.stdout, print_output=print_output)
+    e = StreamLogger(process.stderr, print_output=print_output)
     o.start()
     e.start()
     process.wait()

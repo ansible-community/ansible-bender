@@ -8,6 +8,7 @@ import sys
 
 from ab.api import Application
 from ab.builders.base import ImageMetadata
+from ab.constants import OUT_LOGGER_FORMAT, OUT_LOGGER
 
 
 def set_logging(
@@ -140,8 +141,10 @@ class CLI:
             set_logging(level=logging.DEBUG)
         elif self.args.verbose:
             set_logging(level=logging.INFO)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT)
         else:
             set_logging(level=logging.WARNING)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT)
 
     def _build(self):
         metadata = ImageMetadata()

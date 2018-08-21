@@ -33,6 +33,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
         cmd_args,
         # FIXME: fails with 'exec: \"runc\": executable file not found in $PATH'
         # env={"ANSIBLE_CONFIG": a_cfg_path}
+        print_output=True
     )
 
 
@@ -74,12 +75,13 @@ class AnsibleRunner:
         tmp = tempfile.mkdtemp(prefix="ab")
         try:
             inv_path = os.path.join(tmp, "inventory")
+            logger.info("creating inventory file %s", inv_path)
             with open(inv_path, "w") as fd:
                 self._create_inventory_file(fd, python_interpreter)
-            a_cfg_path = os.path.join(tmp, "ansible.cfg")
-            with open(a_cfg_path, "w") as fd:
-                self._create_ansible_cfg(fd)
-            run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
+            # a_cfg_path = os.path.join(tmp, "ansible.cfg")
+            # with open(a_cfg_path, "w") as fd:
+            #     self._create_ansible_cfg(fd)
+            run_playbook(self.pb, inv_path, None, self.builder.ansible_connection,
                          debug=self.debug)
         finally:
             shutil.rmtree(tmp)

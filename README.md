@@ -32,9 +32,9 @@ while ab takes care of image builds only.
 * [ ] README
 * [x] Functional tests
 * [ ] python packaging
-* [ ] user experience
-  * [ ] print ansible output by default
-  * [ ] tinker default and verbose outputs
+* [x] user experience
+  * [x] print ansible output by default
+  * [x] tinker default and verbose outputs
 * [ ] important TODO/FIXME resolved from code
   * [x] check for presence of binaries
 

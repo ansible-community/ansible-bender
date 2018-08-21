@@ -1,5 +1,11 @@
+import logging
+
 from ab.builder import get_builder
+from ab.constants import OUT_LOGGER
 from ab.core import AnsibleRunner
+
+
+out_logger = logging.getLogger(OUT_LOGGER)
 
 
 class Application:
@@ -15,6 +21,7 @@ class Application:
         """
         # TODO: I think people will want to pick python interpreter via CLI
         self.debug = debug
+        self.target_image = target_image
         self.builder = get_builder(builder_name)(base_image, target_image, metadata, debug=debug)
         self.a_runner = AnsibleRunner(playbook_path, self.builder, debug=debug)
 
@@ -30,6 +37,7 @@ class Application:
         try:
             self.a_runner.build(python_interpreter=self.builder.find_python_interpreter())
             self.builder.commit()
+            out_logger.info("Image '%s' was built successfully \o/",  self.target_image)
         finally:
             # TODO: make cleanup configurable
             self.builder.clean()
