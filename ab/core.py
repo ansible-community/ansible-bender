@@ -3,14 +3,15 @@ import logging
 import tempfile
 import shutil
 
-from ab.utils import run_cmd
+from ab.utils import run_cmd, ap_command_exists
+
 
 logger = logging.getLogger(__name__)
 
 
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
                  ansible_args=None, debug=False):
-    # TODO: make sure a-p is present on system
+    ap_command_exists()
     cmd_args = [
         "ansible-playbook",
         "-i", inventory_path,

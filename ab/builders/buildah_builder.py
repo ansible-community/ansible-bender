@@ -3,7 +3,7 @@ import logging
 import subprocess
 
 from ab.builders.base import Builder
-from ab.utils import graceful_get, run_cmd
+from ab.utils import graceful_get, run_cmd, buildah_command_exists, podman_command_exists
 
 logger = logging.getLogger(__name__)
 
@@ -114,13 +114,14 @@ class BuildahBuilder(Builder):
     def __init__(self, base_image, target_image, metadata, debug=False):
         super().__init__(base_image, metadata, debug=debug)
         self.target_image = target_image
+        # FIXME: pick a container name which does not exist
         self.ansible_host = target_image + "-cont"
+        buildah_command_exists()
 
     def create(self, build_volumes=None):
         """
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
-        # FIXME: pick a container name which does not exist
         create_buildah_container(self.name, self.ansible_host, build_volumes=build_volumes)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
@@ -158,6 +159,7 @@ class BuildahBuilder(Builder):
         pull base image
         """
         logger.info("pull base image: %s", self.name)
+        podman_command_exists()
         pull_buildah_image(self.name)
 
     def find_python_interpreter(self):

@@ -2,6 +2,7 @@
 Utility functions. This module can't depend on anything within ab.
 """
 import logging
+import shutil
 import subprocess
 import threading
 
@@ -74,3 +75,50 @@ def run_cmd(cmd, return_output=False, ignore_status=False, **kwargs):
             raise subprocess.CalledProcessError(cmd=cmd, returncode=process.returncode)
     if return_output:
         return o.get_output()
+
+
+class CommandDoesNotExistException(Exception):
+    pass
+
+
+def command_exists(command, exc_msg):
+    """
+    Verify that the provided command exists. Raise CommandDoesNotExistException in case of an
+    error or if the command does not exist.
+
+    :param command: str, command to check (python 3 only)
+    :param exc_msg: str, message of exception when command does not exist
+    :return: bool, True if everything's all right (otherwise exception is thrown)
+    """
+    found = bool(shutil.which(command))  # py3 only
+    if not found:
+        raise CommandDoesNotExistException(exc_msg)
+    return True
+
+
+def ap_command_exists():
+    return command_exists(
+        "ansible-playbook",
+        "ansible-playbook command doesn't seem to be available on your system. "
+        "It is usually available in 'ansible' package or follow the upstream instructions "
+        "available at https://docs.ansible.com/ansible/latest/installation_guide/"
+        "intro_installation.html#installation-guide"
+    )
+
+
+def buildah_command_exists():
+    return command_exists(
+        "buildah",
+        "buildah command doesn't seem to be available on your system. "
+        "Please follow the upstream instructions "
+        "available at https://github.com/projectatomic/buildah/blob/master/install.md"
+    )
+
+
+def podman_command_exists():
+    return command_exists(
+        "podman",
+        "podman command doesn't seem to be available on your system. "
+        "Please follow the upstream instructions "
+        "available at https://github.com/containers/libpod/blob/master/install.md"
+    )
