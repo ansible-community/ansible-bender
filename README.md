@@ -71,6 +71,13 @@ $ ab build                                       \  # this is the command
      this-is-my-image                            \  # and finally, target image name
 ```
 
+Here is a proof that the image is in there:
+```
+$ podman images this-is-my-image
+REPOSITORY                   TAG      IMAGE ID       CREATED        SIZE
+localhost/this-is-my-image   latest   7558393975c7   1 minute ago   84.4MB
+```
+
 ## TODO for MVP
 
 * [x] You can build images with buildah
