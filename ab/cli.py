@@ -193,5 +193,9 @@ class CLI:
         return 1
 
 
-if __name__ == '__main__':
+def main():
     sys.exit(CLI().run())
+
+
+if __name__ == '__main__':
+    main()
