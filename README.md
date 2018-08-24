@@ -23,6 +23,7 @@ just using Ansible to do something magical.**
 ## Features:
 
 * You can build your container images with buildah as a backend.
+* Ansible playbook is your build recipe.
 * You are able to set various image metadata via CLI:
   * working directory
   * environment variables
