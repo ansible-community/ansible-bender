@@ -1,11 +1,16 @@
 # ab
 
 This is a proof of concept implementation of a tool which builds container
-images using Ansible playbooks. It has a pluggable builder selection — it is up
-to you to pick the tool which will be used to construct your container image.
-ab relies on [Ansible connection
+images using [Ansible](https://github.com/ansible/ansible)
+[playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html).
+It has a pluggable builder selection — it is up to you to pick the tool which
+will be used to construct your container image. Right now the only supported
+builder is [buildah](https://github.com/projectatomic/buildah). [More to come
+in future](#todo-past-010). ab relies on [Ansible connection
 plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for
-that.
+that. tl;dr Ansible is the frontend, buildah is the backend.
+
+I described this concept a while ago in [this blog post](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
 
 You may be asking: why not
 [ansible-container](https://github.com/ansible/ansible-container)? This tool is
