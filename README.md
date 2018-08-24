@@ -7,8 +7,10 @@ It has a pluggable builder selection — it is up to you to pick the tool which
 will be used to construct your container image. Right now the only supported
 builder is [buildah](https://github.com/projectatomic/buildah). [More to come
 in future](#todo-past-010). ab relies on [Ansible connection
-plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for
-that. tl;dr Ansible is the frontend, buildah is the backend.
+plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for performing builds.
+that.
+
+tl;dr Ansible is the frontend, buildah is the backend.
 
 I described this concept a while ago in [this blog post](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
 
@@ -18,8 +20,8 @@ actually heavily inspired by ansible-container: the main distinction is that
 ansible-container covers the complete lifecycle of a containerized application
 while ab takes care of image builds only.
 
-**Please note that this project is not affiliated with Ansible project. It's
-just using Ansible to do something magical.**
+**Please note that this project is not affiliated with the Ansible project.
+It's just using Ansible to do something magical.**
 
 
 **Status**: proof of concept
