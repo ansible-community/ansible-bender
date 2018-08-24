@@ -30,17 +30,18 @@ def graceful_get(d, *keys):
 
 
 class StreamLogger(threading.Thread):
-    def __init__(self, stream, print_output=False):
+    def __init__(self, stream, print_output=False, log_level=logging.DEBUG):
         super().__init__(daemon=True)  # the threads should not linger
         self.stream = stream
         self.output = []
+        self.log_level = log_level
         self.print_output = print_output
 
     def run(self):
         for line in self.stream:
             line = line.rstrip("\n")
             self.output.append(line)
-            logger.debug(line)
+            logger.log(self.log_level, line)
             if self.print_output:
                 out_logger.info(line)
 
@@ -65,8 +66,8 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, *
     logger.debug('%s', " ".join(cmd))  # so you can easily copy/paste
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, **kwargs)
-    o = StreamLogger(process.stdout, print_output=print_output)
-    e = StreamLogger(process.stderr, print_output=print_output)
+    o = StreamLogger(process.stdout, print_output=print_output, log_level=logging.DEBUG)
+    e = StreamLogger(process.stderr, print_output=print_output, log_level=logging.ERROR)
     o.start()
     e.start()
     process.wait()
