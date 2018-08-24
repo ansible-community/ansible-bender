@@ -20,9 +20,24 @@ just using Ansible to do something magical.**
 **Status**: proof of concept
 
 
+## Features:
+
+* You can build your container images with buildah as a backend.
+* You are able to set various image metadata via CLI:
+  * working directory
+  * environment variables
+  * labels
+  * user
+  * default command
+  * exposed ports
+* You can do volume mounts during build.
+
+
+
 ## Installation
 
-At the moment `ab` is not on PyPI because there is already such project. Hence I am looking for [a new, catchy name](#2)!
+At the moment `ab` is not on PyPI because there is already such project. Hence
+I am looking for [a new, catchy name](https://github.com/TomasTomecek/ab/issues/2)!
 
 You can install ab directly from github:
 ```
