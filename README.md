@@ -5,7 +5,9 @@ images using Ansible playbooks. It has a pluggable builder selection — it is u
 to you to pick the tool which will be used to construct your container image.
 ab relies on [Ansible connection
 plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for
-that. You may be asking: why not
+that.
+
+You may be asking: why not
 [ansible-container](https://github.com/ansible/ansible-container)? This tool is
 actually heavily inspired by ansible-container: the main distinction is that
 ansible-container covers the complete lifecycle of a containerized application
@@ -20,7 +22,19 @@ just using Ansible to do something magical.**
 
 ## Installation
 
+At the moment `ab` is not on PyPI because there is already such project. Hence I am looking for [a new, catchy name](#2)!
+
+You can install ab directly from github:
+```
+$ pip3 install --user https://github.com/TomasTomecek/ab@0.1.0
+```
+
+Oh right, and ab is tested only with python 3.
+
+
 ## Usage
+
+**Please note that buildah requires root privileges so you need to invoke ab as root.**
 
 Right now, ab has just a single command and that is... `build`:
 ```
@@ -78,28 +92,8 @@ REPOSITORY                   TAG      IMAGE ID       CREATED        SIZE
 localhost/this-is-my-image   latest   7558393975c7   1 minute ago   84.4MB
 ```
 
-## TODO for MVP
 
-* [x] You can build images with buildah
-* [x] You can set basic metadata:
-  * [x] work dir
-  * [x] env vars
-  * [x] labels
-  * [x] user
-  * [x] cmd
-  * [x] ports
-* [x] You can do volume mounts during build
-* [ ] README
-* [x] Functional tests
-* [ ] python packaging
-* [x] user experience
-  * [x] print ansible output by default
-  * [x] tinker default and verbose outputs
-* [ ] important TODO/FIXME resolved from code
-  * [x] check for presence of binaries
-
-
-## TODO post MVP
+## TODO past 0.1.0
 
 * [ ] Explicit layering
 * [ ] Explicit caching
