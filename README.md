@@ -8,7 +8,6 @@ will be used to construct your container image. Right now the only supported
 builder is [buildah](https://github.com/projectatomic/buildah). [More to come
 in future](#todo-past-010). ab relies on [Ansible connection
 plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for performing builds.
-that.
 
 tl;dr Ansible is the frontend, buildah is the backend.
 
@@ -49,7 +48,7 @@ I am looking for [a new, catchy name](https://github.com/TomasTomecek/ab/issues/
 
 You can install ab directly from github:
 ```
-$ pip3 install --user https://github.com/TomasTomecek/ab@0.1.0
+$ pip3 install --user git+https://github.com/TomasTomecek/ab@0.1.0
 ```
 
 Oh right, and ab is tested only with python 3.
@@ -97,7 +96,7 @@ Storing signatures
 Image 'this-is-my-image' was built successfully \o/
 ```
 
-The command line is a bit longer. That's because all metadata about our target image are in there:
+The command line is a bit longer. That's because all metadata about our target image is in there:
 ```
 $ ab build                                       \  # this is the command
      -e SOME=VALUE                               \  # -e sets environment variables
