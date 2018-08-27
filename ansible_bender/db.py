@@ -45,6 +45,7 @@ class Database:
     @classmethod
     def acquire(cls):
         """
+        TODO: do acquire read-only which loads the current state of the database
         get access to database; only one instance of ab can access database
         """
         try:
@@ -108,6 +109,7 @@ class Database:
 
     def save(self):
         """ save data from memory to disk """
+        # TODO: do critical section here and lock RW of the database
         with open(self._db_path(), "w") as fd:
             json.dump(self._data, fd, indent=2)
 
@@ -117,12 +119,24 @@ class Database:
         self._data["next_build_id"] += 1
         return next_build_id
 
-    def record_build(self, build_i):
+    def record_build(self, build_i, build_state=None):
         """
         record build into database
 
         :param build_i: Build instance
+        :param build_state: one of BuildState
         """
+        if build_state is not None:
+            build_i.state = build_state
         build_i.build_id = self._get_and_bump_build_id()
         self._data["builds"][build_i.build_id] = build_i.to_dict()
         return build_i
+
+    def get_build(self, build_id):
+        """
+        get Build instance by selected build_id
+
+        :param build_id: int, build_id
+        :return: instance of Build
+        """
+        return self._data["builds"][build_id]  # TODO: error checking

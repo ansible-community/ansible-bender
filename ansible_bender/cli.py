@@ -180,9 +180,9 @@ class CLI:
         build.target_image = self.args.target_image
         build.builder_name = self.args.builder
 
-        app = Application(self.args.playbook_path, build, debug=self.args.debug)
+        app = Application(debug=self.args.debug)
         try:
-            app.build(build_volumes=self.args.build_volumes)
+            app.build(self.args.playbook_path, build, build_volumes=self.args.build_volumes)
         finally:
             app.clean()
 

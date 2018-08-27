@@ -36,6 +36,19 @@ class ImageMetadata:
             "volumes": self.volumes
         }
 
+    @classmethod
+    def from_json(cls, j):
+        """ return Metadata instance from the provided json """
+        m = cls()
+        m.working_dir = j["working_dir"]
+        m.labels = j["labels"]
+        m.env_vars = j["env_vars"]
+        m.cmd = j["cmd"]
+        m.user = j["user"]
+        m.ports = j["ports"]
+        m.volumes = j["volumes"]
+        return m
+
 
 class Build:
     """ class which represents a build """
@@ -57,6 +70,18 @@ class Build:
             "target_image": self.target_image,
             "builder_name": self.builder_name
         }
+
+    @classmethod
+    def from_json(cls, j):
+        """ return Build instance from the provided json """
+        b = cls()
+        b.build_id = j["build_id"]
+        b.metadata = ImageMetadata.from_json(j["metadata"])
+        b.state = BuildState(j["state"])
+        b.base_image = j["base_image"]
+        b.target_image = j["target_image"]
+        b.builder_name = j["builder_name"]
+        return b
 
 
 class BuildState(Enum):

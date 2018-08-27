@@ -176,7 +176,7 @@ class BuildahBuilder(Builder):
         """
         pull base image
         """
-        logger.info("pull base image: %s", self.build.base_image)
+        logger.info("pulling base image: %s", self.build.base_image)
         podman_command_exists()
         pull_buildah_image(self.build.base_image)
 
