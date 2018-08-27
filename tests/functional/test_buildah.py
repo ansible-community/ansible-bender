@@ -142,3 +142,15 @@ def test_build_basic_image_with_all_params(tmpdir):
         # assert runtime_volume in co["Volumes"]  # FIXME: figure out how to check this
     finally:
         buildah("rmi", [target_image])
+
+
+def test_build_failure():
+    bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
+    base_image = "docker.io/library/python:3-alpine"
+    target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
+    target_failed_image = target_image + "-failed"
+    cmd = ["build", bad_playbook_path, base_image, target_image]
+    with pytest.raises(subprocess.CalledProcessError):
+        ab(cmd)
+    buildah("inspect", ["-t", "image", target_failed_image])
+    buildah("rmi", [target_failed_image])

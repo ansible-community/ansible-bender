@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+  - name: Create a file
+    copy:
+      content: "I live!"
+      dest: /hello
+  - name: Fail
+    command: exit 42

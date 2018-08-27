@@ -3,7 +3,7 @@ import logging
 from ab.builder import get_builder
 from ab.constants import OUT_LOGGER
 from ab.core import AnsibleRunner
-
+from ab.exceptions import AbBuildUnsuccesful
 
 out_logger = logging.getLogger(OUT_LOGGER)
 
@@ -34,10 +34,26 @@ class Application:
         if not self.builder.is_base_image_present():
             self.builder.pull()
         self.builder.create(build_volumes=build_volumes)
+
+        py_intrprtr = self.builder.find_python_interpreter()
+        failed = False
+        failure_exc = None
         try:
-            self.a_runner.build(python_interpreter=self.builder.find_python_interpreter())
-            self.builder.commit()
-            out_logger.info("Image '%s' was built successfully \o/",  self.target_image)
-        finally:
-            # TODO: make cleanup configurable
-            self.builder.clean()
+            self.a_runner.build(python_interpreter=py_intrprtr)
+        except AbBuildUnsuccesful as ex:
+            failed = True
+            failure_exc = ex
+
+        image_name = self.target_image
+        if failed:
+            image_name = self.target_image + "-failed"
+            self.builder.commit(image_name)
+            out_logger.info("Image build failed /o\\")
+            out_logger.info("The progress is saved into image '%s'", image_name)
+        else:
+            self.builder.commit(image_name)
+            out_logger.info("Image '%s' was built successfully \o/",  image_name)
+        self.builder.clean()
+
+        if failed and failure_exc:
+            raise failure_exc

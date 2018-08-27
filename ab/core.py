@@ -1,8 +1,10 @@
 import os
 import logging
+import subprocess
 import tempfile
 import shutil
 
+from ab.exceptions import AbBuildUnsuccesful
 from ab.utils import run_cmd, ap_command_exists
 
 
@@ -29,12 +31,15 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     cmd_args += [playbook_path]
     logger.debug("%s", " ".join(cmd_args))
     # TODO: does ansible have an API?
-    run_cmd(
-        cmd_args,
-        # FIXME: fails with 'exec: \"runc\": executable file not found in $PATH'
-        # env={"ANSIBLE_CONFIG": a_cfg_path}
-        print_output=True
-    )
+    try:
+        run_cmd(
+            cmd_args,
+            # FIXME: fails with 'exec: \"runc\": executable file not found in $PATH'
+            # env={"ANSIBLE_CONFIG": a_cfg_path}
+            print_output=True
+        )
+    except subprocess.CalledProcessError as ex:
+        raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex)
 
 
 class AnsibleRunner:
@@ -78,6 +83,7 @@ class AnsibleRunner:
             logger.info("creating inventory file %s", inv_path)
             with open(inv_path, "w") as fd:
                 self._create_inventory_file(fd, python_interpreter)
+            # FIXME: do this and get rid of the retry file
             # a_cfg_path = os.path.join(tmp, "ansible.cfg")
             # with open(a_cfg_path, "w") as fd:
             #     self._create_ansible_cfg(fd)

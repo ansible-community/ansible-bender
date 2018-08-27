@@ -52,9 +52,11 @@ class Builder:
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
 
-    def commit(self):
+    def commit(self, image_name):
         """
         snapshot the artifact and create an image
+
+        :param image_name: str, name the snapshot
         """
 
     def clean(self):

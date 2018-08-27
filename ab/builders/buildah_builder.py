@@ -142,15 +142,15 @@ class BuildahBuilder(Builder):
             debug=self.debug
         )
 
-    def commit(self):
-        if self.image_metadata.user:
+    def commit(self, image_name):
+        if self.image_metadata.user or self.image_metadata.cmd or self.image_metadata.volumes:
             # change user if needed
             configure_buildah_container(
                 self.ansible_host, user=self.image_metadata.user,
                 cmd=self.image_metadata.cmd,
                 volumes=self.image_metadata.volumes,
             )
-        buildah("commit", [self.ansible_host, self.target_image], print_output=True,
+        buildah("commit", [self.ansible_host, image_name], print_output=True,
                 debug=self.debug)
 
     def clean(self):
