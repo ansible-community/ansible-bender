@@ -27,15 +27,17 @@ def pull_buildah_image(container_image):
     run_cmd(["podman", "pull", container_image])
 
 
-def podman_run_cmd(container_image, cmd):
+def podman_run_cmd(container_image, cmd, log_stderr=True):
     """
     run provided command in selected container image using podman; raise exc when command fails
 
     :param container_image: str
     :param cmd: list of str
+    :param log_stderr: bool, log errors to stdout as ERROR level
     :return: stdout output
     """
-    return run_cmd(["podman", "run", "--rm", container_image] + cmd, return_output=True)
+    return run_cmd(["podman", "run", "--rm", container_image] + cmd,
+                   return_output=False, log_stderr=log_stderr)
 
 
 def create_buildah_container(container_image, container_name, build_volumes=None, debug=False):
@@ -185,7 +187,7 @@ class BuildahBuilder(Builder):
         for i in self.python_interpr_prio:
             cmd = ["ls", i]
             try:
-                podman_run_cmd(self.name, cmd)
+                podman_run_cmd(self.name, cmd, log_stderr=False)
             except subprocess.CalledProcessError:
                 logger.info("python interpreter %s does not exist", i)
                 continue

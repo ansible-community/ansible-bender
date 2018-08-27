@@ -49,7 +49,8 @@ class StreamLogger(threading.Thread):
         return "\n".join(self.output)
 
 
-def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, **kwargs):
+def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, log_stderr=True,
+            **kwargs):
     """
     run provided command on host system using the same user as you invoked this code, raises
     subprocess.CalledProcessError if it fails
@@ -60,6 +61,7 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, *
     :param kwargs: pass keyword arguments to subprocess.check_* functions; for more info,
             please check `help(subprocess.Popen)`
     :param print_output: bool, print output via print()
+    :param log_stderr: bool, log errors to stdout as ERROR level
     :return: None or str
     """
     logger.info('running command: "%s"', cmd)
@@ -67,7 +69,8 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, *
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, **kwargs)
     o = StreamLogger(process.stdout, print_output=print_output, log_level=logging.DEBUG)
-    e = StreamLogger(process.stderr, print_output=print_output, log_level=logging.ERROR)
+    stderr_log_lvl = logging.ERROR if log_stderr else logging.DEBUG
+    e = StreamLogger(process.stderr, print_output=print_output, log_level=stderr_log_lvl)
     o.start()
     e.start()
     process.wait()
