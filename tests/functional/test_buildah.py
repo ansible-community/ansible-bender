@@ -39,7 +39,7 @@ def test_build_basic_image():
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", basic_playbook_path, base_image, target_image]
     ab(cmd)
-    buildah("inspect", ["-t", "image", "localhost/ddbd:latest"])
+    buildah("inspect", ["-t", "image", target_image])
     buildah("rmi", [target_image])
 
 
