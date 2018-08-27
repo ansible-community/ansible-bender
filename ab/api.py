@@ -1,4 +1,5 @@
 import logging
+import os
 
 from ab.builder import get_builder
 from ab.constants import OUT_LOGGER
@@ -22,6 +23,10 @@ class Application:
         # TODO: I think people will want to pick python interpreter via CLI
         self.debug = debug
         self.target_image = target_image
+
+        if not os.path.isfile(playbook_path):
+            raise RuntimeError("No such file or directory: %s" % playbook_path)
+
         self.builder = get_builder(builder_name)(base_image, target_image, metadata, debug=debug)
         self.a_runner = AnsibleRunner(playbook_path, self.builder, debug=debug)
 
