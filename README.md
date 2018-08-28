@@ -1,12 +1,11 @@
-# ab
+# ansible-bender
 
-This is a proof of concept implementation of a tool which builds container
-images using [Ansible](https://github.com/ansible/ansible)
-[playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html).
+This is a tool which bends containers using [Ansible](https://github.com/ansible/ansible)
+[playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html) and turns them into images.
 It has a pluggable builder selection — it is up to you to pick the tool which
 will be used to construct your container image. Right now the only supported
 builder is [buildah](https://github.com/projectatomic/buildah). [More to come
-in future](#todo-past-010). ab relies on [Ansible connection
+in future](#todo-past-010). ansible-bender (ab) relies on [Ansible connection
 plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for performing builds.
 
 tl;dr Ansible is the frontend, buildah is the backend.
@@ -40,13 +39,11 @@ It's just using Ansible to do something magical.**
 * You can do volume mounts during build.
 
 
-
 ## Installation
 
-At the moment `ab` is not on PyPI because there is already such project. Hence
-I am looking for [a new, catchy name](https://github.com/TomasTomecek/ab/issues/2)!
+`ansible-bender` will be on PyPI starting from version `0.2.0`.
 
-You can install ab directly from github:
+In the meantime, please install it from github directly:
 ```
 $ pip3 install --user git+https://github.com/TomasTomecek/ab@0.1.0
 ```
@@ -57,6 +54,9 @@ Oh right, and ab is tested only with python 3.
 ## Usage
 
 **Please note that buildah requires root privileges so you need to invoke ab as root.**
+
+You may noticed that I refer to `ansible-bender` as ab. That was the initial
+name and also the name of the CLI tool, so I decided to stick to it.
 
 Right now, ab has just a single command and that is... `build`:
 ```

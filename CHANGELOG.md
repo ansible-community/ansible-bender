@@ -1,3 +1,13 @@
+# 0.2.0
+
+Renamed to `ansible-bender`, the CLI was left intact.
+
+
+## Features
+
+* Failed builds are commited as `-failed`.
+
+
 # 0.1.0
 
 Initial release!

@@ -6,26 +6,26 @@ from setuptools import find_packages, setup
 
 # https://packaging.python.org/guides/single-sourcing-package-version/
 version = {}
-with open("./ab/version.py") as fp:
+with open("./ansible_bender/version.py") as fp:
     exec(fp.read(), version)
 
 long_description = ''.join(open('README.md').readlines())
 
 setup(
-    name='ab',
+    name='ansible-bender',
     version=version["__version__"],
-    description="Proof of concept implementation of a tool which builds container images using Ansible playbooks.",
+    description="A tool which builds container images using Ansible playbooks.",
     long_description=long_description,
     # long_description_content_type='text/markdown',
     packages=find_packages(exclude=['tests']),
     install_requires=[],
     entry_points='''
         [console_scripts]
-        ab=ab.cli:main
+        ab=ansible_bender.cli:main
     ''',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
@@ -40,6 +40,6 @@ setup(
     keywords='containers,ansible,buildah',
     author='Red Hat',
     author_email='tomas@tomecek.net',
-    url='https://github.com/TomasTomecek/ab',
+    url='https://github.com/TomasTomecek/ansible-bender',
     include_package_data=True,
 )
