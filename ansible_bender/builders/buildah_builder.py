@@ -2,8 +2,8 @@ import json
 import logging
 import subprocess
 
-from ab.builders.base import Builder
-from ab.utils import graceful_get, run_cmd, buildah_command_exists, podman_command_exists
+from ansible_bender.builders.base import Builder
+from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, podman_command_exists
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,10 @@
 import logging
 import os
 
-from ab.builder import get_builder
-from ab.constants import OUT_LOGGER
-from ab.core import AnsibleRunner
-from ab.exceptions import AbBuildUnsuccesful
+from ansible_bender.builder import get_builder
+from ansible_bender.constants import OUT_LOGGER
+from ansible_bender.core import AnsibleRunner
+from ansible_bender.exceptions import AbBuildUnsuccesful
 
 out_logger = logging.getLogger(OUT_LOGGER)
 

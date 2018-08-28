@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import threading
 
-from ab.constants import OUT_LOGGER
+from ansible_bender.constants import OUT_LOGGER
 
 logger = logging.getLogger(__name__)
 out_logger = logging.getLogger(OUT_LOGGER)

@@ -6,9 +6,9 @@ import argparse
 import logging
 import sys
 
-from ab.api import Application
-from ab.builders.base import ImageMetadata
-from ab.constants import OUT_LOGGER_FORMAT, OUT_LOGGER
+from ansible_bender.api import Application
+from ansible_bender.builders.base import ImageMetadata
+from ansible_bender.constants import OUT_LOGGER_FORMAT, OUT_LOGGER
 
 
 def set_logging(

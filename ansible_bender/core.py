@@ -4,8 +4,8 @@ import subprocess
 import tempfile
 import shutil
 
-from ab.exceptions import AbBuildUnsuccesful
-from ab.utils import run_cmd, ap_command_exists
+from ansible_bender.exceptions import AbBuildUnsuccesful
+from ansible_bender.utils import run_cmd, ap_command_exists
 
 
 logger = logging.getLogger(__name__)

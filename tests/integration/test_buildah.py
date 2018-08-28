@@ -1,6 +1,6 @@
 import pytest
 
-from ab.builders.buildah_builder import BuildahBuilder
+from ansible_bender.builders.buildah_builder import BuildahBuilder
 
 
 @pytest.mark.parametrize("image_name,found", [

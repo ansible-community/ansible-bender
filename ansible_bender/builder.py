@@ -3,7 +3,7 @@ Builder interface
 """
 import logging
 
-from ab.builders.buildah_builder import BuildahBuilder
+from ansible_bender.builders.buildah_builder import BuildahBuilder
 
 
 logger = logging.getLogger(__name__)
