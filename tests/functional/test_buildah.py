@@ -154,3 +154,17 @@ def test_build_failure():
         ab(cmd)
     buildah("inspect", ["-t", "image", target_failed_image])
     buildah("rmi", [target_failed_image])
+
+
+def test_two_runs():
+    """ run ab twice and see if the other instance fails """
+    basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
+    base_image = "docker.io/library/python:3-alpine"
+    target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
+    cmd = ["python3", "-m", "ansible_bender.cli", "build", basic_playbook_path, base_image, target_image]
+    p1 = subprocess.Popen(cmd)
+    p2 = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p2.communicate()
+    assert "ab is already running" in err.decode("utf-8")
+    p1.wait()
+
