@@ -7,12 +7,12 @@ import logging
 import sys
 
 from ansible_bender.api import Application
-from ansible_bender.builders.base import ImageMetadata
+from ansible_bender.builders.base import ImageMetadata, Build, BuildState
 from ansible_bender.constants import OUT_LOGGER_FORMAT, OUT_LOGGER
 
 
 def set_logging(
-        logger_name="ab",
+        logger_name="ansible_bender",
         level=logging.INFO,
         handler_class=logging.StreamHandler,
         handler_kwargs=None,
@@ -170,11 +170,19 @@ class CLI:
             metadata.ports = self.args.ports
         if self.args.runtime_volumes:
             metadata.volumes = self.args.runtime_volumes
-        app = Application(
-            self.args.playbook_path, self.args.base_image, self.args.target_image,
-            self.args.builder, metadata, debug=self.args.debug
-        )
-        app.build(build_volumes=self.args.build_volumes)
+
+        build = Build()
+        build.metadata = metadata
+        build.state = BuildState.NEW
+        build.base_image = self.args.base_image
+        build.target_image = self.args.target_image
+        build.builder_name = self.args.builder
+
+        app = Application(self.args.playbook_path, build, debug=self.args.debug)
+        try:
+            app.build(build_volumes=self.args.build_volumes)
+        finally:
+            app.clean()
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")

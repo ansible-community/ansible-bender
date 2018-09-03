@@ -27,7 +27,7 @@ def ab(args):
 
     :return:
     """
-    cmd = ["python3", "-m", "ab.cli", "--debug"]
+    cmd = ["python3", "-m", "ansible_bender.cli", "--debug"]
     # don't use run_cmd here, it makes things complicated
     subprocess.check_call(cmd + args, cwd=project_dir)
 

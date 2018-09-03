@@ -1,5 +1,6 @@
 import pytest
 
+from ansible_bender.builders.base import Build
 from ansible_bender.builders.buildah_builder import BuildahBuilder
 
 
@@ -9,7 +10,10 @@ from ansible_bender.builders.buildah_builder import BuildahBuilder
     ("docker.io/library/busybox", False),
     ])
 def test_find_py_intrprtr_in_fedora_image(image_name, found):
-    bb = BuildahBuilder(image_name, "asdqwe", None)
+    build = Build()
+    build.base_image = image_name
+    build.target_image = "starena"
+    bb = BuildahBuilder(build)
     try:
         assert bb.find_python_interpreter()
     except RuntimeError:

@@ -3,7 +3,8 @@ import logging
 import subprocess
 
 from ansible_bender.builders.base import Builder
-from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, podman_command_exists
+from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, \
+    podman_command_exists
 
 logger = logging.getLogger(__name__)
 
@@ -121,11 +122,15 @@ class BuildahBuilder(Builder):
     ansible_connection = "buildah"
     name = "buildah"
 
-    def __init__(self, base_image, target_image, metadata, debug=False):
-        super().__init__(base_image, metadata, debug=debug)
-        self.target_image = target_image
+    def __init__(self, build, debug=False):
+        """
+        :param build: instance of Build
+        :param debug: bool, run buildah in debug or not?
+        """
+        super().__init__(build, debug=debug)
+        self.target_image = build.target_image
         # FIXME: pick a container name which does not exist
-        self.ansible_host = target_image + "-cont"
+        self.ansible_host = self.target_image + "-cont"
         buildah_command_exists()
 
     def create(self, build_volumes=None):
@@ -133,24 +138,24 @@ class BuildahBuilder(Builder):
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
         create_buildah_container(
-            self.name, self.ansible_host, build_volumes=build_volumes, debug=self.debug)
+            self.build.base_image, self.ansible_host, build_volumes=build_volumes, debug=self.debug)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
-            self.ansible_host, working_dir=self.image_metadata.working_dir,
-            env_vars=self.image_metadata.env_vars,
-            ports=self.image_metadata.ports,
-            labels=self.image_metadata.labels,  # labels are not applied when they are configured
+            self.ansible_host, working_dir=self.build.metadata.working_dir,
+            env_vars=self.build.metadata.env_vars,
+            ports=self.build.metadata.ports,
+            labels=self.build.metadata.labels,  # labels are not applied when they are configured
                                                 # before doing commit
             debug=self.debug
         )
 
     def commit(self, image_name):
-        if self.image_metadata.user or self.image_metadata.cmd or self.image_metadata.volumes:
+        if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:
             # change user if needed
             configure_buildah_container(
-                self.ansible_host, user=self.image_metadata.user,
-                cmd=self.image_metadata.cmd,
-                volumes=self.image_metadata.volumes,
+                self.ansible_host, user=self.build.metadata.user,
+                cmd=self.build.metadata.cmd,
+                volumes=self.build.metadata.volumes,
             )
         buildah("commit", [self.ansible_host, image_name], print_output=True,
                 debug=self.debug)
@@ -171,9 +176,9 @@ class BuildahBuilder(Builder):
         """
         pull base image
         """
-        logger.info("pull base image: %s", self.name)
+        logger.info("pull base image: %s", self.build.base_image)
         podman_command_exists()
-        pull_buildah_image(self.name)
+        pull_buildah_image(self.build.base_image)
 
     def find_python_interpreter(self):
         """
@@ -187,11 +192,11 @@ class BuildahBuilder(Builder):
         for i in self.python_interpr_prio:
             cmd = ["ls", i]
             try:
-                podman_run_cmd(self.name, cmd, log_stderr=False)
+                podman_run_cmd(self.build.base_image, cmd, log_stderr=False)
             except subprocess.CalledProcessError:
                 logger.info("python interpreter %s does not exist", i)
                 continue
             else:
                 logger.info("using python interpreter %s", i)
                 return i
-        raise RuntimeError("no python interpreter found in image %s" % self.name)
+        raise RuntimeError("no python interpreter found in image %s" % self.build.base_image)

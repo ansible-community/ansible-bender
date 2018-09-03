@@ -2,6 +2,8 @@
 Base class for builders
 """
 
+from enum import Enum
+
 
 class ImageMetadata:
     """
@@ -23,20 +25,58 @@ class ImageMetadata:
         self.ports = []
         self.volumes = []
 
+    def to_dict(self):
+        return {
+            "working_dir": self.working_dir,
+            "labels": self.labels,
+            "env_vars": self.env_vars,
+            "cmd": self.cmd,
+            "user": self.user,
+            "ports": self.ports,
+            "volumes": self.volumes
+        }
+
+
+class Build:
+    """ class which represents a build """
+    def __init__(self):
+        self.build_id = None  # PK, should be set by database
+        self.metadata = None  # Image metadata
+        self.state = None  # enum, BuildState
+        # TODO: dates and times
+        self.base_image = None
+        self.target_image = None
+        self.builder_name = None
+
+    def to_dict(self):
+        return {
+            "build_id": self.build_id,
+            "metadata": self.metadata.to_dict(),
+            "state": self.state.value,
+            "base_image": self.base_image,
+            "target_image": self.target_image,
+            "builder_name": self.builder_name
+        }
+
+
+class BuildState(Enum):
+    NEW = "new"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+    FAILED = "failed"
+
 
 class Builder:
     ansible_connection = "default-value"
     name = "default-value"
 
-    def __init__(self, name, metadata, debug=False):
+    def __init__(self, build, debug=False):
         """
-        :param name: name of the base image
-        :param metadata: instance of ImageMetadata
+        :param build: instance of Build
         :param debug: bool, provide debug output if True
         """
-        self.name = name
+        self.build = build
         self.ansible_host = None
-        self.image_metadata = metadata
         self.debug = debug
         self.python_interpr_prio = (
             "/usr/bin/python3",
@@ -73,7 +113,7 @@ class Builder:
         """
         :return: True when the base image is present, False otherwise
         """
-        return self.is_image_present(self.name)
+        return self.is_image_present(self.build.base_image)
 
     def pull(self):
         """
