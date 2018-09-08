@@ -105,7 +105,7 @@ def buildah(command, args_and_opts, print_output=False, debug=False):
         cmd += ["--debug"]
     cmd += [command] + args_and_opts
     logger.debug("running command: %s", command)
-    return run_cmd(cmd, print_output=print_output)
+    return run_cmd(cmd, print_output=print_output, log_stderr=False)
 
 
 def buildah_with_output(command, args_and_opts, debug=False):

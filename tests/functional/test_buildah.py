@@ -2,6 +2,7 @@
 Make sure that we can build using buildah builder.
 """
 import os
+import re
 import random
 import string
 import subprocess
@@ -21,15 +22,35 @@ def random_word(length):
     return ''.join(random.choice(letters) for _ in range(length))
 
 
-def ab(args):
+def ab(args, debug=True, return_output=False):
     """
     python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
 
     :return:
     """
-    cmd = ["python3", "-m", "ansible_bender.cli", "--debug"]
-    # don't use run_cmd here, it makes things complicated
-    subprocess.check_call(cmd + args, cwd=project_dir)
+    cmd = ["python3", "-m", "ansible_bender.cli"]
+    if debug:
+        cmd += ["--debug"]
+    if return_output:
+        return subprocess.check_output(cmd + args, cwd=project_dir, universal_newlines=True)
+    else:
+        # don't use run_cmd here, it makes things complicated
+        subprocess.check_call(cmd + args, cwd=project_dir)
+
+
+def test_output():
+    basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
+    target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
+    cmd = ["build", basic_playbook_path, base_image, target_image]
+    out = ab(cmd, return_output=True, debug=False)
+    try:
+        assert 'Getting image source signatures' in out
+        assert not re.match(r'ERROR\s+Getting image source signatures', out)
+        assert 'Copying blob' in out
+        assert not re.match(r'ERROR\s+Copying blob', out)
+        buildah("inspect", ["-t", "image", target_image])
+    finally:
+        buildah("rmi", [target_image])
 
 
 def test_build_basic_image():

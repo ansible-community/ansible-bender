@@ -141,10 +141,12 @@ class CLI:
             set_logging(level=logging.DEBUG)
         elif self.args.verbose:
             set_logging(level=logging.INFO)
-            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
+                        handler_kwargs={"stream": sys.stdout})
         else:
             set_logging(level=logging.WARNING)
-            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
+                        handler_kwargs={"stream": sys.stdout})
 
     def _build(self):
         metadata = ImageMetadata()
