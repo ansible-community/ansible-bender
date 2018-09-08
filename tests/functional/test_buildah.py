@@ -14,6 +14,7 @@ from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_res
 this_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(os.path.dirname(this_dir))
 data_dir = os.path.join(this_dir, "data")
+base_image = "docker.io/library/python:3-alpine"
 
 
 def random_word(length):
@@ -55,8 +56,6 @@ def test_output():
 
 def test_build_basic_image():
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    # TODO: pick smaller image: python3 & alpine
-    base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", basic_playbook_path, base_image, target_image]
     ab(cmd)
@@ -68,7 +67,6 @@ def test_build_basic_image_with_env_vars():
     a_b = "A=B"
     x_y = "X=Y"
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "-e", a_b, x_y, "--",
            basic_playbook_path, base_image, target_image]
@@ -83,7 +81,6 @@ def test_build_basic_image_with_env_vars():
 def test_build_basic_image_with_wrong_env_vars():
     la_la_la = "AB-LA-BLA-LA-LA-BLA"
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "-e", la_la_la, "--", basic_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError) as exc:
@@ -98,7 +95,6 @@ def test_build_basic_image_with_labels():
     a_b = "A=B"
     x_y = "x=y"
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "-l", a_b, x_y, "--",
            basic_playbook_path, base_image, target_image]
@@ -116,7 +112,6 @@ def test_build_basic_image_with_build_volumes(tmpdir):
     container_mount = "/asdqwe"
     vol_spec = "%s:%s" % (real_tmp, container_mount)
     basic_playbook_path = os.path.join(data_dir, "basic_playbook_with_volume.yaml")
-    base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build", "--build-volumes", vol_spec, "--",
            basic_playbook_path, base_image, target_image]
@@ -135,7 +130,6 @@ def test_build_basic_image_with_all_params(tmpdir):
     p_80, p_443 = "80", "443"
     runtime_volume = "/var/lib/asdqwe"
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    base_image = "registry.fedoraproject.org/fedora:28"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["build",
            "-w", workdir_path,
@@ -167,7 +161,6 @@ def test_build_basic_image_with_all_params(tmpdir):
 
 def test_build_failure():
     bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
-    base_image = "docker.io/library/python:3-alpine"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     target_failed_image = target_image + "-failed"
     cmd = ["build", bad_playbook_path, base_image, target_image]
@@ -180,7 +173,6 @@ def test_build_failure():
 def test_two_runs():
     """ run ab twice and see if the other instance fails """
     basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-    base_image = "docker.io/library/python:3-alpine"
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     cmd = ["python3", "-m", "ansible_bender.cli", "build", basic_playbook_path, base_image, target_image]
     p1 = subprocess.Popen(cmd)
