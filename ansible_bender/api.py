@@ -41,35 +41,28 @@ class Application:
             self.builder.pull()
         self.builder.create(build_volumes=build_volumes)
 
-        py_intrprtr = self.builder.find_python_interpreter()
-        failed = False
-        failure_exc = None
-
-        self.build_i.state = BuildState.IN_PROGRESS
-        self.db.record_build(self.build_i)
         try:
-            self.a_runner.build(python_interpreter=py_intrprtr)
-        except AbBuildUnsuccesful as ex:
-            failed = True
-            failure_exc = ex
+            py_intrprtr = self.builder.find_python_interpreter()
 
-        image_name = self.target_image
-        if failed:
-            self.build_i.state = BuildState.FAILED
+            self.build_i.state = BuildState.IN_PROGRESS
             self.db.record_build(self.build_i)
-            image_name = self.target_image + "-failed"
-            self.builder.commit(image_name)
-            out_logger.info("Image build failed /o\\")
-            out_logger.info("The progress is saved into image '%s'", image_name)
-        else:
+            try:
+                self.a_runner.build(python_interpreter=py_intrprtr)
+            except AbBuildUnsuccesful:
+                self.build_i.state = BuildState.FAILED
+                self.db.record_build(self.build_i)
+                image_name = self.target_image + "-failed"
+                self.builder.commit(image_name)
+                out_logger.info("Image build failed /o\\")
+                out_logger.info("The progress is saved into image '%s'", image_name)
+                raise
+
             self.build_i.state = BuildState.DONE
             self.db.record_build(self.build_i)
-            self.builder.commit(image_name)
-            out_logger.info("Image '%s' was built successfully \o/",  image_name)
-        self.builder.clean()
-
-        if failed and failure_exc:
-            raise failure_exc
+            self.builder.commit(self.target_image)
+            out_logger.info("Image '%s' was built successfully \o/",  self.target_image)
+        finally:
+            self.builder.clean()
 
     def clean(self):
         self.db.save()

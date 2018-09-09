@@ -32,7 +32,7 @@ def random_word(length):
     return ''.join(random.choice(letters) for _ in range(length))
 
 
-def ab(args, debug=True, return_output=False):
+def ab(args, debug=True, return_output=False, ignore_result=False):
     """
     python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
 
@@ -41,6 +41,8 @@ def ab(args, debug=True, return_output=False):
     cmd = ["python3", "-m", "ansible_bender.cli"]
     if debug:
         cmd += ["--debug"]
+    if ignore_result:
+        return subprocess.call(cmd + args, cwd=project_dir)
     if return_output:
         return subprocess.check_output(cmd + args, cwd=project_dir, universal_newlines=True)
     else:
@@ -156,10 +158,19 @@ def test_build_failure():
 
 def test_two_runs(target_image):
     """ run ab twice and see if the other instance fails """
-    cmd = ["python3", "-m", "ansible_bender.cli", "build", basic_playbook_path, base_image, target_image]
+    cmd = ["python3", "-m", "ansible_bender.cli", "build", basic_playbook_path, base_image,
+           target_image]
     p1 = subprocess.Popen(cmd)
     p2 = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p2.communicate()
     assert "ab is already running" in err.decode("utf-8")
     p1.wait()
 
+
+def test_buildah_err_output(capfd):
+    cmd = ["build", basic_playbook_path, base_image, "vrerv\\23&^&4//5B/F/BSFD/B"]
+    ab(cmd, debug=False, ignore_result=True)
+    c = capfd.readouterr()
+    assert "error parsing target image name" in c.err
+    assert "Invalid image name" in c.err
+    assert "was an error during" in c.err
