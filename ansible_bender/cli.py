@@ -195,6 +195,9 @@ class CLI:
         except KeyboardInterrupt:
             return 133
         except Exception as ex:
+            stderr = getattr(ex, "stderr", "")
+            if stderr:
+                print(stderr, file=sys.stderr)
             if self.args.debug:
                 raise
             print("There was an error during execution: %s" % ex, file=sys.stderr)

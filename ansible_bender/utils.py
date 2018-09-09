@@ -84,7 +84,8 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
             else:
                 return process.returncode
         else:
-            raise subprocess.CalledProcessError(cmd=cmd, returncode=process.returncode)
+            raise subprocess.CalledProcessError(cmd=cmd, returncode=process.returncode,
+                                                stderr=e.get_output())
     if return_output:
         return o.get_output()
 
