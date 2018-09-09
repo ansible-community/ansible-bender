@@ -22,9 +22,14 @@ A database module. A class to manage ab's persistent data.
     }
 }
 """
+import copy
 import json
 import logging
 import os
+import time
+from contextlib import contextmanager
+
+from ansible_bender.builders.base import Build
 
 DEFAULT_DATA = {
     "next_build_id": 1,
@@ -39,27 +44,29 @@ class Database:
     """ Simple implementation of persistent data store for ab; it's just a locked json file  """
 
     def __init__(self):
-        self._data = {}  # the gold
-        self.load()
+        # we can't cache the data
+        pass
 
-    @classmethod
-    def acquire(cls):
+    @contextmanager
+    def acquire(self):
         """
-        TODO: do acquire read-only which loads the current state of the database
-        get access to database; only one instance of ab can access database
+        lock usage of database
         """
-        try:
-            with open(Database._lock_path(), "r") as fd:
-                # the file exists, ab is running
-                pid = fd.read()
-                logger.info("ab is running as PID %s", pid)
-            raise RuntimeError("ab is already running as PID {}, "
-                               "this is being tracked by pidfile {}".format(pid, cls._lock_path()))
-        except FileNotFoundError:
-            # cool, let's take the lock
-            with open(Database._lock_path(), "w") as fd:
-                fd.write("%s" % os.getpid())
-        return Database()
+        while True:
+            try:
+                with open(Database._lock_path(), "r") as fd:
+                    # the file exists, ab changes the database
+                    pid = fd.read()
+                logger.debug("ab is running as PID %s", pid)
+                time.sleep(0.1)
+            except FileNotFoundError:
+                # cool, let's take the lock
+                # FIXME: but this is not atomic, we should use open() for that
+                with open(Database._lock_path(), "w") as fd:
+                    fd.write("%s" % os.getpid())
+                break
+        yield True
+        self.release()
 
     def release(self):
         """ release lock """
@@ -97,27 +104,27 @@ class Database:
         logger.debug("lock path is %s", lock_path)
         return lock_path
 
-    def load(self):
-        """ load data from disk """
+    def _load(self):
+        """ load data from disk, lock has to be acquired already! """
         try:
             with open(self._db_path(), "r") as fd:
-                self._data = json.load(fd)
+                return json.load(fd)
         except FileNotFoundError:
             # no problem, probably a first run
             logger.debug("initializing database")
-            self._data = DEFAULT_DATA
+            return copy.deepcopy(DEFAULT_DATA)
 
-    def save(self):
-        """ save data from memory to disk """
-        # TODO: do critical section here and lock RW of the database
+    def _save(self, data):
+        """ save data from memory to disk, lock has to be acquired already! """
         with open(self._db_path(), "w") as fd:
-            json.dump(self._data, fd, indent=2)
+            json.dump(data, fd, indent=2)
 
-    def _get_and_bump_build_id(self):
+    @staticmethod
+    def _get_and_bump_build_id(data):
         """ return id for next build id and increment the one in DB """
-        next_build_id = self._data["next_build_id"]
-        self._data["next_build_id"] += 1
-        return next_build_id
+        next_build_id = data["next_build_id"]
+        data["next_build_id"] += 1
+        return str(next_build_id)
 
     def record_build(self, build_i, build_state=None):
         """
@@ -126,11 +133,14 @@ class Database:
         :param build_i: Build instance
         :param build_state: one of BuildState
         """
-        if build_state is not None:
-            build_i.state = build_state
-        build_i.build_id = self._get_and_bump_build_id()
-        self._data["builds"][build_i.build_id] = build_i.to_dict()
-        return build_i
+        with self.acquire():
+            data = self._load()
+            if build_state is not None:
+                build_i.state = build_state
+            if build_i.build_id is None:
+                build_i.build_id = self._get_and_bump_build_id(data)
+            data["builds"][build_i.build_id] = build_i.to_dict()
+            self._save(data)
 
     def get_build(self, build_id):
         """
@@ -139,4 +149,6 @@ class Database:
         :param build_id: int, build_id
         :return: instance of Build
         """
-        return self._data["builds"][build_id]  # TODO: error checking
+        with self.acquire():
+            data = self._load()
+            return Build.from_json(data["builds"][build_id])  # TODO: error checking

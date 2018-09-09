@@ -19,7 +19,7 @@ class Application:
         :param debug: bool, provide debug output if True
         """
         self.debug = debug
-        self.db = Database.acquire()
+        self.db = Database()
 
     def build(self, playbook_path, build, build_volumes=None):
         """
@@ -31,6 +31,9 @@ class Application:
         """
         if not os.path.isfile(playbook_path):
             raise RuntimeError("No such file or directory: %s" % playbook_path)
+
+        # record as soon as possible
+        self.db.record_build(build)
 
         builder = get_builder(build.builder_name)(build, debug=self.debug)
         a_runner = AnsibleRunner(playbook_path, builder, build, debug=self.debug)
@@ -64,18 +67,20 @@ class Application:
     def cache_task_result(self, task_name, build_id):
         """ snapshot the container after a task was executed """
         if isinstance(build_id, str):
-            build_id = int(build_id)
+            build_id = build_id
         build = self.db.get_build(build_id)
         # TODO: load build, initiated builder and commit, log results
         # TODO: add here whole task code and task result and also hash referenced files
-        layer_hash = base64.b64encode(task_name)[:8]
+        layer_hash = base64.b64encode(task_name)[:8].decode("utf-8")
         timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         image_name = "%s-%s-%s" % (build.target_image, layer_hash, timestamp)
+        # buildah doesn't accept upper case
+        image_name = image_name.lower()
         builder_kls = get_builder(build.builder_name)
         builder = builder_kls(build, debug=self.debug)
+        # FIXME: do not commit metadata, just filesystem
         builder.commit(image_name)
         return image_name
 
     def clean(self):
-        self.db.save()
-        self.db.release()
+        pass

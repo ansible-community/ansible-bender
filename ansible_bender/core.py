@@ -89,7 +89,7 @@ class AnsibleRunner:
         tmp = tempfile.mkdtemp(prefix="ab")
         try:
             environment = {
-                "AB_BUILD_ID": str(self.build_i.build_id),
+                "AB_BUILD_ID": self.build_i.build_id,
             }
             inv_path = os.path.join(tmp, "inventory")
             logger.info("creating inventory file %s", inv_path)
