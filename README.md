@@ -117,8 +117,9 @@ localhost/this-is-my-image   latest   7558393975c7   1 minute ago   84.4MB
 
 ## TODO past 0.1.0
 
-* [ ] Explicit layering
-* [ ] Explicit caching
-* [ ] A fancy name!
+* [ ] Configurable layering
+* [x] A caching mechanism
+* [ ] Configurable caching
+* [x] A fancy name!
 * [ ] You can build images with podman (needs Ansible connection plugin for podman)
 * [ ] You can build images with docker (incubator maybe?)
