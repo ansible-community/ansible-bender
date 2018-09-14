@@ -57,9 +57,11 @@ def split_once_or_fail_with(strink, pattern, error_message):
     :return: (str, str)
     """
     try:
-        return strink.split(pattern, 1)
+        k, v = strink.split(pattern, 1)
     except ValueError:
         raise RuntimeError(error_message)
+    # we do this on purpose, so that ValueError is raised here
+    return k, v
 
 
 class CLI:

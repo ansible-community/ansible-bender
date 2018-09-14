@@ -24,7 +24,10 @@ base_image = "docker.io/library/python:3-alpine"
 def target_image():
     im = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     yield im
-    buildah("rmi", [im])
+    try:
+        buildah("rmi", [im])
+    except subprocess.CalledProcessError:
+        pass
 
 
 def random_word(length):
