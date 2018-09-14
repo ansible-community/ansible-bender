@@ -104,7 +104,6 @@ class Application:
     def cache_task_result(self, content, build_id):
         """ snapshot the container after a task was executed """
         build = self.db.get_build(build_id)
-        # TODO: setup logging since this was called from ansible and log
         timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         image_name = "%s-%s" % (build.target_image, timestamp)
         # buildah doesn't accept upper case

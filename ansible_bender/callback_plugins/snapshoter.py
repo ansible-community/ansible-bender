@@ -1,11 +1,13 @@
 import hashlib
 import json
+import logging
 import os
 
 from ansible.plugins.callback import CallbackBase
 from ansible.executor.task_result import TaskResult
 
 from ansible_bender.api import Application
+from ansible_bender.cli import set_logging
 
 
 class CallbackModule(CallbackBase):
@@ -27,7 +29,7 @@ class CallbackModule(CallbackBase):
         a = Application()
         content = self.get_task_content(task_result._task.get_ds())
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
-            self._display.display("recoding cache hit")
+            self._display.display("recording cache hit")
             a.record_progress(None, content, None, build_id=build_id)
             return
         image_name = a.cache_task_result(content, build_id=build_id)
@@ -59,6 +61,8 @@ class CallbackModule(CallbackBase):
             task.when = "0"  # skip
 
     def v2_playbook_on_task_start(self, task, is_conditional):
+        # TODO: figure out logging
+        # set_logging(level=logging.DEBUG)
         return self._maybe_load_from_cache(task)
 
     def v2_on_any(self, *args, **kwargs):
@@ -67,4 +71,5 @@ class CallbackModule(CallbackBase):
         except IndexError:
             return
         if isinstance(first_arg, TaskResult):
+            # set_logging(level=logging.DEBUG)
             return self._snapshot(first_arg)
