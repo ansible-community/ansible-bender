@@ -60,6 +60,7 @@ class Build:
         # TODO: dates and times
         self.base_image = None
         self.base_layer = None  # ideally this one would be picked up from progress
+        self.build_container = None
         self.target_image = None
         self.builder_name = None
         self.progress = []
@@ -73,7 +74,8 @@ class Build:
             "target_image": self.target_image,
             "builder_name": self.builder_name,
             "progress": self.progress,
-            "base_layer": self.base_layer
+            "base_layer": self.base_layer,
+            "build_container": self.build_container,
         }
 
     @classmethod
@@ -88,6 +90,7 @@ class Build:
         b.builder_name = j["builder_name"]
         b.progress = j["progress"]
         b.base_layer = j["base_layer"]
+        b.build_container = j["build_container"]
         return b
 
     def append_progress(self, content, layer_id, base_image_id):

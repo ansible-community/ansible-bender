@@ -33,6 +33,7 @@ A database module. A class to manage ab's persistent data.
 }
 """
 import copy
+import datetime
 import json
 import logging
 import os
@@ -161,6 +162,8 @@ class Database:
             if build_state is not None:
                 build_i.state = build_state
             if build_i.build_id is None:
+                timestamp = datetime.datetime.now().strftime("-%Y%M%d-%H%M%S%f")
+                build_i.build_container = build_i.target_image + timestamp + "-cont"
                 build_i.build_id = self._get_and_bump_build_id(data)
             data["builds"][build_i.build_id] = build_i.to_dict()
             self._save(data)

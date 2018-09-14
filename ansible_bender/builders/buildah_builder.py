@@ -130,8 +130,7 @@ class BuildahBuilder(Builder):
         """
         super().__init__(build, debug=debug)
         self.target_image = build.target_image
-        timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S%f")
-        self.ansible_host = self.target_image + timestamp + "-cont"
+        self.ansible_host = build.build_container
         buildah_command_exists()
 
     def create(self, build_volumes=None):
