@@ -1,6 +1,7 @@
 """
 Test Application class
 """
+import logging
 import os
 import random
 import string
@@ -10,6 +11,11 @@ import pytest
 from ansible_bender.api import Application
 from ansible_bender.builders.base import Build, ImageMetadata, BuildState
 from ansible_bender.builders.buildah_builder import buildah
+from ansible_bender.cli import set_logging
+
+
+set_logging(level=logging.DEBUG)
+
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 tests_dir = os.path.dirname(this_dir)

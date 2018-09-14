@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import subprocess
@@ -129,8 +130,8 @@ class BuildahBuilder(Builder):
         """
         super().__init__(build, debug=debug)
         self.target_image = build.target_image
-        # FIXME: pick a container name which does not exist
-        self.ansible_host = self.target_image + "-cont"
+        timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S%f")
+        self.ansible_host = self.target_image + timestamp + "-cont"
         buildah_command_exists()
 
     def create(self, build_volumes=None):

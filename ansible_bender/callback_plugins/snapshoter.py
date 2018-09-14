@@ -23,12 +23,13 @@ class CallbackModule(CallbackBase):
         if task_result._task.action == "setup":
             # we ignore setup
             return
-        if task_result.is_skipped():
-            # TODO: we might need need to record progress to build in db
-            return
         build_id = os.environ["AB_BUILD_ID"]
         a = Application()
         content = self.get_task_content(task_result._task.get_ds())
+        if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
+            self._display.display("recoding cache hit")
+            a.record_progress(None, content, None, build_id=build_id)
+            return
         image_name = a.cache_task_result(content, build_id=build_id)
         self._display.display("caching task result in image '%s'" % image_name)
 

@@ -7,7 +7,7 @@
     debug:
       msg: '{{ ansible_env }}'
   - name: Run a sample command
-    command: 'ls -lha /tmp'
+    command: 'ls -lha /'
   - name: create a file
     copy:
       src: /etc/passwd

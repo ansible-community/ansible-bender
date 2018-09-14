@@ -12,8 +12,8 @@ import pytest
 from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
-tests_dir = os.path.dirname(os.path.dirname(this_dir))
-project_dir = os.path.dirname(os.path.dirname(tests_dir))
+tests_dir = os.path.dirname(this_dir)
+project_dir = os.path.dirname(tests_dir)
 data_dir = os.path.join(tests_dir, "data")
 basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
@@ -56,8 +56,8 @@ def test_output(target_image):
     out = ab(cmd, return_output=True, debug=False)
     assert 'Getting image source signatures' in out
     assert not re.match(r'ERROR\s+Getting image source signatures', out)
-    assert 'Copying blob' in out
-    assert not re.match(r'ERROR\s+Copying blob', out)
+    assert 'Copying ' in out
+    assert not re.match(r'ERROR\s+Copying ', out)
     buildah("inspect", ["-t", "image", target_image])
 
 

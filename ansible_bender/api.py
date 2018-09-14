@@ -68,41 +68,52 @@ class Application:
 
     def maybe_load_from_cache(self, content, build_id):
         build = self.db.get_build(build_id)
-        builder_kls = get_builder(build.builder_name)
-        builder = builder_kls(build, debug=self.debug)
+        builder = self.get_builder(build)
 
         if build.progress:
             last_item = build.progress[-1]
             base_image_id = last_item["image_id"]
         else:
             base_image_id = builder.get_image_id(build.base_image)
-        layer_id = self.db.get_cached_layer(content, base_image_id)
+        layer_id = self.get_layer(content, base_image_id)
         if layer_id:
             builder = self.get_builder(build)
             build.base_layer = layer_id
             builder.swap_working_container()
         return layer_id
 
-    def cache_task_result(self, content, build_id):
-        """ snapshot the container after a task was executed """
-        build = self.db.get_build(build_id)
-        # TODO: setup logging since this called from ansible and log
-        timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
-        image_name = "%s-%s" % (build.target_image, timestamp)
-        # buildah doesn't accept upper case
-        image_name = image_name.lower()
-        builder_kls = get_builder(build.builder_name)
-        builder = builder_kls(build, debug=self.debug)
-        # FIXME: do not commit metadata, just filesystem
-        layer_id = builder.commit(image_name)
+    def get_layer(self, content, base_image_id):
+        return self.db.get_cached_layer(content, base_image_id)
+
+    def record_progress(self, build, content, layer_id, build_id=None):
+        if build_id:
+            build = self.db.get_build(build_id)
+        builder = self.get_builder(build)
         if build.progress:
             last_item = build.progress[-1]
             base_image_id = last_item["image_id"]
         else:
             base_image_id = builder.get_image_id(build.base_image)
+        if not layer_id:
+            # skipped task, not cached
+            layer_id = self.get_layer(content, base_image_id) or base_image_id
         build.append_progress(content, layer_id, base_image_id)
-        self.db.save_layer(layer_id, base_image_id, content)
         self.db.record_build(build)
+        return base_image_id
+
+    def cache_task_result(self, content, build_id):
+        """ snapshot the container after a task was executed """
+        build = self.db.get_build(build_id)
+        # TODO: setup logging since this was called from ansible and log
+        timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
+        image_name = "%s-%s" % (build.target_image, timestamp)
+        # buildah doesn't accept upper case
+        image_name = image_name.lower()
+        builder = self.get_builder(build)
+        # FIXME: do not commit metadata, just filesystem
+        layer_id = builder.commit(image_name)
+        base_image_id = self.record_progress(build, content, layer_id)
+        self.db.save_layer(layer_id, base_image_id, content)
         return image_name
 
     def clean(self):
