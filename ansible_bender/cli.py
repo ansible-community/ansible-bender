@@ -177,6 +177,7 @@ class CLI:
         build.metadata = metadata
         build.state = BuildState.NEW
         build.base_image = self.args.base_image
+        build.base_layer = self.args.base_image
         build.target_image = self.args.target_image
         build.builder_name = self.args.builder
 

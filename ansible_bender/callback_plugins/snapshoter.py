@@ -1,3 +1,5 @@
+import hashlib
+import json
 import os
 
 from ansible.plugins.callback import CallbackBase
@@ -17,23 +19,48 @@ class CallbackModule(CallbackBase):
         snapshot the target container
 
         :param task_result: instance of TaskResult
-        :return:
         """
+        if task_result._task.action == "setup":
+            # we ignore setup
+            return
+        if task_result.is_skipped():
+            # TODO: we might need need to record progress to build in db
+            return
         build_id = os.environ["AB_BUILD_ID"]
-        task_name = task_result.task_name.encode("utf-8")
         a = Application()
-        image_name = a.cache_task_result(task_name, build_id=build_id)
+        content = self.get_task_content(task_result._task.get_ds())
+        image_name = a.cache_task_result(content, build_id=build_id)
         self._display.display("caching task result in image '%s'" % image_name)
 
-    def _load_from_cache(self):
+    @staticmethod
+    def get_task_content(serialized_data):
+        assert serialized_data
+        c = json.dumps(serialized_data, sort_keys=True).encode("utf-8")
+        m = hashlib.sha512(c)
+        return m.hexdigest()
+
+    def _maybe_load_from_cache(self, task):
         """
         load image state from cache
 
-        :return:
+        :param task: instance of Task
         """
+        # TODO: try to control caching with tags: never-cache
+        if task.action == "setup":
+            # we ignore setup
+            return
+        build_id = os.environ["AB_BUILD_ID"]
+        a = Application()
+        content = self.get_task_content(task.get_ds())
+        status = a.maybe_load_from_cache(content, build_id=build_id)
+        if status:
+            self._display.display("loaded from cache: '%s'" % status)
+            task.when = "0"  # skip
+
+    def v2_playbook_on_task_start(self, task, is_conditional):
+        return self._maybe_load_from_cache(task)
 
     def v2_on_any(self, *args, **kwargs):
-        # TODO: before running a task, check cache; try to control this with tags: never-cache
         try:
             first_arg = args[0]
         except IndexError:

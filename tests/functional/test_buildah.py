@@ -12,8 +12,9 @@ import pytest
 from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
-project_dir = os.path.dirname(os.path.dirname(this_dir))
-data_dir = os.path.join(this_dir, "data")
+tests_dir = os.path.dirname(os.path.dirname(this_dir))
+project_dir = os.path.dirname(os.path.dirname(tests_dir))
+data_dir = os.path.join(tests_dir, "data")
 basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 base_image = "docker.io/library/python:3-alpine"
@@ -32,7 +33,7 @@ def random_word(length):
     return ''.join(random.choice(letters) for _ in range(length))
 
 
-def ab(args, debug=True, return_output=False, ignore_result=False):
+def ab(args, debug=False, return_output=False, ignore_result=False):
     """
     python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
 
@@ -111,7 +112,7 @@ def test_build_basic_image_with_build_volumes(tmpdir, target_image):
     ab(cmd)
 
 
-def test_build_basic_image_with_all_params(tmpdir, target_image):
+def test_build_basic_image_with_all_params(target_image):
     workdir_path = "/etc"
     l_a_b = "A=B"
     l_x_y = "x=y"
@@ -157,14 +158,15 @@ def test_build_failure():
 
 
 def test_two_runs(target_image):
-    """ run ab twice and see if the other instance fails """
+    """ this is a naive test to verify race condition """
     cmd = ["python3", "-m", "ansible_bender.cli", "build", basic_playbook_path, base_image,
            target_image]
     p1 = subprocess.Popen(cmd)
-    p2 = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p2.communicate()
-    assert "ab is already running" in err.decode("utf-8")
+    p2 = subprocess.Popen(cmd)
     p1.wait()
+    p2.wait()
+    assert p1.returncode == 0
+    assert p2.returncode == 0
 
 
 def test_buildah_err_output(capfd):

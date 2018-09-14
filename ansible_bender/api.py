@@ -1,6 +1,5 @@
 import logging
 import os
-import base64
 import datetime
 
 from ansible_bender.builder import get_builder
@@ -35,7 +34,7 @@ class Application:
         # record as soon as possible
         self.db.record_build(build)
 
-        builder = get_builder(build.builder_name)(build, debug=self.debug)
+        builder = self.get_builder(build)
         a_runner = AnsibleRunner(playbook_path, builder, build, debug=self.debug)
 
         self.db.record_build(build, build_state=BuildState.IN_PROGRESS)
@@ -50,7 +49,7 @@ class Application:
             try:
                 a_runner.build(python_interpreter=py_intrprtr)
             except AbBuildUnsuccesful:
-                self.db.record_build(build, build_state=BuildState.FAILED)
+                self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED)
                 # TODO: let this be done by the callback plugin
                 image_name = build.target_image + "-failed"
                 builder.commit(image_name)
@@ -58,29 +57,53 @@ class Application:
                 out_logger.info("The progress is saved into image '%s'", image_name)
                 raise
 
-            self.db.record_build(build, build_state=BuildState.DONE)
+            self.db.record_build(None, build_id=build.build_id, build_state=BuildState.DONE)
             builder.commit(build.target_image)
             out_logger.info("Image '%s' was built successfully \o/",  build.target_image)
         finally:
             builder.clean()
 
-    def cache_task_result(self, task_name, build_id):
-        """ snapshot the container after a task was executed """
-        if isinstance(build_id, str):
-            build_id = build_id
+    def get_builder(self, build):
+        return get_builder(build.builder_name)(build, debug=self.debug)
+
+    def maybe_load_from_cache(self, content, build_id):
         build = self.db.get_build(build_id)
-        # TODO: load build, initiated builder and commit, log results
-        # TODO: add here whole task code and task result and also hash referenced files
-        layer_hash = base64.b64encode(task_name)[:8].decode("utf-8")
+        builder_kls = get_builder(build.builder_name)
+        builder = builder_kls(build, debug=self.debug)
+
+        if build.progress:
+            last_item = build.progress[-1]
+            base_image_id = last_item["image_id"]
+        else:
+            base_image_id = builder.get_image_id(build.base_image)
+        layer_id = self.db.get_cached_layer(content, base_image_id)
+        if layer_id:
+            builder = self.get_builder(build)
+            build.base_layer = layer_id
+            builder.swap_working_container()
+        return layer_id
+
+    def cache_task_result(self, content, build_id):
+        """ snapshot the container after a task was executed """
+        build = self.db.get_build(build_id)
+        # TODO: setup logging since this called from ansible and log
         timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
-        image_name = "%s-%s-%s" % (build.target_image, layer_hash, timestamp)
+        image_name = "%s-%s" % (build.target_image, timestamp)
         # buildah doesn't accept upper case
         image_name = image_name.lower()
         builder_kls = get_builder(build.builder_name)
         builder = builder_kls(build, debug=self.debug)
         # FIXME: do not commit metadata, just filesystem
-        builder.commit(image_name)
+        layer_id = builder.commit(image_name)
+        if build.progress:
+            last_item = build.progress[-1]
+            base_image_id = last_item["image_id"]
+        else:
+            base_image_id = builder.get_image_id(build.base_image)
+        build.append_progress(content, layer_id, base_image_id)
+        self.db.save_layer(layer_id, base_image_id, content)
+        self.db.record_build(build)
         return image_name
 
     def clean(self):
-        pass
+        self.db.release()

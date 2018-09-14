@@ -15,7 +15,7 @@ A_CFG_TEMPLATE = """\
 retry_files_enabled = False
 # when user is changed, ansible might not be able to write to /.ansible
 remote_tmp = /tmp
-callback_plugins={}
+callback_plugins={0}
 callback_whitelist=snapshoter\n
 """
 
@@ -30,7 +30,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
 
     ]
     if debug:
-        cmd_args += ["-vvvvv"]
+        cmd_args += ["-vvv"]
     if extra_variables:
         cmd_args += ["--extra-vars"] + \
                     [" ".join(

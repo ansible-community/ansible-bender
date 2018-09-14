@@ -53,13 +53,16 @@ class ImageMetadata:
 class Build:
     """ class which represents a build """
     def __init__(self):
+        # TODO: record every input about build into db
         self.build_id = None  # PK, should be set by database
         self.metadata = None  # Image metadata
         self.state = None  # enum, BuildState
         # TODO: dates and times
         self.base_image = None
+        self.base_layer = None  # ideally this one would be picked up from progress
         self.target_image = None
         self.builder_name = None
+        self.progress = []
 
     def to_dict(self):
         return {
@@ -68,7 +71,9 @@ class Build:
             "state": self.state.value,
             "base_image": self.base_image,
             "target_image": self.target_image,
-            "builder_name": self.builder_name
+            "builder_name": self.builder_name,
+            "progress": self.progress,
+            "base_layer": self.base_layer
         }
 
     @classmethod
@@ -81,7 +86,14 @@ class Build:
         b.base_image = j["base_image"]
         b.target_image = j["target_image"]
         b.builder_name = j["builder_name"]
+        b.progress = j["progress"]
+        b.base_layer = j["base_layer"]
         return b
+
+    def append_progress(self, content, layer_id, base_image_id):
+        self.progress.append(
+            {"content": content, "base_image_id": base_image_id, "image_id": layer_id}
+        )
 
 
 class BuildState(Enum):
@@ -128,6 +140,9 @@ class Builder:
         """
         clean working container
         """
+
+    def get_image_id(self, image_name):
+        """ return image_id for provided image """
 
     def is_image_present(self, image_reference):
         """

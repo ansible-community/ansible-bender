@@ -1,2 +1,2 @@
-tests/functional/data/basic_playbook.retry
-tests/functional/data/basic_playbook_with_volume.retry
+tests/data/basic_playbook.retry
+tests/data/basic_playbook_with_volume.retry

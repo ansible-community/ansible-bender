@@ -17,8 +17,18 @@ A database module. A class to manage ab's persistent data.
                 user: ...
                 env: ...
                 ...
-            }
+            },
+            progress: [
+                {content: "", base_image_id: "", image_id: ""}
+            ]
         },
+    },
+    "store": {
+        "base-image-id": {
+            content: {
+                image_id:
+            }
+        }
     }
 }
 """
@@ -27,13 +37,15 @@ import json
 import logging
 import os
 import time
+import traceback
 from contextlib import contextmanager
 
 from ansible_bender.builders.base import Build
 
 DEFAULT_DATA = {
     "next_build_id": 1,
-    "builds": {}
+    "builds": {},
+    "store": {}
 }
 
 
@@ -57,7 +69,8 @@ class Database:
                 with open(Database._lock_path(), "r") as fd:
                     # the file exists, ab changes the database
                     pid = fd.read()
-                logger.debug("ab is running as PID %s", pid)
+                logger.info("ab is running as PID %s", pid)
+                logger.debug("stack trace: %s", traceback.extract_stack())
                 time.sleep(0.1)
             except FileNotFoundError:
                 # cool, let's take the lock
@@ -65,12 +78,16 @@ class Database:
                 with open(Database._lock_path(), "w") as fd:
                     fd.write("%s" % os.getpid())
                 break
+        logger.debug("this stack has the lock: %s", traceback.extract_stack())
         yield True
         self.release()
 
     def release(self):
         """ release lock """
-        os.unlink(self._lock_path())
+        try:
+            os.unlink(self._lock_path())
+        except FileNotFoundError:
+            pass
 
     @staticmethod
     def _runtime_dir_path():
@@ -114,6 +131,9 @@ class Database:
             logger.debug("initializing database")
             return copy.deepcopy(DEFAULT_DATA)
 
+    def _load_build(self, data, build_id):
+        return Build.from_json(data["builds"][build_id])  # TODO: error checking
+
     def _save(self, data):
         """ save data from memory to disk, lock has to be acquired already! """
         with open(self._db_path(), "w") as fd:
@@ -126,15 +146,18 @@ class Database:
         data["next_build_id"] += 1
         return str(next_build_id)
 
-    def record_build(self, build_i, build_state=None):
+    def record_build(self, build_i, build_id=None, build_state=None):
         """
         record build into database
 
         :param build_i: Build instance
+        :param build_id: str, id of the build to load from DB
         :param build_state: one of BuildState
         """
         with self.acquire():
             data = self._load()
+            if build_id is not None:
+                build_i = self._load_build(data, build_id)
             if build_state is not None:
                 build_i.state = build_state
             if build_i.build_id is None:
@@ -151,4 +174,22 @@ class Database:
         """
         with self.acquire():
             data = self._load()
-            return Build.from_json(data["builds"][build_id])  # TODO: error checking
+            return self._load_build(data, build_id)
+
+    def save_layer(self, layer_id, base_image, content):
+        with self.acquire():
+            data = self._load()
+            store = data["store"]
+            store.setdefault(base_image, {})
+            store[base_image].setdefault(content, {})
+            store[base_image][content]["image_id"] = layer_id
+            self._save(data)
+
+    def get_cached_layer(self, content, base_image_id):
+        with self.acquire():
+            data = self._load()
+            store = data["store"]
+            try:
+                return store[base_image_id][content]["image_id"]
+            except KeyError:
+                return

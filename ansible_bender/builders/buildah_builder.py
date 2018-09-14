@@ -101,8 +101,8 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
 
 def buildah(command, args_and_opts, print_output=False, debug=False):
     cmd = ["buildah"]
-    if debug:
-        cmd += ["--debug"]
+    # if debug:
+    #     cmd += ["--debug"]
     cmd += [command] + args_and_opts
     logger.debug("running command: %s", command)
     return run_cmd(cmd, print_output=print_output, log_stderr=False)
@@ -110,8 +110,8 @@ def buildah(command, args_and_opts, print_output=False, debug=False):
 
 def buildah_with_output(command, args_and_opts, debug=False):
     cmd = ["buildah"]
-    if debug:
-        cmd += ["--debug"]
+    # if debug:
+    #     cmd += ["--debug"]
     cmd += [command] + args_and_opts
     output = run_cmd(cmd, return_output=True)
     logger.debug("output: %s", output)
@@ -138,7 +138,7 @@ class BuildahBuilder(Builder):
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
         create_buildah_container(
-            self.build.base_image, self.ansible_host, build_volumes=build_volumes, debug=self.debug)
+            self.build.base_layer, self.ansible_host, build_volumes=build_volumes, debug=self.debug)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
             self.ansible_host, working_dir=self.build.metadata.working_dir,
@@ -148,6 +148,15 @@ class BuildahBuilder(Builder):
                                                 # before doing commit
             debug=self.debug
         )
+
+    def swap_working_container(self):
+        """
+        remove current working container and replace it with the provided one
+
+        :param image_id: str
+        """
+        self.clean()
+        self.create()  # FIXME: store build volumes in db
 
     def commit(self, image_name):
         if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:
@@ -159,6 +168,7 @@ class BuildahBuilder(Builder):
             )
         buildah("commit", [self.ansible_host, image_name], print_output=True,
                 debug=self.debug)
+        return self.get_image_id(image_name)
 
     def clean(self):
         """
@@ -166,11 +176,15 @@ class BuildahBuilder(Builder):
         """
         buildah("rm", [self.ansible_host], debug=self.debug)
 
+    def get_image_id(self, image_name):
+        """ return image_id for provided image """
+        return get_buildah_image_id(image_name)
+
     def is_image_present(self, image_reference):
         """
         :return: True when the selected image is present, False otherwise
         """
-        return bool(get_buildah_image_id(image_reference))
+        return bool(self.get_image_id(image_reference))
 
     def pull(self):
         """
