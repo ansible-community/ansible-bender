@@ -52,6 +52,9 @@ def test_caching(target_image):
         a.build(basic_playbook_path, build)
         b2 = Build.from_json(build.to_dict())
         a.build(basic_playbook_path, b2)
+        build = a.db.get_build(build.build_id)
+        b2 = a.db.get_build(b2.build_id)
         assert b2.progress == build.progress
+        assert len(build.progress) == 4
     finally:
         a.clean()
