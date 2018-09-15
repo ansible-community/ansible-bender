@@ -9,7 +9,7 @@ import subprocess
 
 import pytest
 
-from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource
+from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, podman_run_cmd
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 tests_dir = os.path.dirname(this_dir)
@@ -79,7 +79,9 @@ def test_build_basic_image_with_env_vars(target_image):
     out = inspect_buildah_resource("image", target_image)
     assert a_b in out["OCIv1"]["config"]["Env"]
     assert x_y in out["OCIv1"]["config"]["Env"]
-    # TODO: also run container and make sure that the env var is set inside the container
+    e = podman_run_cmd(target_image, ["env"], return_output=True)
+    assert a_b in e
+    assert x_y in e
 
 
 def test_build_basic_image_with_wrong_env_vars(target_image):
