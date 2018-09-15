@@ -29,11 +29,10 @@ class CallbackModule(CallbackBase):
         a = Application()
         content = self.get_task_content(task_result._task.get_ds())
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
-            self._display.display("recording cache hit")
             a.record_progress(None, content, None, build_id=build_id)
             return
         image_name = a.cache_task_result(content, build_id=build_id)
-        self._display.display("caching task result in image '%s'" % image_name)
+        self._display.display("caching the task result in an image '%s'" % image_name)
 
     @staticmethod
     def get_task_content(serialized_data):
