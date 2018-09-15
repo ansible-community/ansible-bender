@@ -25,6 +25,8 @@ class CallbackModule(CallbackBase):
         if task_result._task.action == "setup":
             # we ignore setup
             return
+        if task_result.is_failed() or task_result._result.get("rc", 0) > 0:
+            return
         build_id = os.environ["AB_BUILD_ID"]
         a = Application()
         content = self.get_task_content(task_result._task.get_ds())
