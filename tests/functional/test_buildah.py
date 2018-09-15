@@ -11,6 +11,7 @@ import pytest
 
 from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, podman_run_cmd
 
+
 this_dir = os.path.dirname(os.path.abspath(__file__))
 tests_dir = os.path.dirname(this_dir)
 project_dir = os.path.dirname(tests_dir)
@@ -149,7 +150,7 @@ def test_build_basic_image_with_all_params(target_image):
     assert co["User"] == user
     assert p_80 in co["ExposedPorts"]
     assert p_443 in co["ExposedPorts"]
-    # assert runtime_volume in co["Volumes"]  # FIXME: figure out how to check this
+    # FIXME: the volume is not set; a bug in buildah or ab?
 
 
 def test_build_failure():
