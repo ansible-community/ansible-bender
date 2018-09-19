@@ -58,3 +58,22 @@ def test_caching(target_image):
         assert len(build.progress) == 4
     finally:
         a.clean()
+
+
+def test_disabled_caching(target_image):
+    build = Build()
+    build.base_image = base_image
+    build.base_layer = base_image
+    build.target_image = target_image
+    build.metadata = ImageMetadata()
+    build.state = BuildState.NEW
+    build.builder_name = "buildah"  # test with all builders
+    build.cache_tasks = False
+    a = Application()
+    try:
+        a.build(basic_playbook_path, build)
+        build = a.db.get_build(build.build_id)
+        assert build.base_image == build.base_layer
+        assert len(build.progress) == 0
+    finally:
+        a.clean()

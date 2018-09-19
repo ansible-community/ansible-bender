@@ -64,6 +64,7 @@ class Build:
         self.target_image = None
         self.builder_name = None
         self.progress = []
+        self.cache_tasks = True
 
     def to_dict(self):
         return {
@@ -76,6 +77,7 @@ class Build:
             "progress": self.progress,
             "base_layer": self.base_layer,
             "build_container": self.build_container,
+            "cache_tasks": self.cache_tasks,
         }
 
     @classmethod
@@ -91,6 +93,7 @@ class Build:
         b.progress = j["progress"]
         b.base_layer = j["base_layer"]
         b.build_container = j["build_container"]
+        b.cache_tasks = j["cache_tasks"]
         return b
 
     def append_progress(self, content, layer_id, base_image_id):

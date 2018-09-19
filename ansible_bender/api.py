@@ -70,6 +70,9 @@ class Application:
         build = self.db.get_build(build_id)
         builder = self.get_builder(build)
 
+        if not build.cache_tasks:
+            return
+
         if build.progress:
             last_item = build.progress[-1]
             base_image_id = last_item["image_id"]
@@ -104,6 +107,8 @@ class Application:
     def cache_task_result(self, content, build_id):
         """ snapshot the container after a task was executed """
         build = self.db.get_build(build_id)
+        if not build.cache_tasks:
+            return
         timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         image_name = "%s-%s" % (build.target_image, timestamp)
         # buildah doesn't accept upper case

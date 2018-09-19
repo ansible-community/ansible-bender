@@ -34,7 +34,8 @@ class CallbackModule(CallbackBase):
             a.record_progress(None, content, None, build_id=build_id)
             return
         image_name = a.cache_task_result(content, build_id=build_id)
-        self._display.display("caching the task result in an image '%s'" % image_name)
+        if image_name:
+            self._display.display("caching the task result in an image '%s'" % image_name)
 
     @staticmethod
     def get_task_content(serialized_data):

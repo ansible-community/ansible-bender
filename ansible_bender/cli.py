@@ -97,6 +97,12 @@ class CLI:
                                        default="buildah",
                                        choices=["docker", "buildah"])
         self.build_parser.add_argument(
+            "--no-cache",
+            action="store_true",
+            help="disable caching mechanism: storing layers and loading them; when disabled, "
+                 "the final image is composed of a single layer"
+        )
+        self.build_parser.add_argument(
             "--build-volumes",
             help="mount selected directory inside the container during build, "
                  "should be specified as '/host/dir:/container/dir'",
@@ -182,6 +188,7 @@ class CLI:
         build.base_layer = self.args.base_image
         build.target_image = self.args.target_image
         build.builder_name = self.args.builder
+        build.cache_tasks = not self.args.no_cache
 
         app = Application(debug=self.args.debug)
         try:
