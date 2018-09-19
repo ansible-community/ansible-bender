@@ -22,9 +22,9 @@ callback_whitelist=snapshoter\n
 
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
                  ansible_args=None, debug=False, environment=None):
-    ap_command_exists()
+    ap = ap_command_exists()
     cmd_args = [
-        "ansible-playbook-3",  # FIXME: find ansible, prefer python 3
+        ap,
         "-i", inventory_path,
         "-c", connection,
 

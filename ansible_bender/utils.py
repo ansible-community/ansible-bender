@@ -94,7 +94,7 @@ class CommandDoesNotExistException(Exception):
     pass
 
 
-def command_exists(command, exc_msg):
+def one_of_commands_exists(commands, exc_msg):
     """
     Verify that the provided command exists. Raise CommandDoesNotExistException in case of an
     error or if the command does not exist.
@@ -103,15 +103,18 @@ def command_exists(command, exc_msg):
     :param exc_msg: str, message of exception when command does not exist
     :return: bool, True if everything's all right (otherwise exception is thrown)
     """
-    found = bool(shutil.which(command))  # py3 only
+    found = False
+    for command in commands:
+        found = bool(shutil.which(command))  # py3 only
+        if found:
+            return command
     if not found:
         raise CommandDoesNotExistException(exc_msg)
-    return True
 
 
 def ap_command_exists():
-    return command_exists(
-        "ansible-playbook",
+    return one_of_commands_exists(
+        ["ansible-playbook-3", "ansible-playbook"],
         "ansible-playbook command doesn't seem to be available on your system. "
         "It is usually available in 'ansible' package or follow the upstream instructions "
         "available at https://docs.ansible.com/ansible/latest/installation_guide/"
@@ -120,8 +123,8 @@ def ap_command_exists():
 
 
 def buildah_command_exists():
-    return command_exists(
-        "buildah",
+    return one_of_commands_exists(
+        ["buildah"],
         "buildah command doesn't seem to be available on your system. "
         "Please follow the upstream instructions "
         "available at https://github.com/projectatomic/buildah/blob/master/install.md"
@@ -129,8 +132,8 @@ def buildah_command_exists():
 
 
 def podman_command_exists():
-    return command_exists(
-        "podman",
+    return one_of_commands_exists(
+        ["podman"],
         "podman command doesn't seem to be available on your system. "
         "Please follow the upstream instructions "
         "available at https://github.com/containers/libpod/blob/master/install.md"
