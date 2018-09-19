@@ -3,38 +3,13 @@ Make sure that we can build using buildah builder.
 """
 import os
 import re
-import random
-import string
 import subprocess
 
 import pytest
 
 from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, podman_run_cmd
-
-
-this_dir = os.path.dirname(os.path.abspath(__file__))
-tests_dir = os.path.dirname(this_dir)
-project_dir = os.path.dirname(tests_dir)
-data_dir = os.path.join(tests_dir, "data")
-basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
-bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
-base_image = "docker.io/library/python:3-alpine"
-
-
-@pytest.fixture()
-def target_image():
-    im = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
-    yield im
-    try:
-        buildah("rmi", [im])
-    except subprocess.CalledProcessError:
-        pass
-
-
-def random_word(length):
-    # https://stackoverflow.com/a/2030081/909579
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for _ in range(length))
+from ..spellbook import basic_playbook_path, base_image, target_image, project_dir, \
+    bad_playbook_path, random_word
 
 
 def ab(args, debug=False, return_output=False, ignore_result=False):
