@@ -37,6 +37,9 @@ It's just using Ansible to do something magical.**
   * default command
   * exposed ports
 * You can do volume mounts during build.
+* Caching mechanism:
+  * Every task result is cached as a container image layer.
+  * You can turn this off with `--no-cache`
 
 
 ## Installation
