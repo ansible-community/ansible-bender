@@ -1,8 +1,10 @@
 """
 Base class for builders
 """
-
+import datetime
 from enum import Enum
+
+from ansible_bender.constants import TIMESTAMP_FORMAT
 
 
 class ImageMetadata:
@@ -57,20 +59,26 @@ class Build:
         self.build_id = None  # PK, should be set by database
         self.metadata = None  # Image metadata
         self.state = None  # enum, BuildState
-        # TODO: dates and times
+        self.build_start_time = None
+        self.build_finished_time = None
         self.base_image = None
         self.base_layer = None  # ideally this one would be picked up from progress
         self.build_container = None
         self.target_image = None
         self.builder_name = None
-        self.progress = []
+        self.progress = []  # TODO: refactor into layers & cache
         self.cache_tasks = True
+        # TODO: store logs (compressed & base64?)
 
     def to_dict(self):
         return {
             "build_id": self.build_id,
             "metadata": self.metadata.to_dict(),
             "state": self.state.value,
+            "build_start_time": self.build_start_time.strftime(TIMESTAMP_FORMAT)
+                if self.build_start_time else None,
+            "build_finished_time": self.build_finished_time.strftime(TIMESTAMP_FORMAT)
+                if self.build_finished_time else None,
             "base_image": self.base_image,
             "target_image": self.target_image,
             "builder_name": self.builder_name,
@@ -87,6 +95,14 @@ class Build:
         b.build_id = j["build_id"]
         b.metadata = ImageMetadata.from_json(j["metadata"])
         b.state = BuildState(j["state"])
+        b.build_start_time = None
+        sta = j["build_start_time"]
+        if sta:
+            b.build_start_time = datetime.datetime.strptime(sta, TIMESTAMP_FORMAT)
+        b.build_finished_time = None
+        fin = j["build_finished_time"]
+        if fin:
+            b.build_finished_time = datetime.datetime.strptime(fin, TIMESTAMP_FORMAT)
         b.base_image = j["base_image"]
         b.target_image = j["target_image"]
         b.builder_name = j["builder_name"]

@@ -6,6 +6,24 @@ from ansible_bender.builders.base import Build, ImageMetadata, BuildState
 from ..spellbook import basic_playbook_path, base_image, target_image
 
 
+def test_build_db_metadata(target_image):
+    build = Build()
+    build.base_image = base_image
+    build.base_layer = base_image
+    build.target_image = target_image
+    build.metadata = ImageMetadata()
+    build.state = BuildState.NEW
+    build.builder_name = "buildah"  # test with all builders
+    a = Application()
+    try:
+        a.build(basic_playbook_path, build)
+        build = a.db.get_build(build.build_id)
+        assert build.build_finished_time is not None
+        assert build.build_start_time is not None
+    finally:
+        a.clean()
+
+
 def test_caching(target_image):
     build = Build()
     build.base_image = base_image

@@ -42,6 +42,7 @@ import traceback
 from contextlib import contextmanager
 
 from ansible_bender.builders.base import Build
+from ansible_bender.constants import TIMESTAMP_FORMAT
 
 DEFAULT_DATA = {
     "next_build_id": 1,
@@ -147,13 +148,14 @@ class Database:
         data["next_build_id"] += 1
         return str(next_build_id)
 
-    def record_build(self, build_i, build_id=None, build_state=None):
+    def record_build(self, build_i, build_id=None, build_state=None, set_finish_time=False):
         """
         record build into database
 
         :param build_i: Build instance
         :param build_id: str, id of the build to load from DB
         :param build_state: one of BuildState
+        :param set_finish_time: bool, set build_finish_time to current time
         """
         with self.acquire():
             data = self._load()
@@ -162,9 +164,11 @@ class Database:
             if build_state is not None:
                 build_i.state = build_state
             if build_i.build_id is None:
-                timestamp = datetime.datetime.now().strftime("-%Y%M%d-%H%M%S%f")
+                timestamp = datetime.datetime.now().strftime("-" + TIMESTAMP_FORMAT)
                 build_i.build_container = build_i.target_image + timestamp + "-cont"
                 build_i.build_id = self._get_and_bump_build_id(data)
+            if set_finish_time:
+                build_i.build_finished_time = datetime.datetime.now()
             data["builds"][build_i.build_id] = build_i.to_dict()
             self._save(data)
 
