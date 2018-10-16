@@ -30,18 +30,20 @@ def graceful_get(d, *keys):
 
 
 class StreamLogger(threading.Thread):
-    def __init__(self, stream, print_output=False, log_level=logging.DEBUG):
+    def __init__(self, stream, print_output=False, log_level=logging.DEBUG, log_output=True):
         super().__init__(daemon=True)  # the threads should not linger
         self.stream = stream
         self.output = []
         self.log_level = log_level
+        self.log_output = log_output
         self.print_output = print_output
 
     def run(self):
         for line in self.stream:
             line = line.rstrip("\n")
             self.output.append(line)
-            logger.log(self.log_level, line)
+            if self.log_output:
+                logger.log(self.log_level, line)
             if self.print_output:
                 out_logger.info(line)
 
@@ -50,7 +52,7 @@ class StreamLogger(threading.Thread):
 
 
 def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, log_stderr=True,
-            **kwargs):
+            log_output=True, **kwargs):
     """
     run provided command on host system using the same user as you invoked this code, raises
     subprocess.CalledProcessError if it fails
@@ -62,13 +64,15 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
             please check `help(subprocess.Popen)`
     :param print_output: bool, print output via print()
     :param log_stderr: bool, log errors to stdout as ERROR level
+    :param log_output: bool, print output of the command to logs
     :return: None or str
     """
     logger.info('running command: "%s"', cmd)
     logger.debug('%s', " ".join(cmd))  # so you can easily copy/paste
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, **kwargs)
-    o = StreamLogger(process.stdout, print_output=print_output, log_level=logging.DEBUG)
+    o = StreamLogger(process.stdout, print_output=print_output, log_level=logging.DEBUG,
+                     log_output=log_output)
     stderr_log_lvl = logging.ERROR if log_stderr else logging.DEBUG
     e = StreamLogger(process.stderr, print_output=print_output, log_level=stderr_log_lvl)
     o.start()

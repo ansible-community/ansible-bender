@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 def inspect_buildah_resource(resource_type, resource_id):
     try:
-        i = run_cmd(["buildah", "inspect", "-t", resource_type, resource_id], return_output=True)
+        i = run_cmd(["buildah", "inspect", "-t", resource_type, resource_id],
+                    return_output=True, log_output=False)
     except subprocess.CalledProcessError:
         logger.info("no such %s %s", resource_type, resource_id)
         return None
