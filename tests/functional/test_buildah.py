@@ -12,13 +12,13 @@ from ..spellbook import basic_playbook_path, base_image, target_image, project_d
     bad_playbook_path, random_word
 
 
-def ab(args, debug=False, return_output=False, ignore_result=False):
+def ab(args, tmpdir_path, debug=False, return_output=False, ignore_result=False):
     """
     python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
 
     :return:
     """
-    cmd = ["python3", "-m", "ansible_bender.cli"]
+    cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path]
     if debug:
         cmd += ["--debug"]
     if ignore_result:
@@ -30,9 +30,9 @@ def ab(args, debug=False, return_output=False, ignore_result=False):
         subprocess.check_call(cmd + args, cwd=project_dir)
 
 
-def test_output(target_image):
+def test_output(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
-    out = ab(cmd, return_output=True, debug=False)
+    out = ab(cmd, str(tmpdir), return_output=True, debug=False)
     assert 'Getting image source signatures' in out
     assert not re.match(r'ERROR\s+Getting image source signatures', out)
     assert 'Copying ' in out
@@ -40,18 +40,18 @@ def test_output(target_image):
     buildah("inspect", ["-t", "image", target_image])
 
 
-def test_build_basic_image(target_image):
+def test_build_basic_image(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
-    ab(cmd)
+    ab(cmd, str(tmpdir))
     buildah("inspect", ["-t", "image", target_image])
 
 
-def test_build_basic_image_with_env_vars(target_image):
+def test_build_basic_image_with_env_vars(tmpdir, target_image):
     a_b = "A=B"
     x_y = "X=Y"
     cmd = ["build", "-e", a_b, x_y, "--",
            basic_playbook_path, base_image, target_image]
-    ab(cmd)
+    ab(cmd, str(tmpdir))
     out = inspect_buildah_resource("image", target_image)
     assert a_b in out["OCIv1"]["config"]["Env"]
     assert x_y in out["OCIv1"]["config"]["Env"]
@@ -60,23 +60,23 @@ def test_build_basic_image_with_env_vars(target_image):
     assert x_y in e
 
 
-def test_build_basic_image_with_wrong_env_vars(target_image):
+def test_build_basic_image_with_wrong_env_vars(tmpdir, target_image):
     la_la_la = "AB-LA-BLA-LA-LA-BLA"
     cmd = ["build", "-e", la_la_la, "--", basic_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError) as exc:
-        ab(cmd)
+        ab(cmd, str(tmpdir))
         e = ("There was an error during execution: "
              "Environment variable {} doesn't seem to be "
              "specified in format 'KEY=VALUE'.".format(la_la_la))
         assert e in exc.value.message
 
 
-def test_build_basic_image_with_labels(target_image):
+def test_build_basic_image_with_labels(tmpdir, target_image):
     a_b = "A=B"
     x_y = "x=y"
     cmd = ["build", "-l", a_b, x_y, "--",
            basic_playbook_path, base_image, target_image]
-    ab(cmd)
+    ab(cmd, str(tmpdir))
     out = inspect_buildah_resource("image", target_image)
     assert out["OCIv1"]["config"]["Labels"]["A"] == "B"
     assert out["OCIv1"]["config"]["Labels"]["x"] == "y"
@@ -90,10 +90,10 @@ def test_build_basic_image_with_build_volumes(tmpdir, target_image):
     vol_spec = "%s:%s" % (real_tmp, container_mount)
     cmd = ["build", "--build-volumes", vol_spec, "--",
            basic_playbook_path, base_image, target_image]
-    ab(cmd)
+    ab(cmd, str(tmpdir))
 
 
-def test_build_basic_image_with_all_params(target_image):
+def test_build_basic_image_with_all_params(tmpdir, target_image):
     workdir_path = "/etc"
     l_a_b = "A=B"
     l_x_y = "x=y"
@@ -113,7 +113,7 @@ def test_build_basic_image_with_all_params(target_image):
            "--runtime-volumes", runtime_volume,
            "--",
            basic_playbook_path, base_image, target_image]
-    ab(cmd)
+    ab(cmd, str(tmpdir))
     out = inspect_buildah_resource("image", target_image)
     co = out["OCIv1"]["config"]
     assert co["WorkingDir"] == workdir_path
@@ -128,19 +128,20 @@ def test_build_basic_image_with_all_params(target_image):
     # FIXME: the volume is not set; a bug in buildah or ab?
 
 
-def test_build_failure():
+def test_build_failure(tmpdir):
     target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     target_failed_image = target_image + "-failed"
     cmd = ["build", bad_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError):
-        ab(cmd)
+        ab(cmd, str(tmpdir))
     buildah("inspect", ["-t", "image", target_failed_image])
     buildah("rmi", [target_failed_image])
 
 
-def test_two_runs(target_image):
+def test_two_runs(tmpdir, target_image):
     """ this is a naive test to verify race condition """
-    cmd = ["python3", "-m", "ansible_bender.cli", "build", basic_playbook_path, base_image,
+    cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", str(tmpdir),
+           "build", basic_playbook_path, base_image,
            target_image]
     p1 = subprocess.Popen(cmd)
     p2 = subprocess.Popen(cmd)
@@ -150,9 +151,9 @@ def test_two_runs(target_image):
     assert p2.returncode == 0
 
 
-def test_buildah_err_output(capfd):
+def test_buildah_err_output(tmpdir, capfd):
     cmd = ["build", basic_playbook_path, base_image, "vrerv\\23&^&4//5B/F/BSFD/B"]
-    ab(cmd, debug=False, ignore_result=True)
+    ab(cmd, str(tmpdir), debug=False, ignore_result=True)
     c = capfd.readouterr()
     assert "error parsing target image name" in c.err
     assert "Invalid image name" in c.err
