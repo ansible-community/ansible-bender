@@ -156,5 +156,3 @@ def test_buildah_err_output(tmpdir, capfd):
     ab(cmd, str(tmpdir), debug=False, ignore_result=True)
     c = capfd.readouterr()
     assert "error parsing target image name" in c.err
-    assert "Invalid image name" in c.err
-    assert "was an error during" in c.err

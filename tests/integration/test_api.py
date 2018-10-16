@@ -38,8 +38,10 @@ def test_build_db_metadata(target_image, application, build):
 
 def test_caching(target_image, application, build):
     try:
-        application.build(basic_playbook_path, build)
         b2 = Build.from_json(build.to_dict())
+        application.build(basic_playbook_path, build)
+        b2.build_id = None
+        b2.target_image += "2"
         application.build(basic_playbook_path, b2)
         build = application.db.get_build(build.build_id)
         b2 = application.db.get_build(b2.build_id)
