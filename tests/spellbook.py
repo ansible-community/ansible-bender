@@ -17,6 +17,7 @@ project_dir = os.path.dirname(tests_dir)
 data_dir = os.path.join(tests_dir, "data")
 basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
+# TODO: check if the image exists, if not, pull it
 base_image = "docker.io/library/python:3-alpine"
 
 
@@ -25,6 +26,7 @@ def target_image():
     im = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     yield im
     buildah("rmi", [im])  # FIXME: use builder interface instead for sake of other backends
+    # FIXME: dont traceback if rmi operation fails
 
 
 def random_word(length):

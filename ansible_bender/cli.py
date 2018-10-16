@@ -9,6 +9,7 @@ import sys
 from ansible_bender.api import Application
 from ansible_bender.builders.base import ImageMetadata, Build, BuildState
 from ansible_bender.constants import OUT_LOGGER_FORMAT, OUT_LOGGER
+from ansible_bender.db import Database
 
 
 def set_logging(
@@ -76,6 +77,13 @@ class CLI:
                                  help="provide verbose output")
         self.parser.add_argument("--debug", action="store_true",
                                  help="provide all the output")
+        candidates_str = ", ".join(filter(lambda x: x, Database.path_candidates))
+        self.parser.add_argument(
+            "--database-dir",
+            action="store",
+            help="a path to directory where ab will store runtime data, defaults to: \"%s\""
+                 % candidates_str
+        )
         subparsers = self.parser.add_subparsers( help='commands')
         self.build_parser = subparsers.add_parser(
             name="build",
@@ -190,7 +198,7 @@ class CLI:
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
 
-        app = Application(debug=self.args.debug)
+        app = Application(debug=self.args.debug, db_path=self.args.database_dir)
         try:
             app.build(self.args.playbook_path, build, build_volumes=self.args.build_volumes)
         finally:

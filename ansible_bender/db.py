@@ -55,11 +55,18 @@ logger = logging.getLogger(__name__)
 
 
 class Database:
-    """ Simple implementation of persistent data store for ab; it's just a locked json file  """
+    """ Simple implementation of persistent data store for ab; it's just a locked json file """
+    path_candidates = [
+        os.environ.get("XDG_RUNTIME_DIR", ""),
+        "~/.cache",
+        "/var/tmp"
+    ]
 
-    def __init__(self):
-        # we can't cache the data
-        pass
+    def __init__(self, db_path=None):
+        # we can't cache the data due to race conditions
+        self.path_preference = self.path_candidates.copy()
+        if db_path:
+            self.path_candidates.insert(0, db_path)
 
     @contextmanager
     def acquire(self):
@@ -68,7 +75,7 @@ class Database:
         """
         while True:
             try:
-                with open(Database._lock_path(), "r") as fd:
+                with open(self._lock_path(), "r") as fd:
                     # the file exists, ab changes the database
                     pid = fd.read()
                 logger.info("ab is running as PID %s", pid)
@@ -77,7 +84,7 @@ class Database:
             except FileNotFoundError:
                 # cool, let's take the lock
                 # FIXME: but this is not atomic, we should use open() for that
-                with open(Database._lock_path(), "w") as fd:
+                with open(self._lock_path(), "w") as fd:
                     fd.write("%s" % os.getpid())
                 break
         logger.debug("this stack has the lock: %s", traceback.extract_stack())
@@ -91,14 +98,8 @@ class Database:
         except FileNotFoundError:
             pass
 
-    @staticmethod
-    def _runtime_dir_path():
-        candidates = [
-            os.environ.get("XDG_RUNTIME_DIR", None),
-            "~/.cache",
-            "/var/tmp"
-        ]
-        for c in candidates:
+    def _runtime_dir_path(self):
+        for c in self.path_preference:
             if not c:
                 continue
             resolved = os.path.abspath(os.path.expanduser(c))
@@ -111,15 +112,13 @@ class Database:
         os.makedirs(our_dir, mode=0o0700, exist_ok=True)
         return our_dir
 
-    @staticmethod
-    def _db_path():
-        data_path = os.path.join(Database._runtime_dir_path(), "db.json")
+    def _db_path(self):
+        data_path = os.path.join(self._runtime_dir_path(), "db.json")
         logger.debug("DB path is %s", data_path)
         return data_path
 
-    @staticmethod
-    def _lock_path():
-        lock_path = os.path.join(Database._runtime_dir_path(), "ab.pid")
+    def _lock_path(self):
+        lock_path = os.path.join(self._runtime_dir_path(), "ab.pid")
         logger.debug("lock path is %s", lock_path)
         return lock_path
 
@@ -133,7 +132,8 @@ class Database:
             logger.debug("initializing database")
             return copy.deepcopy(DEFAULT_DATA)
 
-    def _load_build(self, data, build_id):
+    @staticmethod
+    def _load_build(data, build_id):
         return Build.from_json(data["builds"][build_id])  # TODO: error checking
 
     def _save(self, data):

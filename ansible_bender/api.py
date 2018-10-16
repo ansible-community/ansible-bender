@@ -13,12 +13,13 @@ out_logger = logging.getLogger(OUT_LOGGER)
 
 
 class Application:
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, db_path=None):
         """
         :param debug: bool, provide debug output if True
+        :param db_path: str, path to json file where the database stores the data persistently
         """
         self.debug = debug
-        self.db = Database()
+        self.db = Database(db_path=db_path)
 
     def build(self, playbook_path, build, build_volumes=None):
         """
