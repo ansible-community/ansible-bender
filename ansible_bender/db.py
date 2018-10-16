@@ -200,3 +200,13 @@ class Database:
                 return store[base_image_id][content]["image_id"]
             except KeyError:
                 return
+
+    def load_builds(self):
+        """
+        provide a list of all available builds
+
+        :return: a list of Build instances
+        """
+        with self.acquire():
+            data = self._load()
+            return [Build.from_json(b) for b in data["builds"].values()]

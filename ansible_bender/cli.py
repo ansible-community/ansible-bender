@@ -6,6 +6,8 @@ import argparse
 import logging
 import sys
 
+from tabulate import tabulate
+
 from ansible_bender.api import Application
 from ansible_bender.builders.base import ImageMetadata, Build, BuildState
 from ansible_bender.constants import OUT_LOGGER_FORMAT, OUT_LOGGER
@@ -84,8 +86,27 @@ class CLI:
             help="a path to directory where ab will store runtime data, defaults to: \"%s\""
                  % candidates_str
         )
-        subparsers = self.parser.add_subparsers( help='commands')
-        self.build_parser = subparsers.add_parser(
+        self.subparsers = self.parser.add_subparsers(help='commands')
+
+        self._do_build_interface()
+        self._do_list_builds_interface()
+
+        self.args = self.parser.parse_args()
+        if self.args.debug:
+            set_logging(level=logging.DEBUG)
+        elif self.args.verbose:
+            set_logging(level=logging.INFO)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
+                        handler_kwargs={"stream": sys.stdout})
+        else:
+            set_logging(level=logging.WARNING)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
+                        handler_kwargs={"stream": sys.stdout})
+
+        self.app = Application(debug=self.args.debug, db_path=self.args.database_dir)
+
+    def _do_build_interface(self):
+        self.build_parser = self.subparsers.add_parser(
             name="build",
             epilog="Please use '--' to separate options and arguments."
         )
@@ -152,17 +173,13 @@ class CLI:
             nargs="*"
         )
         self.build_parser.set_defaults(subcommand="build")
-        self.args = self.parser.parse_args()
-        if self.args.debug:
-            set_logging(level=logging.DEBUG)
-        elif self.args.verbose:
-            set_logging(level=logging.INFO)
-            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
-                        handler_kwargs={"stream": sys.stdout})
-        else:
-            set_logging(level=logging.WARNING)
-            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
-                        handler_kwargs={"stream": sys.stdout})
+
+    def _do_list_builds_interface(self):
+        self.lb_parser = self.subparsers.add_parser(
+            name="list-builds",
+            description="print a list of past and present builds",
+        )
+        self.lb_parser.set_defaults(subcommand="list-builds")
 
     def _build(self):
         metadata = ImageMetadata()
@@ -198,11 +215,24 @@ class CLI:
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
 
-        app = Application(debug=self.args.debug, db_path=self.args.database_dir)
-        try:
-            app.build(self.args.playbook_path, build, build_volumes=self.args.build_volumes)
-        finally:
-            app.clean()
+        self.app.build(self.args.playbook_path, build, build_volumes=self.args.build_volumes)
+
+    def _list_builds(self):
+        builds = self.app.list_builds()
+        header = ("BUILD ID", "IMAGE NAME", "STATUS", "DATE", "BUILD TIME")
+        builds_data = []
+        for b in builds:
+            build_time = ""
+            if b.build_finished_time and b.build_start_time:
+                build_time = b.build_finished_time - b.build_start_time
+            builds_data.append((
+                b.build_id,
+                b.target_image,
+                b.state,  # TODO: print just the name
+                b.build_finished_time if b.build_finished_time else "",
+                build_time  # TODO: make it fancy
+            ))
+        print(tabulate(builds_data, headers=header))
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
@@ -210,9 +240,13 @@ class CLI:
             if subcommand == "build":
                 self._build()
                 return 0
+            elif subcommand == "list-builds":
+                self._list_builds()
+                return 0
         except KeyboardInterrupt:
             return 133
         except Exception as ex:
+            self.app.clean()
             stderr = getattr(ex, "stderr", "")
             if stderr:
                 print(stderr, file=sys.stderr)

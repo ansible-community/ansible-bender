@@ -67,6 +67,9 @@ class Application:
         finally:
             builder.clean()
 
+    def list_builds(self):
+        return self.db.load_builds()
+
     def get_builder(self, build):
         return get_builder(build.builder_name)(build, debug=self.debug)
 
