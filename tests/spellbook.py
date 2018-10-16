@@ -2,6 +2,7 @@ import logging
 import os
 import random
 import string
+import subprocess
 
 import pytest
 
@@ -25,8 +26,10 @@ base_image = "docker.io/library/python:3-alpine"
 def target_image():
     im = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
     yield im
-    buildah("rmi", [im])  # FIXME: use builder interface instead for sake of other backends
-    # FIXME: dont traceback if rmi operation fails
+    try:
+        buildah("rmi", [im])  # FIXME: use builder interface instead for sake of other backends
+    except subprocess.CalledProcessError as ex:
+        print(ex)
 
 
 def random_word(length):
