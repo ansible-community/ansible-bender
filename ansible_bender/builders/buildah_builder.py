@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import subprocess
@@ -133,6 +132,7 @@ class BuildahBuilder(Builder):
         super().__init__(build, debug=debug)
         self.target_image = build.target_image
         self.ansible_host = build.build_container
+        self.logs = []
         buildah_command_exists()
 
     def create(self, build_volumes=None):
@@ -216,3 +216,10 @@ class BuildahBuilder(Builder):
                 logger.info("using python interpreter %s", i)
                 return i
         raise RuntimeError("no python interpreter found in image %s" % self.build.base_image)
+
+    def get_logs(self):
+        """
+        obtain logs for the selected build
+
+        :return: list of str
+        """

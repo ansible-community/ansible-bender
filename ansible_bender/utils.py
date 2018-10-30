@@ -30,9 +30,10 @@ def graceful_get(d, *keys):
 
 
 class StreamLogger(threading.Thread):
-    def __init__(self, stream, print_output=False, log_level=logging.DEBUG, log_output=True):
+    def __init__(self, stream, print_output=False, log_level=logging.DEBUG, log_output=True, buffer=None):
         super().__init__(daemon=True)  # the threads should not linger
         self.stream = stream
+        self.buffer = buffer  # to easily share output, both stdout & stderr
         self.output = []
         self.log_level = log_level
         self.log_output = log_output
@@ -41,6 +42,8 @@ class StreamLogger(threading.Thread):
     def run(self):
         for line in self.stream:
             line = line.rstrip("\n")
+            if self.buffer is not None:
+                self.buffer.append(line)
             self.output.append(line)
             if self.log_output:
                 logger.log(self.log_level, line)
@@ -52,13 +55,14 @@ class StreamLogger(threading.Thread):
 
 
 def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, log_stderr=True,
-            log_output=True, **kwargs):
+            log_output=True, return_all_output=False, **kwargs):
     """
     run provided command on host system using the same user as you invoked this code, raises
     subprocess.CalledProcessError if it fails
 
     :param cmd: list of str
     :param return_output: bool, return output of the command
+    :param return_all_output: bool, return output including stderr
     :param ignore_status: bool, do not fail in case nonzero return code
     :param kwargs: pass keyword arguments to subprocess.check_* functions; for more info,
             please check `help(subprocess.Popen)`
@@ -68,13 +72,14 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
     :return: None or str
     """
     logger.info('running command: "%s"', cmd)
-    logger.debug('%s', " ".join(cmd))  # so you can easily copy/paste
+    logger.debug('%s', " ".join(cmd))  # so you can easily copy/pasta
+    whole_output = []
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, **kwargs)
     o = StreamLogger(process.stdout, print_output=print_output, log_level=logging.DEBUG,
-                     log_output=log_output)
+                     log_output=log_output, buffer=whole_output)
     stderr_log_lvl = logging.ERROR if log_stderr else logging.DEBUG
-    e = StreamLogger(process.stderr, print_output=print_output, log_level=stderr_log_lvl)
+    e = StreamLogger(process.stderr, print_output=print_output, log_level=stderr_log_lvl, buffer=whole_output)
     o.start()
     e.start()
     process.wait()
@@ -89,7 +94,9 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
                 return process.returncode
         else:
             raise subprocess.CalledProcessError(cmd=cmd, returncode=process.returncode,
-                                                stderr=e.get_output())
+                                                stderr=e.get_output(), output="\n".join(whole_output))
+    if return_all_output:
+        return whole_output
     if return_output:
         return o.get_output()
 

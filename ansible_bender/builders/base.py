@@ -68,9 +68,10 @@ class Build:
         self.builder_name = None
         self.progress = []  # TODO: refactor into layers & cache
         self.cache_tasks = True
-        # TODO: store logs (compressed & base64?)
+        self.log_lines = []  # a list of strings
 
     def to_dict(self):
+        """ serialize """
         return {
             "build_id": self.build_id,
             "metadata": self.metadata.to_dict(),
@@ -86,6 +87,8 @@ class Build:
             "base_layer": self.base_layer,
             "build_container": self.build_container,
             "cache_tasks": self.cache_tasks,
+            # we could compress/base64 here, let's go for the easier solution first
+            "log_lines": self.log_lines
         }
 
     @classmethod
@@ -110,6 +113,7 @@ class Build:
         b.base_layer = j["base_layer"]
         b.build_container = j["build_container"]
         b.cache_tasks = j["cache_tasks"]
+        b.log_lines = j["log_lines"]
         return b
 
     def append_progress(self, content, layer_id, base_image_id):
@@ -187,4 +191,11 @@ class Builder:
         find python executable in the base image, for prio order see constructor
 
         :return: str, path to python interpreter
+        """
+
+    def get_logs(self):
+        """
+        obtain logs for the selected build
+
+        :return: list of str
         """

@@ -49,10 +49,12 @@ class Application:
 
         try:
             try:
-                a_runner.build(python_interpreter=py_intrprtr)
-            except AbBuildUnsuccesful:
-                self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
-                                     set_finish_time=True)
+                output = a_runner.build(python_interpreter=py_intrprtr)
+            except AbBuildUnsuccesful as ex:
+                b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
+                                         set_finish_time=True)
+                b.log_lines = ex.output
+                self.db.record_build(b)
                 # TODO: let this be done by the callback plugin
                 image_name = build.target_image + "-failed"
                 builder.commit(image_name)
@@ -60,8 +62,10 @@ class Application:
                 out_logger.info("The progress is saved into image '%s'", image_name)
                 raise
 
-            self.db.record_build(None, build_id=build.build_id, build_state=BuildState.DONE,
-                                 set_finish_time=True)
+            b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.DONE,
+                                     set_finish_time=True)
+            b.log_lines = output
+            self.db.record_build(b)
             builder.commit(build.target_image)
             out_logger.info("Image '%s' was built successfully \o/",  build.target_image)
         finally:

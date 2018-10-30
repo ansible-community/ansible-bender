@@ -22,6 +22,20 @@ callback_whitelist=snapshoter\n
 
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
                  ansible_args=None, debug=False, environment=None):
+    """
+    run selected ansible playbook and return output from ansible-playbook run
+
+    :param playbook_path:
+    :param inventory_path:
+    :param a_cfg_path:
+    :param connection:
+    :param extra_variables:
+    :param ansible_args:
+    :param debug:
+    :param environment:
+
+    :return: output
+    """
     ap = ap_command_exists()
     cmd_args = [
         ap,
@@ -47,13 +61,14 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
 
     # TODO: does ansible have an API?
     try:
-        run_cmd(
+        return run_cmd(
             cmd_args,
             print_output=True,
             env=env,
+            return_all_output=True,
         )
     except subprocess.CalledProcessError as ex:
-        raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex)
+        raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex, ex.output)
 
 
 class AnsibleRunner:
@@ -84,7 +99,7 @@ class AnsibleRunner:
         """
         run the playbook against the container
 
-        :return:
+        :return: str, output
         """
         tmp = tempfile.mkdtemp(prefix="ab")
         try:
@@ -98,7 +113,7 @@ class AnsibleRunner:
             a_cfg_path = os.path.join(tmp, "ansible.cfg")
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
-            run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
-                         debug=self.debug, environment=environment)
+            return run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
+                                debug=self.debug, environment=environment)
         finally:
             shutil.rmtree(tmp)

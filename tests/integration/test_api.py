@@ -32,6 +32,11 @@ def test_build_db_metadata(target_image, application, build):
         build = application.db.get_build(build.build_id)
         assert build.build_finished_time is not None
         assert build.build_start_time is not None
+        assert build.log_lines is not None
+        logs = "\n".join(build.log_lines)
+        assert "PLAY [all]" in logs
+        assert "TASK [Gathering Facts]" in logs
+        assert "failed=0" in logs
     finally:
         application.clean()
 

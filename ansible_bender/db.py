@@ -79,7 +79,7 @@ class Database:
                     # the file exists, ab changes the database
                     pid = fd.read()
                 logger.info("ab is running as PID %s", pid)
-                logger.debug("stack trace: %s", traceback.extract_stack())
+                # logger.debug("stack trace: %s", traceback.extract_stack())
                 time.sleep(0.1)
             except FileNotFoundError:
                 # cool, let's take the lock
@@ -87,7 +87,7 @@ class Database:
                 with open(self._lock_path(), "w") as fd:
                     fd.write("%s" % os.getpid())
                 break
-        logger.debug("this stack has the lock: %s", traceback.extract_stack())
+        # logger.debug("this stack has the lock: %s", traceback.extract_stack())
         yield True
         self.release()
 
@@ -171,6 +171,7 @@ class Database:
                 build_i.build_finished_time = datetime.datetime.now()
             data["builds"][build_i.build_id] = build_i.to_dict()
             self._save(data)
+        return build_i
 
     def get_build(self, build_id):
         """
