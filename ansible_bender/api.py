@@ -71,6 +71,16 @@ class Application:
         finally:
             builder.clean()
 
+    def get_logs(self, build_id=None):
+        """
+        get logs for a specific build, if build_id is not, select the latest build
+
+        :param build_id: str or None
+        :return: list of str
+        """
+        build = self.db.get_build(build_id=build_id)
+        return build.log_lines
+
     def list_builds(self):
         return self.db.load_builds()
 

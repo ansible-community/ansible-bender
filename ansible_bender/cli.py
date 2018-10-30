@@ -90,6 +90,7 @@ class CLI:
 
         self._do_build_interface()
         self._do_list_builds_interface()
+        self._do_get_logs_interface()
 
         self.args = self.parser.parse_args()
         if self.args.debug:
@@ -174,6 +175,19 @@ class CLI:
         )
         self.build_parser.set_defaults(subcommand="build")
 
+    def _do_get_logs_interface(self):
+        self.gl_parser = self.subparsers.add_parser(
+            name="get-logs",
+            description="show logs of a specific build (default to latest build)",
+        )
+        self.gl_parser.add_argument(
+            "BUILD_ID",
+            help="ID of the build",
+            nargs="?",
+            default=None
+        )
+        self.gl_parser.set_defaults(subcommand="get-logs")
+
     def _do_list_builds_interface(self):
         self.lb_parser = self.subparsers.add_parser(
             name="list-builds",
@@ -234,6 +248,11 @@ class CLI:
             ))
         print(tabulate(builds_data, headers=header))
 
+    def _get_logs(self):
+        build_id = self.args.BUILD_ID
+        log_lines = self.app.get_logs(build_id=build_id)
+        print("\n".join(log_lines))
+
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
@@ -242,6 +261,9 @@ class CLI:
                 return 0
             elif subcommand == "list-builds":
                 self._list_builds()
+                return 0
+            elif subcommand == "get-logs":
+                self._get_logs()
                 return 0
         except KeyboardInterrupt:
             return 133

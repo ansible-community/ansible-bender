@@ -134,7 +134,10 @@ class Database:
 
     @staticmethod
     def _load_build(data, build_id):
-        return Build.from_json(data["builds"][build_id])  # TODO: error checking
+        try:
+            return Build.from_json(data["builds"][build_id])
+        except KeyError:
+            raise RuntimeError("There is no such build with ID %s" % build_id)
 
     def _save(self, data):
         """ save data from memory to disk, lock has to be acquired already! """
@@ -173,7 +176,7 @@ class Database:
             self._save(data)
         return build_i
 
-    def get_build(self, build_id):
+    def get_build(self, build_id=None):
         """
         get Build instance by selected build_id
 
@@ -182,6 +185,8 @@ class Database:
         """
         with self.acquire():
             data = self._load()
+            if build_id is None:
+                build_id = str(data["next_build_id"] - 1)
             return self._load_build(data, build_id)
 
     def save_layer(self, layer_id, base_image, content):
