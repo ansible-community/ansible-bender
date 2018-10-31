@@ -41,6 +41,13 @@ It's just using Ansible to do something magical.**
   * Every task result is cached as a container image layer.
   * You can turn this off with `--no-cache`
 
+## Subcommands
+
+* `build` — build a new container image using selected playbook
+* `list-builds` — list all builds
+* `get-logs` — display build logs
+* `inspect` — provide detailed metadata about the selected build
+
 
 ## Installation
 
