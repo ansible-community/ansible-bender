@@ -241,7 +241,7 @@ class CLI:
             builds_data.append((
                 b.build_id,
                 b.target_image,
-                b.state,  # TODO: print just the name
+                b.state.value,
                 b.build_finished_time if b.build_finished_time else "",
                 build_time  # TODO: make it fancy
             ))
