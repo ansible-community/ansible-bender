@@ -238,9 +238,9 @@ cf41883b24b8         docker.io/library/python:3-alpine                        Oc
 
 ## TODO past 0.1.0
 
-* [ ] Configurable layering
-* [x] A caching mechanism
-* [ ] Configurable caching
 * [x] A fancy name!
+* [x] A caching mechanism
+* [ ] Configurable layering: ability to skip layer commit (for sake of security and saving disk space (hi whiteouts!))
+* [ ] Configurable caching: ability to stop caching at some point during execution (cached git clones are bad)
 * [ ] You can build images with podman (Requires https://github.com/ansible/ansible/pull/47519)
 * [ ] You can build images with docker (incubator maybe?)
