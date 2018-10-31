@@ -56,46 +56,65 @@ Oh right, and ab is tested only with python 3.
 
 ## Usage
 
-**Please note that buildah requires root privileges so you need to invoke ab as root.**
-
 You may noticed that I refer to `ansible-bender` as ab. That was the initial
 name and also the name of the CLI tool, so I decided to stick to it.
 
-Right now, ab has just a single command and that is... `build`:
+If you clone this repository, you can utilize a simple playbook I am using for testing:
 ```
-$ ab build -e SOME=VALUE -l some=other-value -- ./tests/functional/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
+$ ab build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
 
-PLAY [all] ***********************************************************************************************************************************
+PLAY [all] ************************************************************************************************************************
 
-TASK [Gathering Facts] ***********************************************************************************************************************
-ok: [this-is-my-image-cont]
+TASK [Gathering Facts] ************************************************************************************************************
+ok: [this-is-my-image-20181031-121858148338-cont]
 
-TASK [Run a sample command] ******************************************************************************************************************
-changed: [this-is-my-image-cont]
+TASK [print local env vars] *******************************************************************************************************
+ok: [this-is-my-image-20181031-121858148338-cont] => {
+    "msg": "/tmp/ab1nsv_c9b/ansible.cfg,,"
+}
+caching the task result in an image 'this-is-my-image-20181931-121904'
 
-TASK [create a file] *************************************************************************************************************************
-changed: [this-is-my-image-cont]
+TASK [print all remote env vars] **************************************************************************************************
+ok: [this-is-my-image-20181031-121858148338-cont] => {
+    "msg": {
+        "GPG_KEY": "0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
+        "HOME": "/root",
+        "LANG": "C.UTF-8",
+        "PATH": "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "PWD": "/",
+        "PYTHON_PIP_VERSION": "18.1",
+        "PYTHON_VERSION": "3.7.0",
+        "SHLVL": "1",
+        "SOME": "VALUE"
+    }
+}
+caching the task result in an image 'this-is-my-image-20181931-121905'
 
-PLAY RECAP ***********************************************************************************************************************************
-this-is-my-image-cont      : ok=3    changed=2    unreachable=0    failed=0
+TASK [Run a sample command] *******************************************************************************************************
+changed: [this-is-my-image-20181031-121858148338-cont]
+caching the task result in an image 'this-is-my-image-20181931-121908'
+
+TASK [create a file] **************************************************************************************************************
+changed: [this-is-my-image-20181031-121858148338-cont]
+caching the task result in an image 'this-is-my-image-20181931-121912'
+
+PLAY RECAP ************************************************************************************************************************
+this-is-my-image-20181031-121858148338-cont : ok=5    changed=2    unreachable=0    failed=0
 
 Getting image source signatures
-Skipping fetch of repeat blob sha256:73046094a9b835e443af1a9d736fcfc11a994107500e474d0abf399499ed280c
-Skipping fetch of repeat blob sha256:8b63854c53f36e35be6b38f35ba6c0cb9ccffdf43ca67fcf74ff7a8011a126c4
-Skipping fetch of repeat blob sha256:83b96d0bacdae9d29f02d93fb861aa612d0a50a3e6ff838d8ef1ac18d6588a47
-Skipping fetch of repeat blob sha256:95d81b13128eaecbeb8526d03456d6bcba587220a3c23bf8c0d35b542667cb8d
-Skipping fetch of repeat blob sha256:98801e48f5965cc825524f30acad1485f797241999f66a2234d12cf9a6967f8a
-Copying blob sha256:eb20406495adfe66c0e2b6d89a37d4fe2f5fcf3bedf064588ce7b4b87ff33746
-
- 0 B / 434.50 KiB [------------------------------------------------------------]
- 434.50 KiB / 434.50 KiB [==================================================] 0s
-Copying config sha256:7558393975c749748a292835a4708c583d574a282f9d79be7e6e6cc8b38be8f0
+Skipping fetch of repeat blob sha256:df64d3292fd6194b7865d7326af5255db6d81e9df29f48adde61a918fbd8c332
+Skipping fetch of repeat blob sha256:beefb6beb20fa287cfcfaf083c0fda606f9c7f4b2830a286a50f1bbcacd52cf3
+Skipping fetch of repeat blob sha256:e2986b5e7ba21a779988ffeb8bd4c0ca5b0fddaaf1ea8a4b02da1c60492f51e4
+Skipping fetch of repeat blob sha256:6795dbd93463993b8257a1500534c1fe8566aa79dfc08a03c9d823b26d08b8d8
+Skipping fetch of repeat blob sha256:3b3df229744dd8a66aa6713ce8084f529712e96c4d01fa7b0a4cb49fe2e2ebff
+Skipping fetch of repeat blob sha256:3e8ad7a0bc8fa42dfb6e11bb57ec6cafd865426b1557e29ee58c4ffd8b077aba
+Copying config sha256:bbf10af5c37b2c7f6098f07308df4addcd81598e16d1e432bb5c5b1916c9d912
 
  0 B / 5.11 KiB [--------------------------------------------------------------]
  5.11 KiB / 5.11 KiB [======================================================] 0s
 Writing manifest to image destination
 Storing signatures
-7558393975c749748a292835a4708c583d574a282f9d79be7e6e6cc8b38be8f0
+bbf10af5c37b2c7f6098f07308df4addcd81598e16d1e432bb5c5b1916c9d912
 Image 'this-is-my-image' was built successfully \o/
 ```
 
@@ -110,11 +129,103 @@ $ ab build                                       \  # this is the command
      this-is-my-image                            \  # and finally, target image name
 ```
 
+At some point, I should figure out a file-format where these would live (ansible variables? a dedicated file?).
+
+
+If we rerun the build again, we can see that ab loads every task from a cache:
+```
+$ ab build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
+
+PLAY [all] ************************************************************************************************************************
+
+TASK [Gathering Facts] ************************************************************************************************************
+ok: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [print local env vars] *******************************************************************************************************
+loaded from cache: '2cf027dce668d168f73c67e3aa42175e89c42458f6c5f6844ebf74f3064080d2'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [print all remote env vars] **************************************************************************************************
+loaded from cache: 'e6b4f418907ca31d5e52e2b971f8224637daa610a1b54467ee2919001d4caf37'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [Run a sample command] *******************************************************************************************************
+loaded from cache: '96aaa104e30b394652639d56122bbf8bb3ba8e75c1bdf8ea01fa879930c07bc6'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [create a file] **************************************************************************************************************
+loaded from cache: '91dd37d6c6cf05b5505cb7b799534757c89a5e22230fceff1ad01999c766a2a0'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+PLAY RECAP ************************************************************************************************************************
+this-is-my-image-20181031-121917088731-cont : ok=1    changed=0    unreachable=0    failed=0
+
+Getting image source signatures
+Skipping fetch of repeat blob sha256:df64d3292fd6194b7865d7326af5255db6d81e9df29f48adde61a918fbd8c332
+Skipping fetch of repeat blob sha256:beefb6beb20fa287cfcfaf083c0fda606f9c7f4b2830a286a50f1bbcacd52cf3
+Skipping fetch of repeat blob sha256:e2986b5e7ba21a779988ffeb8bd4c0ca5b0fddaaf1ea8a4b02da1c60492f51e4
+Skipping fetch of repeat blob sha256:6795dbd93463993b8257a1500534c1fe8566aa79dfc08a03c9d823b26d08b8d8
+Skipping fetch of repeat blob sha256:3b3df229744dd8a66aa6713ce8084f529712e96c4d01fa7b0a4cb49fe2e2ebff
+Skipping fetch of repeat blob sha256:eca799d88ff3ae1f5a17bd5569a54f7de3694b3b6a134c16cda1216a3b8a2779
+Skipping fetch of repeat blob sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1
+Copying config sha256:8eabbd9aef50ae41499a5720ec6a1be6bad29095b278e58fccb9f04c2eaa459a
+
+ 0 B / 5.22 KiB [--------------------------------------------------------------]
+ 5.22 KiB / 5.22 KiB [======================================================] 0s
+Writing manifest to image destination
+Storing signatures
+8eabbd9aef50ae41499a5720ec6a1be6bad29095b278e58fccb9f04c2eaa459a
+Image 'this-is-my-image' was built successfully \o/
+```
+
+We can list builds we have done:
+```
+  BUILD ID  IMAGE NAME        STATUS           DATE                        BUILD TIME
+----------  ----------------  ---------------  --------------------------  --------------
+         1  this-is-my-image  BuildState.DONE  2018-10-31 12:19:13.847864  0:00:15.699248
+         2  this-is-my-image  BuildState.DONE  2018-10-31 12:19:27.341574  0:00:10.252394
+```
+
+Wanna check build logs sometime later? No problem!
+```
+$ ab get-logs 2
+
+PLAY [all] ******************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************************************************************************
+ok: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [print local env vars] *************************************************************************************************************************************************
+loaded from cache: '2cf027dce668d168f73c67e3aa42175e89c42458f6c5f6844ebf74f3064080d2'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [print all remote env vars] ********************************************************************************************************************************************
+loaded from cache: 'e6b4f418907ca31d5e52e2b971f8224637daa610a1b54467ee2919001d4caf37'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [Run a sample command] *************************************************************************************************************************************************
+loaded from cache: '96aaa104e30b394652639d56122bbf8bb3ba8e75c1bdf8ea01fa879930c07bc6'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+TASK [create a file] ********************************************************************************************************************************************************
+loaded from cache: '91dd37d6c6cf05b5505cb7b799534757c89a5e22230fceff1ad01999c766a2a0'
+skipping: [this-is-my-image-20181031-121917088731-cont]
+
+PLAY RECAP ******************************************************************************************************************************************************************
+this-is-my-image-20181031-121917088731-cont : ok=1    changed=0    unreachable=0    failed=0
+```
+
 Here is a proof that the image is in there:
 ```
-$ podman images this-is-my-image
-REPOSITORY                   TAG      IMAGE ID       CREATED        SIZE
-localhost/this-is-my-image   latest   7558393975c7   1 minute ago   84.4MB
+$ podman images
+REPOSITORY                                   TAG                      IMAGE ID       CREATED         SIZE
+localhost/this-is-my-image                   latest                   8eabbd9aef50   7 minutes ago   83.1MB
+docker.io/library/python                     3-alpine                 cf41883b24b8   3 weeks ago     81.9MB
+
+$ buildah images
+IMAGE ID             IMAGE NAME                                               CREATED AT             SIZE
+cf41883b24b8         docker.io/library/python:3-alpine                        Oct 10, 2018 00:28     81.9 MB
+8eabbd9aef50         localhost/this-is-my-image:latest                        Oct 31, 2018 12:19     83.1 MB
 ```
 
 
@@ -124,5 +235,5 @@ localhost/this-is-my-image   latest   7558393975c7   1 minute ago   84.4MB
 * [x] A caching mechanism
 * [ ] Configurable caching
 * [x] A fancy name!
-* [ ] You can build images with podman (needs Ansible connection plugin for podman)
+* [ ] You can build images with podman (Requires https://github.com/ansible/ansible/pull/47519)
 * [ ] You can build images with docker (incubator maybe?)
