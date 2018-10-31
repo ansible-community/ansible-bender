@@ -134,6 +134,8 @@ def test_build_failure(tmpdir):
     cmd = ["build", bad_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError):
         ab(cmd, str(tmpdir))
+    out = ab(["get-logs"], str(tmpdir), return_output=True)
+    assert "PLAY [all]" in out
     buildah("inspect", ["-t", "image", target_failed_image])
     buildah("rmi", [target_failed_image])
 

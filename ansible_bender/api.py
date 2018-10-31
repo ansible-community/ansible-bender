@@ -57,7 +57,7 @@ class Application:
             except AbBuildUnsuccesful as ex:
                 b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
                                          set_finish_time=True)
-                b.log_lines = ex.output
+                b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
                 # TODO: let this be done by the callback plugin
                 image_name = build.target_image + "-failed"
