@@ -178,17 +178,26 @@ class Database:
             self._save(data)
         return build_i
 
-    def get_build(self, build_id=None):
+    def get_latest_build(self):
+        """
+        return build with highest ID
+
+        :return: build
+        """
+        with self.acquire():
+            data = self._load()
+            build_id = str(data["next_build_id"] - 1)
+            return self._load_build(data, build_id)
+
+    def get_build(self, build_id):
         """
         get Build instance by selected build_id
 
-        :param build_id: int, build_id
+        :param build_id: str
         :return: instance of Build
         """
         with self.acquire():
             data = self._load()
-            if build_id is None:
-                build_id = str(data["next_build_id"] - 1)
             return self._load_build(data, build_id)
 
     def save_layer(self, layer_id, base_image, content):

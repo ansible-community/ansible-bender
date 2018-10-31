@@ -3,9 +3,11 @@ CLI for ansible builder
 """
 
 import argparse
+import json
 import logging
 import sys
 
+import yaml
 from tabulate import tabulate
 
 from ansible_bender.api import Application
@@ -91,6 +93,7 @@ class CLI:
         self._do_build_interface()
         self._do_list_builds_interface()
         self._do_get_logs_interface()
+        self._do_inspect_interface()
 
         self.args = self.parser.parse_args()
         if self.args.debug:
@@ -195,6 +198,24 @@ class CLI:
         )
         self.lb_parser.set_defaults(subcommand="list-builds")
 
+    def _do_inspect_interface(self):
+        self.inspect_parser = self.subparsers.add_parser(
+            name="inspect",
+            description="provide detailed information for a selected build (default to latest build)",
+        )
+        self.inspect_parser.add_argument(
+            "BUILD_ID",
+            help="ID of the build",
+            nargs="?",
+            default=None
+        )
+        self.inspect_parser.add_argument(
+            "--json",
+            help="output the information in JSON format",
+            action="store_true"
+        )
+        self.inspect_parser.set_defaults(subcommand="inspect")
+
     def _build(self):
         metadata = ImageMetadata()
         if self.args.workdir:
@@ -252,6 +273,14 @@ class CLI:
         log_lines = self.app.get_logs(build_id=build_id)
         print("\n".join(log_lines))
 
+    def _inspect(self):
+        build_id = self.args.BUILD_ID
+        inspect_data = self.app.inspect(build_id=build_id)
+        if self.args.json:
+            print(json.dumps(inspect_data))
+        else:
+            yaml.safe_dump(inspect_data, sys.stdout, indent=2, default_flow_style=False)
+
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
@@ -264,7 +293,9 @@ class CLI:
             elif subcommand == "get-logs":
                 self._get_logs()
                 return 0
-            # TODO: add inspect command: pretty print *useful* info
+            elif subcommand == "inspect":
+                self._inspect()
+                return 0
         except KeyboardInterrupt:
             return 133
         except Exception as ex:

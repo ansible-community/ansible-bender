@@ -75,6 +75,17 @@ class Application:
         finally:
             builder.clean()
 
+    def get_build(self, build_id=None):
+        """
+        get selected build or latest build if build_id is None
+
+        :param build_id: str or None
+        :return: build
+        """
+        if build_id is None:
+            return self.db.get_latest_build()
+        return self.db.get_build(build_id)
+
     def get_logs(self, build_id=None):
         """
         get logs for a specific build, if build_id is not, select the latest build
@@ -82,11 +93,24 @@ class Application:
         :param build_id: str or None
         :return: list of str
         """
-        build = self.db.get_build(build_id=build_id)
+        build = self.get_build(build_id=build_id)
         return build.log_lines
 
     def list_builds(self):
         return self.db.load_builds()
+
+    def inspect(self, build_id=None):
+        """
+        provide detailed information about the selected build
+
+        :param build_id: str or None
+        :return: dict
+        """
+        build = self.get_build(build_id=build_id)
+        di = build.to_dict()
+        del di["log_lines"]  # we have a dedicated command for that
+        del di["layer_index"]  # internal info
+        return di
 
     def get_builder(self, build):
         return get_builder(build.builder_name)(build, debug=self.debug)
