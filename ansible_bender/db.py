@@ -18,13 +18,16 @@ A database module. A class to manage ab's persistent data.
                 env: ...
                 ...
             },
-            progress: [
-                {content: "", base_image_id: "", image_id: ""}
+            layers: [
+                Layer(content, layer_id, base_image_id, cached),
             ]
+            layer_index: {
+                layer_id: layer
+            }
         },
     },
     "store": {
-        "base-image-id": {
+        "base-image-id": {  # base-image + content = new image
             content: {
                 image_id:
             }
@@ -38,7 +41,6 @@ import json
 import logging
 import os
 import time
-import traceback
 from contextlib import contextmanager
 
 from ansible_bender.builders.base import Build

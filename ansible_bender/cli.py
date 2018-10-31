@@ -220,11 +220,10 @@ class CLI:
         if self.args.runtime_volumes:
             metadata.volumes = self.args.runtime_volumes
 
-        build = Build()
+        build = Build()  # we should have a helper for this
         build.metadata = metadata
         build.state = BuildState.NEW
         build.base_image = self.args.base_image
-        build.base_layer = self.args.base_image
         build.target_image = self.args.target_image
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
@@ -265,6 +264,7 @@ class CLI:
             elif subcommand == "get-logs":
                 self._get_logs()
                 return 0
+            # TODO: add inspect command: pretty print *useful* info
         except KeyboardInterrupt:
             return 133
         except Exception as ex:

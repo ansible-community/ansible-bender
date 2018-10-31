@@ -52,6 +52,39 @@ class ImageMetadata:
         return m
 
 
+class Layer:
+    """ This is an image layer """
+
+    def __init__(self, content, layer_id, base_image_id, cached=None):
+        """
+        :param content: what's the content of the layer
+        :param layer_id:
+        :param base_image_id:
+        :param cached: bool, was it loaded from cache?
+        """
+        self.content = content
+        self.layer_id = layer_id
+        self.base_image_id = base_image_id
+        self.cached = cached
+
+    def to_dict(self):
+        return {
+            "content": self.content,
+            "layer_id": self.layer_id,
+            "base_image_id": self.base_image_id,
+            "cached": self.cached
+        }
+
+    @classmethod
+    def from_json(cls, j):
+        return cls(
+            j["content"],
+            j["layer_id"],
+            j["base_image_id"],
+            cached=j["cached"]
+        )
+
+
 class Build:
     """ class which represents a build """
     def __init__(self):
@@ -62,12 +95,12 @@ class Build:
         self.build_start_time = None
         self.build_finished_time = None
         self.base_image = None
-        self.base_layer = None  # ideally this one would be picked up from progress
         self.build_container = None
         self.target_image = None
         self.builder_name = None
-        self.progress = []  # TODO: refactor into layers & cache
-        self.cache_tasks = True
+        self.layers = []
+        self.layer_index = {}  # this is an index for layers: `layer_id: Layer()`
+        self.cache_tasks = True  # we cache by default, a user can opt out
         self.log_lines = []  # a list of strings
 
     def to_dict(self):
@@ -83,8 +116,8 @@ class Build:
             "base_image": self.base_image,
             "target_image": self.target_image,
             "builder_name": self.builder_name,
-            "progress": self.progress,
-            "base_layer": self.base_layer,
+            "layers": [x.to_dict() for x in self.layers],
+            "layer_index": {x.layer_id: x.to_dict() for x in self.layers},
             "build_container": self.build_container,
             "cache_tasks": self.cache_tasks,
             # we could compress/base64 here, let's go for the easier solution first
@@ -109,17 +142,34 @@ class Build:
         b.base_image = j["base_image"]
         b.target_image = j["target_image"]
         b.builder_name = j["builder_name"]
-        b.progress = j["progress"]
-        b.base_layer = j["base_layer"]
+        b.layers = [Layer.from_json(x) for x in j["layers"]]
+        b.layer_index = {layer_id: Layer.from_json(layer_data)
+                         for layer_id, layer_data in j["layer_index"].items()}
         b.build_container = j["build_container"]
         b.cache_tasks = j["cache_tasks"]
         b.log_lines = j["log_lines"]
         return b
 
-    def append_progress(self, content, layer_id, base_image_id):
-        self.progress.append(
-            {"content": content, "base_image_id": base_image_id, "image_id": layer_id}
-        )
+    def record_layer(self, content, layer_id, base_image_id, cached=None):
+        """
+        record a new layer for this build
+
+        :param content:
+        :param layer_id:
+        :param base_image_id:
+        :param cached: bool, was it cached?
+        """
+        layer = Layer(content, layer_id, base_image_id, cached=cached)
+        self.layers.append(layer)
+        self.layer_index[layer_id] = layer
+
+    def get_top_layer_id(self):
+        """ return id of the top layer, or None """
+        if self.layers:
+            return self.layers[-1].layer_id
+
+    def record_cache_entry(self, image_id):
+        self.layer_index[image_id].cached = True
 
 
 class BuildState(Enum):

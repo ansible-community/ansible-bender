@@ -32,10 +32,14 @@ class Application:
         if not os.path.isfile(playbook_path):
             raise RuntimeError("No such file or directory: %s" % playbook_path)
 
-        # record as soon as possible
+        # we have to record as soon as possible
         self.db.record_build(build)
 
         builder = self.get_builder(build)
+        # let's record base image as a first layer
+        base_image_id = builder.get_image_id(build.base_image)
+        build.record_layer(None, base_image_id, None, cached=True)
+
         a_runner = AnsibleRunner(playbook_path, builder, build, debug=self.debug)
 
         build.build_start_time = datetime.datetime.now()
@@ -94,41 +98,47 @@ class Application:
         if not build.cache_tasks:
             return
 
-        if build.progress:
-            last_item = build.progress[-1]
-            base_image_id = last_item["image_id"]
-        else:
-            base_image_id = builder.get_image_id(build.base_image)
+        base_image_id = build.get_top_layer_id()
         layer_id = self.get_layer(content, base_image_id)
         if layer_id:
-            builder = self.get_builder(build)
-            build.base_layer = layer_id
             builder.swap_working_container()
         return layer_id
 
     def get_layer(self, content, base_image_id):
+        """
+        provide a layer for given content and base_image_id; if there
+        is such layer in cache store, return its layer_id
+
+        :param content:
+        :param base_image_id:
+        :return:
+        """
         return self.db.get_cached_layer(content, base_image_id)
 
     def record_progress(self, build, content, layer_id, build_id=None):
+        """
+        record build progress to the database
+
+        :param build:
+        :param content:
+        :param layer_id:
+        :param build_id:
+        :return:
+        """
         if build_id:
             build = self.db.get_build(build_id)
-        builder = self.get_builder(build)
-        if build.progress:
-            last_item = build.progress[-1]
-            base_image_id = last_item["image_id"]
-        else:
-            base_image_id = builder.get_image_id(build.base_image)
+        base_image_id = build.get_top_layer_id()
         if not layer_id:
             # skipped task, not cached
             layer_id = self.get_layer(content, base_image_id) or base_image_id
-        build.append_progress(content, layer_id, base_image_id)
+        build.record_layer(content, layer_id, base_image_id)
         self.db.record_build(build)
         return base_image_id
 
     def cache_task_result(self, content, build_id):
         """ snapshot the container after a task was executed """
         build = self.db.get_build(build_id)
-        if not build.cache_tasks:
+        if not build.cache_tasks:  # actually we could still cache results
             return
         timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         image_name = "%s-%s" % (build.target_image, timestamp)

@@ -140,7 +140,7 @@ class BuildahBuilder(Builder):
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
         create_buildah_container(
-            self.build.base_layer, self.ansible_host, build_volumes=build_volumes, debug=self.debug)
+            self.build.get_top_layer_id(), self.ansible_host, build_volumes=build_volumes, debug=self.debug)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
             self.ansible_host, working_dir=self.build.metadata.working_dir,
