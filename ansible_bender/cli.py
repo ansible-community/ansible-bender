@@ -11,7 +11,7 @@ from tabulate import tabulate
 
 from ansible_bender.api import Application
 from ansible_bender.builders.base import ImageMetadata, Build, BuildState
-from ansible_bender.db import Database
+from ansible_bender.db import PATH_CANDIDATES
 
 
 def split_once_or_fail_with(strink, pattern, error_message):
@@ -44,7 +44,7 @@ class CLI:
                                  help="provide verbose output")
         self.parser.add_argument("--debug", action="store_true",
                                  help="provide all the output")
-        candidates_str = ", ".join(filter(lambda x: x, Database.path_candidates))
+        candidates_str = ", ".join(filter(lambda x: x, PATH_CANDIDATES))
         self.parser.add_argument(
             "--database-dir",
             action="store",
