@@ -58,6 +58,9 @@ class CallbackModule(CallbackBase):
         if task.action == "setup":
             # we ignore setup
             return
+        if "dont-cache" in getattr(task, "tags", []):
+            self._display.display("detected tag 'dont-cache', disabling caching mechanism")
+            return
         a, build = self._get_app_and_build()
         content = self.get_task_content(task.get_ds())
         status = a.maybe_load_from_cache(content, build_id=build.build_id)

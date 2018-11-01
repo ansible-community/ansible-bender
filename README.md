@@ -236,11 +236,26 @@ cf41883b24b8         docker.io/library/python:3-alpine                        Oc
 ```
 
 
+### Caching mechanism
+
+Ansible bender has a caching mechanism. It is enabled by default. ab caches
+task results (=images). If a task content did not change and the base image is
+the same, the layer is loaded from cache instead of being processed again. This
+doesn't work correctly with tasks which process file: ab doesn't handle files
+yet.
+
+You are able to control caching in two ways:
+
+ * disable it completely by running `ab build --no-cache`
+ * or adding a tag to your task named `dont-cache` — ab detects such tag and
+   will not try to load from cache
+
+
 ## TODO past 0.1.0
 
 * [x] A fancy name!
 * [x] A caching mechanism
 * [ ] Configurable layering: ability to skip layer commit (for sake of security and saving disk space (hi whiteouts!))
-* [ ] Configurable caching: ability to stop caching at some point during execution (cached git clones are bad)
+* [x] Configurable caching: ability to stop caching at some point during execution (cached git clones are bad)
 * [ ] You can build images with podman (Requires https://github.com/ansible/ansible/pull/47519)
 * [ ] You can build images with docker (incubator maybe?)

@@ -17,6 +17,7 @@ tests_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(tests_dir)
 data_dir = os.path.join(tests_dir, "data")
 basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
+dont_cache_playbook_path = os.path.join(data_dir, "dont_cache_playbook.yaml")
 small_basic_playbook_path = os.path.join(data_dir, "small_basic_playbook.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 # TODO: check if the image exists, if not, pull it
