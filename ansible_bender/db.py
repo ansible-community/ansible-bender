@@ -119,12 +119,10 @@ class Database:
 
     def _db_path(self):
         data_path = os.path.join(self.runtime_dir_path, "db.json")
-        logger.debug("DB path is %s", data_path)
         return data_path
 
     def _lock_path(self):
         lock_path = os.path.join(self.runtime_dir_path, "ab.pid")
-        logger.debug("lock path is %s", lock_path)
         return lock_path
 
     def _load(self):
