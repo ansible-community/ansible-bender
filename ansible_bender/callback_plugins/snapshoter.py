@@ -1,13 +1,10 @@
 import hashlib
 import json
-import logging
 import os
 
 from ansible.plugins.callback import CallbackBase
 from ansible.executor.task_result import TaskResult
-
 from ansible_bender.api import Application
-from ansible_bender.cli import set_logging
 
 
 class CallbackModule(CallbackBase):
@@ -15,6 +12,14 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'a_container_image_snapshoter'
     CALLBACK_NEEDS_WHITELIST = True
+
+    def _get_app_and_build(self):
+        build_id = os.environ["AB_BUILD_ID"]
+        db_path = os.environ["AB_DB_PATH"]
+        app = Application(init_logging=False, db_path=db_path)
+        build = app.get_build(build_id)
+        app.set_logging(debug=build.debug, verbose=build.verbose)
+        return app, build
 
     def _snapshot(self, task_result):
         """
@@ -27,13 +32,12 @@ class CallbackModule(CallbackBase):
             return
         if task_result.is_failed() or task_result._result.get("rc", 0) > 0:
             return
-        build_id = os.environ["AB_BUILD_ID"]
-        a = Application()
+        a, build = self._get_app_and_build()
         content = self.get_task_content(task_result._task.get_ds())
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
-            a.record_progress(None, content, None, build_id=build_id)
+            a.record_progress(None, content, None, build_id=build.build_id)
             return
-        image_name = a.cache_task_result(content, build_id=build_id)
+        image_name = a.cache_task_result(content, build_id=build.build_id)
         if image_name:
             self._display.display("caching the task result in an image '%s'" % image_name)
 
@@ -54,17 +58,14 @@ class CallbackModule(CallbackBase):
         if task.action == "setup":
             # we ignore setup
             return
-        build_id = os.environ["AB_BUILD_ID"]
-        a = Application()
+        a, build = self._get_app_and_build()
         content = self.get_task_content(task.get_ds())
-        status = a.maybe_load_from_cache(content, build_id=build_id)
+        status = a.maybe_load_from_cache(content, build_id=build.build_id)
         if status:
             self._display.display("loaded from cache: '%s'" % status)
             task.when = "0"  # skip
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        # TODO: figure out logging
-        # set_logging(level=logging.DEBUG)
         return self._maybe_load_from_cache(task)
 
     def v2_on_any(self, *args, **kwargs):
@@ -73,5 +74,4 @@ class CallbackModule(CallbackBase):
         except IndexError:
             return
         if isinstance(first_arg, TaskResult):
-            # set_logging(level=logging.DEBUG)
             return self._snapshot(first_arg)

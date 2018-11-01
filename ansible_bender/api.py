@@ -2,24 +2,47 @@ import logging
 import os
 import datetime
 
+import sys
+
 from ansible_bender.builder import get_builder
 from ansible_bender.builders.base import BuildState
-from ansible_bender.constants import OUT_LOGGER
+from ansible_bender.constants import OUT_LOGGER, OUT_LOGGER_FORMAT
 from ansible_bender.core import AnsibleRunner
 from ansible_bender.db import Database
 from ansible_bender.exceptions import AbBuildUnsuccesful
+from ansible_bender.utils import set_logging
 
 out_logger = logging.getLogger(OUT_LOGGER)
 
 
 class Application:
-    def __init__(self, debug=False, db_path=None):
+    def __init__(self, debug=False, db_path=None, verbose=False, init_logging=True):
         """
         :param debug: bool, provide debug output if True
         :param db_path: str, path to json file where the database stores the data persistently
+        :param verbose: bool, print verbose output
+        :param init_logging: bool, set up logging if True
         """
+        if init_logging:
+            self.set_logging(debug=debug, verbose=verbose)
+        self.verbose = verbose
         self.debug = debug
+        self.db_path = db_path
         self.db = Database(db_path=db_path)
+
+    @staticmethod
+    def set_logging(debug=False, verbose=False):
+        """ configure logging """
+        if debug:
+            set_logging(level=logging.DEBUG)
+        elif verbose:
+            set_logging(level=logging.INFO)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
+                        handler_kwargs={"stream": sys.stdout})
+        else:
+            set_logging(level=logging.WARNING)
+            set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
+                        handler_kwargs={"stream": sys.stdout})
 
     def build(self, playbook_path, build, build_volumes=None):
         """
@@ -32,6 +55,8 @@ class Application:
         if not os.path.isfile(playbook_path):
             raise RuntimeError("No such file or directory: %s" % playbook_path)
 
+        build.debug = self.debug
+        build.verbose = self.verbose
         # we have to record as soon as possible
         self.db.record_build(build)
 
@@ -53,7 +78,7 @@ class Application:
 
         try:
             try:
-                output = a_runner.build(python_interpreter=py_intrprtr)
+                output = a_runner.build(self.db_path, python_interpreter=py_intrprtr)
             except AbBuildUnsuccesful as ex:
                 b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
                                          set_finish_time=True)

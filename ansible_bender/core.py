@@ -95,7 +95,7 @@ class AnsibleRunner:
         callback_plugins_dir = os.path.dirname(callback_plugins.__file__)
         fd.write(A_CFG_TEMPLATE.format(callback_plugins_dir))
 
-    def build(self, python_interpreter="/usr/bin/python3"):
+    def build(self, db_path, python_interpreter="/usr/bin/python3"):
         """
         run the playbook against the container
 
@@ -105,6 +105,7 @@ class AnsibleRunner:
         try:
             environment = {
                 "AB_BUILD_ID": self.build_i.build_id,
+                "AB_DB_PATH": db_path,
             }
             inv_path = os.path.join(tmp, "inventory")
             logger.info("creating inventory file %s", inv_path)

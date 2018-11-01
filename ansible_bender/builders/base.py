@@ -102,6 +102,8 @@ class Build:
         self.layer_index = {}  # this is an index for layers: `layer_id: Layer()`
         self.cache_tasks = True  # we cache by default, a user can opt out
         self.log_lines = []  # a list of strings
+        self.debug = None
+        self.verbose = None
 
     def to_dict(self):
         """ serialize """
@@ -121,7 +123,9 @@ class Build:
             "build_container": self.build_container,
             "cache_tasks": self.cache_tasks,
             # we could compress/base64 here, let's go for the easier solution first
-            "log_lines": self.log_lines
+            "log_lines": self.log_lines,
+            "debug": self.debug,
+            "verbose": self.verbose
         }
 
     @classmethod
@@ -148,6 +152,8 @@ class Build:
         b.build_container = j["build_container"]
         b.cache_tasks = j["cache_tasks"]
         b.log_lines = j["log_lines"]
+        b.debug = j["debug"]
+        b.verbose = j["verbose"]
         return b
 
     def record_layer(self, content, layer_id, base_image_id, cached=None):
