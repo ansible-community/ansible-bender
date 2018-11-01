@@ -67,6 +67,9 @@ class Layer:
         self.base_image_id = base_image_id
         self.cached = cached
 
+    def __str__(self):
+        return f"layer_id={self.layer_id} cached={self.cached}"
+
     def to_dict(self):
         return {
             "content": self.content,

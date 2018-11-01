@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+  - name: print local env vars
+    debug:
+      msg: "{{ lookup('env','ANSIBLE_CONFIG', 'AB_BUILDER_NAME', 'AB_TARGET_IMAGE_NAME') }}"

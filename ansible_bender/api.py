@@ -177,10 +177,12 @@ class Application:
         if build_id:
             build = self.db.get_build(build_id)
         base_image_id = build.get_top_layer_id()
+        was_cached = False
         if not layer_id:
-            # skipped task, not cached
-            layer_id = self.get_layer(content, base_image_id) or base_image_id
-        build.record_layer(content, layer_id, base_image_id)
+            # skipped task, it was cached
+            layer_id = self.get_layer(content, base_image_id)
+            was_cached = True
+        build.record_layer(content, layer_id, base_image_id, cached=was_cached)
         self.db.record_build(build)
         return base_image_id
 
