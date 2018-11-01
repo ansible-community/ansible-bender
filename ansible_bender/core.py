@@ -20,6 +20,7 @@ callback_whitelist=snapshoter\n
 """
 
 
+# TODO: implement ansible_args and utilize it in tests to provide mega debug output
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
                  ansible_args=None, debug=False, environment=None):
     """
