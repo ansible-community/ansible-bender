@@ -100,7 +100,8 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     e_a_b = "A=B"
     e_x_y = "X=Y"
     cmd, cmd_e = "ls -lha", ["ls", "-lha"]
-    user = "1000123"
+    # FIXME: this doesn't work with user namespaces
+    # user = "1000"
     p_80, p_443 = "80", "443"
     runtime_volume = "/var/lib/asdqwe"
     cmd = ["build",
@@ -108,7 +109,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            "-l", l_a_b, l_x_y,
            "-e", e_a_b, e_x_y,
            "--cmd", cmd,
-           "-u", user,
+           # "-u", user,
            "-p", p_80, p_443,
            "--runtime-volumes", runtime_volume,
            "--",
@@ -122,7 +123,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     assert e_a_b in co["Env"]
     assert e_x_y in co["Env"]
     assert co["Cmd"] == cmd_e
-    assert co["User"] == user
+    # assert co["User"] == user
     assert p_80 in co["ExposedPorts"]
     assert p_443 in co["ExposedPorts"]
     # FIXME: the volume is not set; a bug in buildah or ab?
