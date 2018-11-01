@@ -27,8 +27,8 @@ class Application:
             self.set_logging(debug=debug, verbose=verbose)
         self.verbose = verbose
         self.debug = debug
-        self.db_path = db_path
         self.db = Database(db_path=db_path)
+        self.db_path = self.db.db_root_path
 
     @staticmethod
     def set_logging(debug=False, verbose=False):

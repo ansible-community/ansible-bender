@@ -68,7 +68,7 @@ class Database:
         path_preference = PATH_CANDIDATES.copy()
         if db_path:
             path_preference.insert(0, db_path)
-        self.runtime_dir_path = self._runtime_dir_path(path_preference)
+        self.runtime_dir_path, self.db_root_path = self._runtime_dir_path(path_preference)
 
     @contextmanager
     def acquire(self):
@@ -115,7 +115,7 @@ class Database:
         logger.debug("runtime dir is %s", resolved)
         our_dir = os.path.join(resolved, "ab")
         os.makedirs(our_dir, mode=0o0700, exist_ok=True)
-        return our_dir
+        return our_dir, resolved
 
     def _db_path(self):
         data_path = os.path.join(self.runtime_dir_path, "db.json")
