@@ -52,23 +52,23 @@ DEFAULT_DATA = {
     "store": {}
 }
 
+PATH_CANDIDATES = [
+    "~/.cache",
+    os.environ.get("XDG_RUNTIME_DIR", ""),
+    "/var/tmp"
+]
 
 logger = logging.getLogger(__name__)
 
 
 class Database:
     """ Simple implementation of persistent data store for ab; it's just a locked json file """
-    path_candidates = [
-        os.environ.get("XDG_RUNTIME_DIR", ""),
-        "~/.cache",
-        "/var/tmp"
-    ]
 
     def __init__(self, db_path=None):
-        # we can't cache the data due to race conditions
-        self.path_preference = self.path_candidates.copy()
+        path_preference = PATH_CANDIDATES.copy()
         if db_path:
-            self.path_candidates.insert(0, db_path)
+            path_preference.insert(0, db_path)
+        self.runtime_dir_path = self._runtime_dir_path(path_preference)
 
     @contextmanager
     def acquire(self):
@@ -100,8 +100,11 @@ class Database:
         except FileNotFoundError:
             pass
 
-    def _runtime_dir_path(self):
-        for c in self.path_preference:
+    @staticmethod
+    def _runtime_dir_path(path_preference):
+        logger.debug("search for runtime dir")
+        for c in path_preference:
+            logger.debug("trying %s", c)
             if not c:
                 continue
             resolved = os.path.abspath(os.path.expanduser(c))
@@ -115,12 +118,12 @@ class Database:
         return our_dir
 
     def _db_path(self):
-        data_path = os.path.join(self._runtime_dir_path(), "db.json")
+        data_path = os.path.join(self.runtime_dir_path, "db.json")
         logger.debug("DB path is %s", data_path)
         return data_path
 
     def _lock_path(self):
-        lock_path = os.path.join(self._runtime_dir_path(), "ab.pid")
+        lock_path = os.path.join(self.runtime_dir_path, "ab.pid")
         logger.debug("lock path is %s", lock_path)
         return lock_path
 
