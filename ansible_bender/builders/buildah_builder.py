@@ -171,7 +171,7 @@ class BuildahBuilder(Builder):
         self.clean()
         self.create()  # FIXME: store build volumes in db
 
-    def commit(self, image_name):
+    def commit(self, image_name, print_output=True):
         if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:
             # change user if needed
             configure_buildah_container(
@@ -179,7 +179,7 @@ class BuildahBuilder(Builder):
                 cmd=self.build.metadata.cmd,
                 volumes=self.build.metadata.volumes,
             )
-        buildah("commit", [self.ansible_host, image_name], print_output=True,
+        buildah("commit", [self.ansible_host, image_name], print_output=print_output,
                 debug=self.debug)
         return self.get_image_id(image_name)
 

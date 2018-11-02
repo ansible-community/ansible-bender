@@ -195,8 +195,7 @@ class Application:
         # buildah doesn't accept upper case
         image_name = image_name.lower()
         builder = self.get_builder(build)
-        # FIXME: do not commit metadata, just filesystem
-        layer_id = builder.commit(image_name)
+        layer_id = builder.commit(image_name, print_output=False)
         base_image_id = self.record_progress(build, content, layer_id)
         self.db.save_layer(layer_id, base_image_id, content)
         return image_name
