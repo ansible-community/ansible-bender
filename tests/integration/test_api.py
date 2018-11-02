@@ -1,12 +1,16 @@
 """
 Test Application class
 """
+import os
+import shutil
+
 from ansible_bender.api import Application
 from ansible_bender.builders.base import Build, ImageMetadata, BuildState
-from tests.spellbook import dont_cache_playbook_path, change_layering_playbook
+from tests.spellbook import dont_cache_playbook_path, change_layering_playbook, data_dir
 from ..spellbook import basic_playbook_path, small_basic_playbook_path, base_image, target_image
 
 import pytest
+import yaml
 
 
 @pytest.fixture()
@@ -116,8 +120,37 @@ def test_stop_layering(target_image, application, build):
     builder.run(build.target_image, ["ls", "-1", "/etc/passwd-lol"])
 
 
-def test_file_caching_mechanism(target_image, application, build):
-    # TODO: skip caching for files: when a task wasn't changed
-    #       likely skip tasks which are related to file operations
-    #       in task result, if it's not changed, load from cache and continue the cache chain
-    return True
+def test_file_caching_mechanism(tmpdir, target_image, application, build):
+    second_build = Build.from_json(build.to_dict())
+    t = str(tmpdir)
+    pb_name = "file_caching.yaml"
+    test_file_name = "a_bag_of_fun"
+    file_caching_pb = os.path.join(data_dir, pb_name)
+    p = os.path.join(t, pb_name)
+    test_file = os.path.join(data_dir, test_file_name)
+    f = os.path.join(t, test_file_name)
+
+    shutil.copy(file_caching_pb, p)
+    shutil.copy(test_file, f)
+
+    with open(p) as fd:
+        d = yaml.safe_load(fd)
+        d[0]["tasks"][0]["copy"]["src"] = f
+    with open(p, "w") as fd:
+        yaml.safe_dump(d, fd)
+
+    application.build(p, build)
+    build = application.db.get_build(build.build_id)
+    assert len(build.layers) == 2
+
+    fun_content = "Much more fun, fun, fun!"
+    with open(f, "w") as fd:
+        fd.write(fun_content)
+
+    application.build(p, second_build)
+    second_build = application.db.get_build(second_build.build_id)
+    assert not second_build.layers[1].cached
+
+    builder = application.get_builder(second_build)
+    out = builder.run(second_build.target_image, ["cat", "/fun"])
+    assert out == fun_content

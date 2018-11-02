@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+  - copy:
+      src: FILL_THIS_IN
+      dest: /fun

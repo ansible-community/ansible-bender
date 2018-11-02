@@ -7,6 +7,9 @@ from ansible.executor.task_result import TaskResult
 from ansible_bender.api import Application
 
 
+FILE_ACTIONS = ["file", "copy", "synchronize", "unarchive", "template"]
+
+
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'notification'
@@ -41,6 +44,16 @@ class CallbackModule(CallbackBase):
         if not build.is_layering_on():
             return
         content = self.get_task_content(task_result._task.get_ds())
+        # alternatively, we can guess it's a file action and do getattr(task, "src")
+        if task_result._task.action in FILE_ACTIONS:
+            # if it's changed, we have a new cache entry
+            # it it didn't change, we can reload from cache
+            if not task_result.is_changed():
+                status = a.maybe_load_from_cache(content, build_id=build.build_id)
+                if status:
+                    self._display.display("loaded from cache: '%s'" % status)
+                    return
+
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
             a.record_progress(None, content, None, build_id=build.build_id)
             return
@@ -61,17 +74,20 @@ class CallbackModule(CallbackBase):
 
         :param task: instance of Task
         """
-        # TODO: try to control caching with tags: never-cache
         if task.action == "setup":
             # we ignore setup
-            return
-        if "dont-cache" in getattr(task, "tags", []):
-            self._display.display("detected tag 'dont-cache', disabling caching mechanism")
             return
         a, build = self._get_app_and_build()
         if "stop-layering" in getattr(task, "tags", []):
             build.stop_layering()
             a.db.record_build(build)
+            return
+        if task.action in FILE_ACTIONS:
+            # if the task is a file action, let's use ansible and let it do its job
+            # and if it's not changed, we can safely reload from cache
+            return
+        if "dont-cache" in getattr(task, "tags", []):
+            self._display.display("detected tag 'dont-cache', disabling caching mechanism")
             return
         if not build.is_layering_on():
             return
