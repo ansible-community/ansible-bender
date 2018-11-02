@@ -19,6 +19,7 @@ data_dir = os.path.join(tests_dir, "data")
 basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
 dont_cache_playbook_path = os.path.join(data_dir, "dont_cache_playbook.yaml")
 small_basic_playbook_path = os.path.join(data_dir, "small_basic_playbook.yaml")
+change_layering_playbook = os.path.join(data_dir, "change_layering.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 # TODO: check if the image exists, if not, pull it
 base_image = "docker.io/library/python:3-alpine"

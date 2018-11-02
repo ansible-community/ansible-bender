@@ -151,6 +151,17 @@ class BuildahBuilder(Builder):
             debug=self.debug
         )
 
+    def run(self, image_name, command):
+        """
+        run provided command in the selected image and return output
+
+        :param image_name: str
+        :param command: list of str
+        :return: str (output)
+        """
+        cmd = ["podman", "run", "--rm", image_name] + command
+        return run_cmd(cmd, return_output=True)
+
     def swap_working_container(self):
         """
         remove current working container and replace it with the provided one

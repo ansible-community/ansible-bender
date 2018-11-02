@@ -105,6 +105,7 @@ class Build:
         self.layer_index = {}  # this is an index for layers: `layer_id: Layer()`
         self.cache_tasks = True  # we cache by default, a user can opt out
         self.log_lines = []  # a list of strings
+        self.layering = True
         self.debug = None
         self.verbose = None
 
@@ -127,6 +128,7 @@ class Build:
             "cache_tasks": self.cache_tasks,
             # we could compress/base64 here, let's go for the easier solution first
             "log_lines": self.log_lines,
+            "layering": self.layering,
             "debug": self.debug,
             "verbose": self.verbose
         }
@@ -155,6 +157,7 @@ class Build:
         b.build_container = j["build_container"]
         b.cache_tasks = j["cache_tasks"]
         b.log_lines = j["log_lines"]
+        b.layering = j["layering"]
         b.debug = j["debug"]
         b.verbose = j["verbose"]
         return b
@@ -179,6 +182,12 @@ class Build:
 
     def record_cache_entry(self, image_id):
         self.layer_index[image_id].cached = True
+
+    def stop_layering(self):
+        self.layering = False
+
+    def is_layering_on(self):
+        return self.layering
 
 
 class BuildState(Enum):
@@ -212,6 +221,15 @@ class Builder:
     def create(self, build_volumes=None):
         """
         :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
+        """
+
+    def run(self, image_name, command):
+        """
+        run provided command in the selected image and return output
+
+        :param image_name: str
+        :param command: list of str
+        :return: str (output)
         """
 
     def commit(self, image_name):

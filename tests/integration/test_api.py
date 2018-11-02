@@ -3,7 +3,7 @@ Test Application class
 """
 from ansible_bender.api import Application
 from ansible_bender.builders.base import Build, ImageMetadata, BuildState
-from tests.spellbook import dont_cache_playbook_path
+from tests.spellbook import dont_cache_playbook_path, change_layering_playbook
 from ..spellbook import basic_playbook_path, small_basic_playbook_path, base_image, target_image
 
 import pytest
@@ -104,6 +104,16 @@ def test_dont_cache_tag(target_image, application, build):
     assert not dont_cache_b.layers[2].cached
     assert not dont_cache_b.layers[3].cached
     assert not dont_cache_b.layers[4].cached
+
+
+def test_stop_layering(target_image, application, build):
+    """ utilize a playbook which halts caching """
+    application.build(change_layering_playbook, build)
+    build = application.db.get_build(build.build_id)
+    assert len(build.layers) == 2  # base image, first task (the final layer is not present here)
+
+    builder = application.get_builder(build)
+    builder.run(build.target_image, ["ls", "-1", "/etc/passwd-lol"])
 
 
 def test_file_caching_mechanism(target_image, application, build):

@@ -33,6 +33,13 @@ class CallbackModule(CallbackBase):
         if task_result.is_failed() or task_result._result.get("rc", 0) > 0:
             return
         a, build = self._get_app_and_build()
+        if "stop-layering" in getattr(task_result._task, "tags", []):
+            build.stop_layering()
+            a.db.record_build(build)
+            self._display.display("detected tag 'stop-layering', tasks won't be cached nor layered any more")
+            return
+        if not build.is_layering_on():
+            return
         content = self.get_task_content(task_result._task.get_ds())
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
             a.record_progress(None, content, None, build_id=build.build_id)
@@ -62,6 +69,12 @@ class CallbackModule(CallbackBase):
             self._display.display("detected tag 'dont-cache', disabling caching mechanism")
             return
         a, build = self._get_app_and_build()
+        if "stop-layering" in getattr(task, "tags", []):
+            build.stop_layering()
+            a.db.record_build(build)
+            return
+        if not build.is_layering_on():
+            return
         content = self.get_task_content(task.get_ds())
         status = a.maybe_load_from_cache(content, build_id=build.build_id)
         if status:

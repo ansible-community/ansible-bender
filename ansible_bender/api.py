@@ -84,7 +84,6 @@ class Application:
                                          set_finish_time=True)
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
-                # TODO: let this be done by the callback plugin
                 image_name = build.target_image + "-failed"
                 builder.commit(image_name)
                 out_logger.info("Image build failed /o\\")

@@ -251,11 +251,23 @@ You are able to control caching in two ways:
    will not try to load from cache
 
 
+### Layering mechanism
+
+When building your image by default, every task (except for setup) is being
+cached as an image layer. This may have bad consequences on storage and
+security: there may be things which you didn't want to have cached nor stored
+in a layer (certificates, package manager metadata, build artifacts).
+
+ab allows you to easily disable layering mechanism. All you need to do is to
+add a tag `stop-layering` to a task which will disable layering (and caching)
+for that task and all the following ones.
+
+
 ## TODO past 0.1.0
 
 * [x] A fancy name!
 * [x] A caching mechanism
-* [ ] Configurable layering: ability to skip layer commit (for sake of security and saving disk space (hi whiteouts!))
+* [x] Configurable layering: ability to skip layer commit (for sake of security and saving disk space (hi whiteouts!))
 * [x] Configurable caching: ability to stop caching at some point during execution (cached git clones are bad)
 * [ ] You can build images with podman (Requires https://github.com/ansible/ansible/pull/47519)
 * [ ] You can build images with docker (incubator maybe?)

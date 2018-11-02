@@ -1,0 +1,16 @@
+- hosts: all
+  tasks:
+  - name: print local env vars
+    debug:
+      msg: "{{ lookup('env','ANSIBLE_CONFIG', 'AB_BUILDER_NAME', 'AB_TARGET_IMAGE_NAME') }}"
+  - name: print all remote env vars
+    debug:
+      msg: '{{ ansible_env }}'
+    tags:
+    - stop-layering
+  - name: Run a sample command
+    command: 'ls -lha /'
+  - name: create a file
+    copy:
+      src: /etc/passwd
+      dest: /etc/passwd-lol
