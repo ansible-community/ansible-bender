@@ -39,7 +39,10 @@ It's just using Ansible to do something magical.**
 * You can do volume mounts during build.
 * Caching mechanism:
   * Every task result is cached as a container image layer.
-  * You can turn this off with `--no-cache`
+  * You can turn this off with `--no-cache`.
+  * You can disable caching from a certain point by adding a tag `dont-cache` to a task.
+* You can stop creating new image layers by adding tag `stop-layering` to a task.
+
 
 ## Subcommands
 
