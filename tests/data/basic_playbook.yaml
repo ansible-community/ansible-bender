@@ -10,5 +10,5 @@
     command: 'ls -lha /'
   - name: create a file
     copy:
-      src: /etc/passwd
-      dest: /tmp/passwd-lol
+      src: '{{ playbook_dir }}/a_bag_of_fun'
+      dest: /fun

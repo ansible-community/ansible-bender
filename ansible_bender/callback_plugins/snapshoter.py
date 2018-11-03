@@ -45,21 +45,25 @@ class CallbackModule(CallbackBase):
             return
         content = self.get_task_content(task_result._task.get_ds())
         # alternatively, we can guess it's a file action and do getattr(task, "src")
-        if task_result._task.action in FILE_ACTIONS:
-            # if it's changed, we have a new cache entry
-            # it it didn't change, we can reload from cache
-            if not task_result.is_changed():
-                status = a.maybe_load_from_cache(content, build_id=build.build_id)
-                if status:
-                    self._display.display("loaded from cache: '%s'" % status)
-                    return
-
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
             a.record_progress(None, content, None, build_id=build.build_id)
             return
-        image_name = a.cache_task_result(content, build_id=build.build_id)
-        if image_name:
-            self._display.display("caching the task result in an image '%s'" % image_name)
+        if task_result._task.action in FILE_ACTIONS:
+            # unfortunately ansible doesn't track files well enough: reports changed=True
+            # even when the file is the same
+            # let's just ignore caching, do a layer and carry on for now
+            self._display.display(
+                "disabling caching: ansible doesn't tell us the truth whether the file was changed or not")
+            a.create_new_layer(content, build)
+            # if not task_result.is_changed():
+            #     status = a.maybe_load_from_cache(content, build_id=build.build_id)
+            #     if status:
+            #         self._display.display("loaded from cache: '%s'" % status)
+            #         return
+        else:
+            image_name = a.cache_task_result(content, build)
+            if image_name:
+                self._display.display("caching the task result in an image '%s'" % image_name)
 
     @staticmethod
     def get_task_content(serialized_data):
@@ -83,8 +87,9 @@ class CallbackModule(CallbackBase):
             a.db.record_build(build)
             return
         if task.action in FILE_ACTIONS:
-            # if the task is a file action, let's use ansible and let it do its job
-            # and if it's not changed, we can safely reload from cache
+            # the task is a file action: unfortunately we can't cache that
+            # also ansible doesn't help here since it says changed=True even if the file didn't change
+            # let's abort caching
             return
         if "dont-cache" in getattr(task, "tags", []):
             self._display.display("detected tag 'dont-cache', disabling caching mechanism")

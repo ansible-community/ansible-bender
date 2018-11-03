@@ -185,18 +185,21 @@ class Application:
         self.db.record_build(build)
         return base_image_id
 
-    def cache_task_result(self, content, build_id):
-        """ snapshot the container after a task was executed """
-        build = self.db.get_build(build_id)
-        if not build.cache_tasks:  # actually we could still cache results
-            return
+    def create_new_layer(self, content, build):
+        builder = self.get_builder(build)
         timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
         image_name = "%s-%s" % (build.target_image, timestamp)
         # buildah doesn't accept upper case
         image_name = image_name.lower()
-        builder = self.get_builder(build)
         layer_id = builder.commit(image_name, print_output=False)
         base_image_id = self.record_progress(build, content, layer_id)
+        return image_name, layer_id, base_image_id
+
+    def cache_task_result(self, content, build):
+        """ snapshot the container after a task was executed """
+        if not build.cache_tasks:  # actually we could still cache results
+            return
+        image_name, layer_id, base_image_id = self.create_new_layer(content, build)
         self.db.save_layer(layer_id, base_image_id, content)
         return image_name
 

@@ -53,7 +53,9 @@ def test_caching(target_image, application, build):
     application.build(basic_playbook_path, b2)
     build = application.db.get_build(build.build_id)
     b2 = application.db.get_build(b2.build_id)
-    assert [x.layer_id for x in b2.layers] == [y.layer_id for y in build.layers]
+    assert [x.layer_id for x in b2.layers[:3]] == [y.layer_id for y in build.layers[:3]]
+    assert not b2.layers[4].cached
+    assert not build.layers[4].cached
     assert len(build.layers) == 5
 
 
@@ -61,9 +63,9 @@ def test_disabled_caching(target_image, application, build):
     build.cache_tasks = False
     application.build(basic_playbook_path, build)
     build = application.db.get_build(build.build_id)
-    base_image_id = application.get_builder(build).get_image_id(build.base_image)
-    assert base_image_id == build.get_top_layer_id()
-    assert len([x for x in build.layers if x.cached]) == 1
+    assert len(build.layers) == 2
+    assert build.layers[0].cached
+    assert not build.layers[1].cached
 
 
 def test_caching_mechanism(target_image, application, build):
@@ -121,7 +123,9 @@ def test_stop_layering(target_image, application, build):
 
 
 def test_file_caching_mechanism(tmpdir, target_image, application, build):
+    """ make sure that we don't load from cache when a file was changed """
     second_build = Build.from_json(build.to_dict())
+    cached_build = Build.from_json(build.to_dict())
     t = str(tmpdir)
     pb_name = "file_caching.yaml"
     test_file_name = "a_bag_of_fun"
@@ -142,7 +146,18 @@ def test_file_caching_mechanism(tmpdir, target_image, application, build):
     application.build(p, build)
     build = application.db.get_build(build.build_id)
     assert len(build.layers) == 2
+    assert build.layers[0].cached
+    assert not build.layers[1].cached
 
+    # ideally this would be cached, but isn't now
+    application.build(p, cached_build)
+    cached_build = application.db.get_build(cached_build.build_id)
+    assert len(cached_build.layers) == 2
+    assert cached_build.layers[0].cached
+    # since ansible doesn't track files and whether they changed, let's just make sure it works we expect it to work
+    assert not cached_build.layers[1].cached
+
+    # and now we test that if we change the file, it's not loaded from cache
     fun_content = "Much more fun, fun, fun!"
     with open(f, "w") as fd:
         fd.write(fun_content)

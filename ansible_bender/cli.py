@@ -90,8 +90,8 @@ class CLI:
         self.build_parser.add_argument(
             "--no-cache",
             action="store_true",
-            help="disable caching mechanism: storing layers and loading them; when disabled, "
-                 "the final image is composed of a single layer"
+            help="disable caching mechanism: storing layers and loading them if a task is unchanged; "
+                 "this option also implies the final image is composed of a base image and one additional layer"
         )
         self.build_parser.add_argument(
             "--build-volumes",
