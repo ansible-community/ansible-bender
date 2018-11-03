@@ -1,17 +1,23 @@
 # 0.2.0
 
-Renamed to `ansible-bender`, the CLI was left intact.
-
+Renamed to `ansible-bender`, the binary name was left intact.
 
 ## Features
 
-* Failed builds are commited as `-failed`.
+ * Failed builds are commited as `-failed`.
+ * Added command `list-builds`.
+ * Added command `get-logs`.
+ * Added command `inspect`.
+ * Implemented a caching mechanism:
+   * Limitation of caching are file tasks: ansible can't detect that a file wasn't changed and reports it changed.
+     This means that ab is not able to load such result from cache.
+   * Caching can be controled by a tag `dont-cache` which you can put into a task.
+ * You can disable layering either by build's option `--no-cache` or adding a tag `stop-Layering` to a task.
 
 
 # 0.1.0
 
 Initial release!
-
 
 ## Features
 
