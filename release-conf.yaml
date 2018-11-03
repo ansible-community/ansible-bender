@@ -1,0 +1,11 @@
+# list of major python versions that bot will build separate wheels for
+python_versions:
+  - 3
+# whether to release on fedora. False by default
+trigger_on_issue: true
+fedora: false
+# list of labels to be put on issues and PRs created by bot
+labels:
+  - bot
+  - release-bot
+  - user-cont
