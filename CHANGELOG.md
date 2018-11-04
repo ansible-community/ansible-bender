@@ -1,5 +1,73 @@
 # 0.2.0
 
+* add config for release bot
+* 0.2.0 changelog
+* disable caching for file tasks
+* properly cache and load file-based actions
+* update readme
+* less verbose buildah when committing layers
+* implement explicit layering
+* correctly process default db dir
+* add a way to stop caching in playbook
+* changing user with user namespaces doesn't really work
+* todo: implement ansible_args for sake of easier debugging while testing
+* db: less useless logging, less churn
+* cli: correct obtaining db path candidates
+* new test case for caching
+* set up logging in app & pass db path to snapshoter
+* runtime dir: check only once
+* readme: update roadmap
+* readme: list subcommands
+* add inspect command and more CLI tests
+* store logs correctly when a build fails
+* list-builds: pretty print state name
+* explicitly store layers in DB
+* update README
+* new CLI command: get-logs
+* store logs in the DB
+* fix tests
+* functional tests: a dedicated runtime db per test case
+* do not log output of buildah inspect to debug log
+* implement list-builds command
+* testing: ignore errors when removing images
+* enable overriding path to db via CLI
+* store build start and fin times in db
+* document caching briefly
+* find a-p command
+* tests: start spellbook: utilities & DRY
+* implement --no-cache
+* fix caching tests and test for count
+* update todo string
+* dont cache failed tasks
+* caching: tinker output text
+* seems that runtime volumes are not being set
+* check that env vars are set in a container
+* readme: update todo
+* try logging in plugins
+* store build container name in db
+* fix split_once_or_fail_with, ignore rmi test fails
+* tinker caching
+* implement caching mechanism
+* db: lock when writing
+* kickoff callback plugin
+* test case for error capturing + clean working cont always
+* print stderr output for failed commands
+* tests: DRY
+* tests: use python 3 alpine base image
+* buildah: dont print stderr
+* add a test for parallel runs
+* store state persistently on disk
+* bump to 0.2.0.dev0
+* finish the rename
+* rename project to ansible-bender
+* fail early when the playbook doesnt exist
+* dont log errors when finding python interpreter
+* tests: whoops, check for presence of correct image
+* commit image even if the a-p execution failed
+* fixups: installation, typos
+
+# 0.2.0
+
 Renamed to `ansible-bender`, the binary name was left intact.
 
 ## Features
