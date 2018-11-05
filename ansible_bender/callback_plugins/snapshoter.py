@@ -92,7 +92,7 @@ class CallbackModule(CallbackBase):
             # let's abort caching
             return
         if "dont-cache" in getattr(task, "tags", []):
-            self._display.display("detected tag 'dont-cache', disabling caching mechanism")
+            self._display.display("detected tag 'dont-cache': nothing will be loaded from cache from now")
             return
         if not build.is_layering_on():
             return
