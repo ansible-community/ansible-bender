@@ -47,6 +47,7 @@ because I care about the problem it solves.**
 * You can stop creating new image layers by adding tag `stop-layering` to a task.
 * If an image build fails, it's comitted and named with a suffix `-failed` (so
   you can take a look inside and resolve the issue).
+* The tool tries to find python interpreter inside the base image.
 
 
 ## Interface

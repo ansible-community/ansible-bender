@@ -5,6 +5,7 @@ Renamed to `ansible-bender`, the binary name was left intact.
 ## Features
 
  * Failed builds are commited as `-failed`.
+ * The tool tries to find python interpreter inside the base image.
  * Added command `list-builds`.
  * Added command `get-logs`.
  * Added command `inspect`.
@@ -13,6 +14,7 @@ Renamed to `ansible-bender`, the binary name was left intact.
      This means that ab is not able to load such result from cache.
    * Caching can be controled by a tag `no-cache` which you can put into a task.
  * You can disable layering either by build's option `--no-cache` or adding a tag `stop-Layering` to a task.
+ * Multiple user experience, output, polish changes.
 
 
 # 0.1.0
