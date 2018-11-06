@@ -5,7 +5,7 @@ import os
 from ansible.plugins.callback import CallbackBase
 from ansible.executor.task_result import TaskResult
 from ansible_bender.api import Application
-
+from ansible_bender.constants import NO_CACHE_TAG
 
 FILE_ACTIONS = ["file", "copy", "synchronize", "unarchive", "template"]
 
@@ -91,8 +91,8 @@ class CallbackModule(CallbackBase):
             # also ansible doesn't help here since it says changed=True even if the file didn't change
             # let's abort caching
             return
-        if "dont-cache" in getattr(task, "tags", []):
-            self._display.display("detected tag 'dont-cache': nothing will be loaded from cache from now")
+        if NO_CACHE_TAG in getattr(task, "tags", []):
+            self._display.display("detected tag '%s': no cache loading from now" % NO_CACHE_TAG)
             return
         if not build.is_layering_on():
             return

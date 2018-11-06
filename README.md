@@ -40,7 +40,7 @@ It's just using Ansible to do something magical.**
 * Caching mechanism:
   * Every task result is cached as a container image layer.
   * You can turn this off with `--no-cache`.
-  * You can disable caching from a certain point by adding a tag `dont-cache` to a task.
+  * You can disable caching from a certain point by adding a tag `no-cache` to a task.
 * You can stop creating new image layers by adding tag `stop-layering` to a task.
 
 
@@ -250,7 +250,7 @@ yet.
 You are able to control caching in two ways:
 
  * disable it completely by running `ab build --no-cache`
- * or adding a tag to your task named `dont-cache` — ab detects such tag and
+ * or adding a tag to your task named `no-cache` — ab detects such tag and
    will not try to load from cache
 
 

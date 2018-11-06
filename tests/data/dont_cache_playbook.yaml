@@ -7,7 +7,7 @@
     debug:
       msg: '{{ ansible_env }}'
     tags:
-      - dont-cache
+      - no-cache
   - name: Run a sample command
     command: 'ls -lha /'
   - name: create a file
