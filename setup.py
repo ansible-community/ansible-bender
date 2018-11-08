@@ -4,12 +4,18 @@ import os
 
 from setuptools import find_packages, setup
 
+
+def get_requirements():
+    with open("./requirements.txt") as file:
+        return file.readlines()
+
 # https://packaging.python.org/guides/single-sourcing-package-version/
 version = {}
 with open("./ansible_bender/version.py") as fp:
     exec(fp.read(), version)
 
 long_description = ''.join(open('README.md').readlines())
+
 
 setup(
     name='ansible-bender',
@@ -18,7 +24,8 @@ setup(
     long_description=long_description,
     # long_description_content_type='text/markdown',
     packages=find_packages(exclude=['tests']),
-    install_requires=[],
+    python_requires='>=3.6',
+    install_requires=get_requirements(),
     entry_points='''
         [console_scripts]
         ab=ansible_bender.cli:main
