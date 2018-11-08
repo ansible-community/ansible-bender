@@ -10,16 +10,19 @@ plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for perfo
 
 tl;dr Ansible is the frontend, buildah is the backend.
 
-I described this concept a while ago in [this blog post](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
+I described this concept in these blog posts:
+* [Building containers with buildah and ansible](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
+* [Ansible and Podman Can Play Together Now](https://blog.tomecek.net/post/ansible-and-podman-can-play-together-now/)
 
 You may be asking: why not
-[ansible-container](https://github.com/ansible/ansible-container)? This tool is
+[ansible-container](https://github.com/ansible/ansible-container)? Ansible bender is
 actually heavily inspired by ansible-container: the main distinction is that
 ansible-container covers the complete lifecycle of a containerized application
 while ab takes care of image builds only.
 
 **Please note that this project is not affiliated with the Ansible project.
-It's just using Ansible to do something magical.**
+Even though I work for Red Hat, I am not on the Ansible team. I wrote the tool
+because I care about the problem it solves.**
 
 
 **Status**: proof of concept
@@ -42,32 +45,38 @@ It's just using Ansible to do something magical.**
   * You can turn this off with `--no-cache`.
   * You can disable caching from a certain point by adding a tag `no-cache` to a task.
 * You can stop creating new image layers by adding tag `stop-layering` to a task.
+* If an image build fails, it's comitted and named with a suffix `-failed` (so
+  you can take a look inside and resolve the issue).
 
 
-## Subcommands
+## Interface
 
-* `build` — build a new container image using selected playbook
-* `list-builds` — list all builds
-* `get-logs` — display build logs
-* `inspect` — provide detailed metadata about the selected build
+ab has these commands:
+
+Command | Description
+--------|------------
+`build` | build a new container image using selected playbook
+`list-builds` | list all builds
+`get-logs` | display build logs
+`inspect` | provide detailed metadata about the selected build
 
 
 ## Installation
 
-`ansible-bender` will be on PyPI starting from version `0.2.0`.
-
-In the meantime, please install it from github directly:
 ```
-$ pip3 install --user git+https://github.com/TomasTomecek/ab@0.1.0
+$ pip3 install ansible-bender
 ```
 
-Oh right, and ab is tested only with python 3.
+Ansible bender supports python 3 only. This means that you need to have a
+python3 interpretter inside your base image.
 
 
 ## Usage
 
 You may noticed that I refer to `ansible-bender` as ab. That was the initial
 name and also the name of the CLI tool, so I decided to stick to it.
+
+### Building images
 
 If you clone this repository, you can utilize a simple playbook I am using for testing:
 ```
@@ -139,9 +148,6 @@ $ ab build                                       \  # this is the command
      this-is-my-image                            \  # and finally, target image name
 ```
 
-At some point, I should figure out a file-format where these would live (ansible variables? a dedicated file?).
-
-
 If we rerun the build again, we can see that ab loads every task from a cache:
 ```
 $ ab build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
@@ -188,6 +194,9 @@ Storing signatures
 Image 'this-is-my-image' was built successfully \o/
 ```
 
+
+### Listing builds
+
 We can list builds we have done:
 ```
   BUILD ID  IMAGE NAME        STATUS           DATE                        BUILD TIME
@@ -195,6 +204,9 @@ We can list builds we have done:
          1  this-is-my-image  BuildState.DONE  2018-10-31 12:19:13.847864  0:00:15.699248
          2  this-is-my-image  BuildState.DONE  2018-10-31 12:19:27.341574  0:00:10.252394
 ```
+
+
+### Getting logs of a build
 
 Wanna check build logs sometime later? No problem!
 ```
@@ -224,6 +236,9 @@ skipping: [this-is-my-image-20181031-121917088731-cont]
 PLAY RECAP ******************************************************************************************************************************************************************
 this-is-my-image-20181031-121917088731-cont : ok=1    changed=0    unreachable=0    failed=0
 ```
+
+
+### Locating built images with podman
 
 Here is a proof that the image is in there:
 ```
