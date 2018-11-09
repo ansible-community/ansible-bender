@@ -45,7 +45,7 @@ setup(
         'Topic :: Utilities',
     ],
     keywords='containers,ansible,buildah',
-    author='Red Hat',
+    author='Tomas Tomecek',
     author_email='tomas@tomecek.net',
     url='https://github.com/TomasTomecek/ansible-bender',
     include_package_data=True,
