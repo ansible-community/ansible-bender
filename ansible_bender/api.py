@@ -146,10 +146,8 @@ class Application:
         if not build.cache_tasks:
             return
 
-        base_image_id = build.get_top_layer_id()
-        layer_id = self.get_layer(content, base_image_id)
-        if layer_id:
-            builder.swap_working_container()
+        base_image_id, layer_id = self.record_progress(build, content, None)
+        builder.swap_working_container()
         return layer_id
 
     def get_layer(self, content, base_image_id):
@@ -180,10 +178,12 @@ class Application:
         if not layer_id:
             # skipped task, it was cached
             layer_id = self.get_layer(content, base_image_id)
+            if not layer_id:
+                return None, None
             was_cached = True
         build.record_layer(content, layer_id, base_image_id, cached=was_cached)
         self.db.record_build(build)
-        return base_image_id
+        return base_image_id, layer_id
 
     def create_new_layer(self, content, build):
         builder = self.get_builder(build)
@@ -192,7 +192,7 @@ class Application:
         # buildah doesn't accept upper case
         image_name = image_name.lower()
         layer_id = builder.commit(image_name, print_output=False)
-        base_image_id = self.record_progress(build, content, layer_id)
+        base_image_id, _ = self.record_progress(build, content, layer_id)
         return image_name, layer_id, base_image_id
 
     def cache_task_result(self, content, build):

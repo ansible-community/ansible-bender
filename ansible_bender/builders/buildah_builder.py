@@ -165,8 +165,6 @@ class BuildahBuilder(Builder):
     def swap_working_container(self):
         """
         remove current working container and replace it with the provided one
-
-        :param image_id: str
         """
         self.clean()
         self.create()  # FIXME: store build volumes in db

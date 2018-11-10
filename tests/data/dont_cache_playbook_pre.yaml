@@ -1,4 +1,4 @@
-# this is a plybook used in no-cache test; this is the second run
+# this is a plybook used in no-cache test; this is the first run
 - hosts: all
   tasks:
   - name: create a file
@@ -6,7 +6,5 @@
   - name: print all remote env vars
     debug:
       msg: '{{ ansible_env }}'
-    tags:
-    - no-cache
   - name: Run a sample command
     command: 'ls -lha /'

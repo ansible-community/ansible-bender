@@ -6,7 +6,7 @@ import shutil
 
 from ansible_bender.api import Application
 from ansible_bender.builders.base import Build, ImageMetadata, BuildState
-from tests.spellbook import dont_cache_playbook_path, change_layering_playbook, data_dir
+from tests.spellbook import dont_cache_playbook_path, change_layering_playbook, data_dir, dont_cache_playbook_path_pre
 from ..spellbook import basic_playbook_path, small_basic_playbook_path, base_image, target_image
 
 import pytest
@@ -89,27 +89,30 @@ def test_caching_mechanism(target_image, application, build):
     assert not build.layers[4].cached
 
 
-def test_dont_cache_tag(target_image, application, build):
+def test_no_cache_tag(target_image, application, build):
     """ utilize a playbook which halts caching """
     dont_cache_b = Build.from_json(build.to_dict())
 
-    application.build(basic_playbook_path, build)
+    application.build(dont_cache_playbook_path_pre, build)
     build = application.db.get_build(build.build_id)
-    assert len(build.layers) == 5
+    assert len(build.layers) == 4
     assert build.layers[0].cached
     assert not build.layers[1].cached
     assert not build.layers[2].cached
+    assert not build.layers[3].cached
 
     dont_cache_b.target_image += "2"
 
     application.build(dont_cache_playbook_path, dont_cache_b)
     dont_cache_b = application.db.get_build(dont_cache_b.build_id)
-    assert len(dont_cache_b.layers) == 5
+    assert len(dont_cache_b.layers) == 4
     assert dont_cache_b.layers[0].cached
     assert dont_cache_b.layers[1].cached
     assert not dont_cache_b.layers[2].cached
     assert not dont_cache_b.layers[3].cached
-    assert not dont_cache_b.layers[4].cached
+
+    builder = application.get_builder(dont_cache_b)
+    builder.run(dont_cache_b.target_image, ["ls", "-1", "/asd"])
 
 
 def test_stop_layering(target_image, application, build):
