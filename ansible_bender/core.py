@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import shutil
 
+import ansible_bender
 from ansible_bender import callback_plugins
 from ansible_bender.exceptions import AbBuildUnsuccesful
 from ansible_bender.utils import run_cmd, ap_command_exists
@@ -96,6 +97,13 @@ class AnsibleRunner:
         callback_plugins_dir = os.path.dirname(callback_plugins.__file__)
         fd.write(A_CFG_TEMPLATE.format(callback_plugins_dir))
 
+    def _get_path_our_site(self):
+        """ return a path to a directory which contains ansible_bender installation """
+        # pip in Fedora installs to /usr/local which is on default pythonpath but when ansible invokes
+        # the callback plugin, that directory is not on sys.path: wat?
+        # hence, let's add the site ab is installed in to sys.path
+        return os.path.dirname(os.path.dirname(ansible_bender.__file__))
+
     def build(self, db_path, python_interpreter="/usr/bin/python3"):
         """
         run the playbook against the container
@@ -103,10 +111,19 @@ class AnsibleRunner:
         :return: str, output
         """
         tmp = tempfile.mkdtemp(prefix="ab")
+
+        pythonpath = os.environ.get("PYTHONPATH", "")
+        site_path = self._get_path_our_site()
+        if pythonpath:
+            pythonpath = f"{site_path}:{pythonpath}"
+        else:
+            pythonpath = site_path
+
         try:
             environment = {
                 "AB_BUILD_ID": self.build_i.build_id,
                 "AB_DB_PATH": db_path,
+                "PYTHONPATH": pythonpath,  # TODO write an e2e test for this
             }
             inv_path = os.path.join(tmp, "inventory")
             logger.info("creating inventory file %s", inv_path)
