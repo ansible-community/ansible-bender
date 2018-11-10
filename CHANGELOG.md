@@ -1,3 +1,12 @@
+# 0.2.1
+
+## Bug fixes
+
+* Correctly recreate working container when loading a layer from cache.
+* When ab is installed using pip on Fedora 29, it wasn't able to import itself
+  when invoked from the callback plugin. This is now resolved.
+
+
 # 0.2.0
 
 Renamed to `ansible-bender`, the binary name was left intact.
