@@ -45,7 +45,18 @@ def test_output(target_image, tmpdir):
 def test_build_basic_image(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    buildah("inspect", ["-t", "image", target_image])
+
+    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_image]))[0]
+    image_id = p_inspect_data["Id"]
+
+    cmd = ["inspect", "--json"]
+    ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
+    top_layer_id = ab_inspect_data["layers"][-1]["layer_id"]
+    final_image_id = ab_inspect_data["final_layer_id"]
+
+    # these two are really different: top is w/o metadata
+    assert image_id != top_layer_id
+    assert image_id == final_image_id
 
 
 def test_build_basic_image_with_env_vars(tmpdir, target_image):
@@ -140,14 +151,16 @@ def test_build_failure(tmpdir):
     out = ab(["get-logs"], str(tmpdir), return_output=True)
     assert "PLAY [all]" in out
 
-    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_failed_image]))
+    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_failed_image]))[0]
     image_id = p_inspect_data["Id"]
 
     cmd = ["inspect", "--json"]
-    ab_inspect_data = json.loads(ab(cmd, str(tmpdir)))
+    ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
     top_layer_id = ab_inspect_data["layers"][-1]["layer_id"]
+    final_image_id = ab_inspect_data["final_layer_id"]
 
     assert image_id == top_layer_id
+    assert image_id == final_image_id
     assert ab_inspect_data["target_image"] == target_failed_image
     buildah("rmi", [target_failed_image])
 
