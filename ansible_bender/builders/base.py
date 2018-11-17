@@ -70,6 +70,9 @@ class Layer:
     def __str__(self):
         return f"layer_id={self.layer_id} cached={self.cached}"
 
+    def __repr__(self):
+        return f"Layer(layer_id={self.layer_id}, cached={self.cached}, base={self.base_image_id})"
+
     def to_dict(self):
         return {
             "content": self.content,
