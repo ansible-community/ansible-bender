@@ -167,7 +167,7 @@ class BuildahBuilder(Builder):
         remove current working container and replace it with the provided one
         """
         self.clean()
-        self.create()  # FIXME: store build volumes in db
+        self.create()
 
     def commit(self, image_name, print_output=True):
         if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:

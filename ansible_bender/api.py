@@ -44,16 +44,14 @@ class Application:
             set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
                         handler_kwargs={"stream": sys.stdout})
 
-    def build(self, playbook_path, build, build_volumes=None):
+    def build(self, build):
         """
         build container image
 
-        :param playbook_path: str, path to playbook
         :param build: instance of Build
-        :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
         """
-        if not os.path.isfile(playbook_path):
-            raise RuntimeError("No such file or directory: %s" % playbook_path)
+        if not os.path.isfile(build.playbook_path):
+            raise RuntimeError("No such file or directory: %s" % build.playbook_path)
 
         build.debug = self.debug
         build.verbose = self.verbose
@@ -65,7 +63,7 @@ class Application:
         base_image_id = builder.get_image_id(build.base_image)
         build.record_layer(None, base_image_id, None, cached=True)
 
-        a_runner = AnsibleRunner(playbook_path, builder, build, debug=self.debug)
+        a_runner = AnsibleRunner(build.playbook_path, builder, build, debug=self.debug)
 
         build.build_start_time = datetime.datetime.now()
         self.db.record_build(build, build_state=BuildState.IN_PROGRESS)
@@ -74,7 +72,7 @@ class Application:
             builder.pull()
         py_intrprtr = builder.find_python_interpreter()
 
-        builder.create(build_volumes=build_volumes)
+        builder.create(build_volumes=build.build_volumes)
 
         try:
             try:

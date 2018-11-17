@@ -228,6 +228,8 @@ class CLI:
             metadata.volumes = self.args.runtime_volumes
 
         build = Build()  # we should have a helper for this
+        build.playbook_path = self.args.playbook_path
+        build.build_volumes = self.args.build_volumes
         build.metadata = metadata
         build.state = BuildState.NEW
         build.base_image = self.args.base_image
@@ -235,7 +237,7 @@ class CLI:
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
 
-        self.app.build(self.args.playbook_path, build, build_volumes=self.args.build_volumes)
+        self.app.build(build)
 
     def _list_builds(self):
         builds = self.app.list_builds()

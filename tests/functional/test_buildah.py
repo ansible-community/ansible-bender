@@ -10,7 +10,7 @@ import pytest
 
 from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, podman_run_cmd
 from ..spellbook import basic_playbook_path, base_image, target_image, project_dir, \
-    bad_playbook_path, random_word
+    bad_playbook_path, random_word, basic_playbook_path_w_bv
 
 
 def ab(args, tmpdir_path, debug=False, return_output=False, ignore_result=False):
@@ -102,8 +102,14 @@ def test_build_basic_image_with_build_volumes(tmpdir, target_image):
     container_mount = "/asdqwe"
     vol_spec = "%s:%s" % (real_tmp, container_mount)
     cmd = ["build", "--build-volumes", vol_spec, "--",
-           basic_playbook_path, base_image, target_image]
+           basic_playbook_path_w_bv, base_image, target_image]
     ab(cmd, str(tmpdir))
+
+    cmd = ["inspect", "--json"]
+    ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
+    build_volumes = ab_inspect_data["build_volumes"]
+
+    assert vol_spec in build_volumes
 
 
 def test_build_basic_image_with_all_params(tmpdir, target_image):

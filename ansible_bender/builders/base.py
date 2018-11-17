@@ -91,8 +91,9 @@ class Layer:
 class Build:
     """ class which represents a build """
     def __init__(self):
-        # TODO: record every input about build into db
         self.build_id = None  # PK, should be set by database
+        self.playbook_path = None
+        self.build_volumes = []  # volumes for the build container
         self.metadata = None  # Image metadata
         self.state = None  # enum, BuildState
         self.build_start_time = None
@@ -114,6 +115,8 @@ class Build:
         """ serialize """
         return {
             "build_id": self.build_id,
+            "playbook_path": self.playbook_path,
+            "build_volumes": self.build_volumes,
             "metadata": self.metadata.to_dict(),
             "state": self.state.value,
             "build_start_time": self.build_start_time.strftime(TIMESTAMP_FORMAT)
@@ -140,6 +143,8 @@ class Build:
         """ return Build instance from the provided json """
         b = cls()
         b.build_id = j["build_id"]
+        b.playbook_path = j["playbook_path"]
+        b.build_volumes = j["build_volumes"]
         b.metadata = ImageMetadata.from_json(j["metadata"])
         b.state = BuildState(j["state"])
         b.build_start_time = None
