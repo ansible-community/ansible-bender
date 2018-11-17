@@ -22,7 +22,6 @@ dont_cache_playbook_path = os.path.join(data_dir, "dont_cache_playbook.yaml")
 small_basic_playbook_path = os.path.join(data_dir, "small_basic_playbook.yaml")
 change_layering_playbook = os.path.join(data_dir, "change_layering.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
-# TODO: check if the image exists, if not, pull it
 base_image = "docker.io/library/python:3-alpine"
 
 
@@ -32,6 +31,7 @@ def target_image():
     yield im
     try:
         buildah("rmi", [im])  # FIXME: use builder interface instead for sake of other backends
+        # FIXME: also remove everything from cache
     except subprocess.CalledProcessError as ex:
         print(ex)
 
