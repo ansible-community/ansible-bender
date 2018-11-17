@@ -102,6 +102,7 @@ class Build:
         self.target_image = None
         self.builder_name = None
         self.layers = []
+        self.final_layer_id = None  # once the image is built, this is the final layer: content + metadata
         self.layer_index = {}  # this is an index for layers: `layer_id: Layer()`
         self.cache_tasks = True  # we cache by default, a user can opt out
         self.log_lines = []  # a list of strings
@@ -123,6 +124,7 @@ class Build:
             "target_image": self.target_image,
             "builder_name": self.builder_name,
             "layers": [x.to_dict() for x in self.layers],
+            "final_layer_id": self.final_layer_id,
             "layer_index": {x.layer_id: x.to_dict() for x in self.layers},
             "build_container": self.build_container,
             "cache_tasks": self.cache_tasks,
@@ -152,6 +154,7 @@ class Build:
         b.target_image = j["target_image"]
         b.builder_name = j["builder_name"]
         b.layers = [Layer.from_json(x) for x in j["layers"]]
+        b.final_layer_id = j.get("final_layer_id", None)
         b.layer_index = {layer_id: Layer.from_json(layer_data)
                          for layer_id, layer_data in j["layer_index"].items()}
         b.build_container = j["build_container"]

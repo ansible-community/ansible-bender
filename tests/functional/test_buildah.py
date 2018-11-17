@@ -33,6 +33,7 @@ def ab(args, tmpdir_path, debug=False, return_output=False, ignore_result=False)
 def test_output(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
     out = ab(cmd, str(tmpdir), return_output=True, debug=False)
+    assert f"Image '{target_image}' was built successfully \\o/" in out
     assert 'Getting image source signatures' in out
     assert not re.match(r'ERROR\s+Getting image source signatures', out)
     assert 'Copying ' in out

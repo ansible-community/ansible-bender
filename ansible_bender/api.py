@@ -85,7 +85,9 @@ class Application:
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
                 image_name = build.target_image + "-failed"
-                builder.commit(image_name)
+                image_id = builder.commit(image_name)
+                b.final_layer_id = image_id
+                self.record_progress(b, None, image_id)
                 out_logger.info("Image build failed /o\\")
                 out_logger.info("The progress is saved into image '%s'", image_name)
                 raise
@@ -93,8 +95,11 @@ class Application:
             b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.DONE,
                                      set_finish_time=True)
             b.log_lines = output
+
+            # commit the final image and apply all metadata
+            b.final_layer_id = builder.commit(build.target_image)
             self.db.record_build(b)
-            builder.commit(build.target_image)
+
             out_logger.info("Image '%s' was built successfully \o/",  build.target_image)
         finally:
             builder.clean()
@@ -192,7 +197,8 @@ class Application:
         was_cached = False
         if not layer_id:
             # skipped task, it was cached
-            layer_id = self.get_layer(content, base_image_id)
+            if content:
+                layer_id = self.get_layer(content, base_image_id)
             if not layer_id:
                 return None, None
             was_cached = True
