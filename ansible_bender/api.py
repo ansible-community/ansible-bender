@@ -94,10 +94,13 @@ class Application:
             b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.DONE,
                                      set_finish_time=True)
             b.log_lines = output
-
             # commit the final image and apply all metadata
             b.final_layer_id = builder.commit(build.target_image)
-            self.db.record_build(b)
+
+            if not b.cache_tasks or not b.is_layering_on():
+                self.record_progress(b, None, b.final_layer_id)
+            else:
+                self.db.record_build(b)
 
             out_logger.info("Image '%s' was built successfully \o/",  build.target_image)
         finally:
@@ -217,9 +220,9 @@ class Application:
 
     def cache_task_result(self, content, build):
         """ snapshot the container after a task was executed """
+        image_name, layer_id, base_image_id = self.create_new_layer(content, build)
         if not build.cache_tasks:  # actually we could still cache results
             return
-        image_name, layer_id, base_image_id = self.create_new_layer(content, build)
         self.db.save_layer(layer_id, base_image_id, content)
         return image_name
 
