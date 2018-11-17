@@ -1,3 +1,18 @@
+# 0.3.0
+
+## Features
+
+* There is a new command available: `push`. You can push the images you built
+  to remote locations. This is built on top of `podman push` command, for more
+  info please see manpages podman-push(1) or skopeo(1).
+* Inspecting a build now produces more info: playbook path, ID of the image, build volumes.
+
+## Bug fixes
+
+* For file-related actions, when ansible reports changed=False, the respective
+  layer will be now loaded from cache.
+
+
 # 0.2.1
 
 ## Bug fixes
