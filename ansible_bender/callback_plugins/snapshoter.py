@@ -44,26 +44,20 @@ class CallbackModule(CallbackBase):
         if not build.is_layering_on():
             return
         content = self.get_task_content(task_result._task.get_ds())
-        # alternatively, we can guess it's a file action and do getattr(task, "src")
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
             a.record_progress(None, content, None, build_id=build.build_id)
             return
+        # # alternatively, we can guess it's a file action and do getattr(task, "src")
+        # # most of the time ansible says changed=True even when the file is the same
         if task_result._task.action in FILE_ACTIONS:
-            # unfortunately ansible doesn't track files well enough: reports changed=True
-            # even when the file is the same
-            # let's just ignore caching, do a layer and carry on for now
-            self._display.display(
-                "disabling caching: ansible doesn't tell us the truth whether the file was changed or not")
-            a.create_new_layer(content, build)
-            # if not task_result.is_changed():
-            #     status = a.maybe_load_from_cache(content, build_id=build.build_id)
-            #     if status:
-            #         self._display.display("loaded from cache: '%s'" % status)
-            #         return
-        else:
-            image_name = a.cache_task_result(content, build)
-            if image_name:
-                self._display.display("caching the task result in an image '%s'" % image_name)
+            if not task_result.is_changed():
+                status = a.maybe_load_from_cache(content, build_id=build.build_id)
+                if status:
+                    self._display.display("loaded from cache: '%s'" % status)
+                    return
+        image_name = a.cache_task_result(content, build)
+        if image_name:
+            self._display.display("caching the task result in an image '%s'" % image_name)
 
     @staticmethod
     def get_task_content(serialized_data):
@@ -86,13 +80,15 @@ class CallbackModule(CallbackBase):
             build.stop_layering()
             a.db.record_build(build)
             return
+        if not build.was_last_layer_cached():
+            return
         if task.action in FILE_ACTIONS:
             # the task is a file action: unfortunately we can't cache that
             # also ansible doesn't help here since it says changed=True even if the file didn't change
             # let's abort caching
             return
         if NO_CACHE_TAG in getattr(task, "tags", []):
-            self._display.display("detected tag '%s': no cache loading from now" % NO_CACHE_TAG)
+            self._display.display("detected tag '%s': won't load from cache from now" % NO_CACHE_TAG)
             return
         if not build.is_layering_on():
             return

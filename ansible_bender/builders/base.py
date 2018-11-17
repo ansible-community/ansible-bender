@@ -180,6 +180,10 @@ class Build:
         if self.layers:
             return self.layers[-1].layer_id
 
+    def was_last_layer_cached(self):
+        if self.layers:
+            return self.layers[-1].cached
+
     def record_cache_entry(self, image_id):
         self.layer_index[image_id].cached = True
 
