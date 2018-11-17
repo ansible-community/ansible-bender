@@ -1,6 +1,7 @@
 """
 Make sure that we can build using buildah builder.
 """
+import json
 import os
 import re
 import subprocess
@@ -138,7 +139,16 @@ def test_build_failure(tmpdir):
         ab(cmd, str(tmpdir))
     out = ab(["get-logs"], str(tmpdir), return_output=True)
     assert "PLAY [all]" in out
-    buildah("inspect", ["-t", "image", target_failed_image])
+
+    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_failed_image]))
+    image_id = p_inspect_data["Id"]
+
+    cmd = ["inspect", "--json"]
+    ab_inspect_data = json.loads(ab(cmd, str(tmpdir)))
+    top_layer_id = ab_inspect_data["layers"][-1]["layer_id"]
+
+    assert image_id == top_layer_id
+    assert ab_inspect_data["target_image"] == target_failed_image
     buildah("rmi", [target_failed_image])
 
 

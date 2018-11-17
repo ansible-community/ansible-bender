@@ -85,6 +85,7 @@ class Application:
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
                 image_name = build.target_image + "-failed"
+                b.target_image = image_name
                 image_id = builder.commit(image_name)
                 b.final_layer_id = image_id
                 self.record_progress(b, None, image_id)
@@ -186,7 +187,7 @@ class Application:
         record build progress to the database
 
         :param build:
-        :param content:
+        :param content: str or None
         :param layer_id:
         :param build_id:
         :return:
