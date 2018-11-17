@@ -136,6 +136,21 @@ class Application:
         del di["layer_index"]  # internal info
         return di
 
+    def push(self, target, build_id=None, force=False):
+        """
+        push built image into a remote location, this method raises an exception when:
+         * the push failed or the image can't be found
+         * the build haven't finished yet
+
+        :param target: str, transport:details
+        :param build_id: id of the build or None
+        :param force: bool, bypass checks if True
+        :return: None
+        """
+        build = self.get_build(build_id=build_id)
+        builder = self.get_builder(build)
+        builder.push(build, target, force=force)
+
     def get_builder(self, build):
         return get_builder(build.builder_name)(build, debug=self.debug)
 

@@ -205,6 +205,20 @@ class BuildahBuilder(Builder):
         podman_command_exists()
         pull_buildah_image(self.build.base_image)
 
+    def push(self, build, target, force=False):
+        """
+        push built image into a remote location using `podman push`
+
+        :param target: str, transport:details
+        :param build: instance of Build
+        :param force: bool, bypass checks if True
+        :return: None
+        """
+        built_image = build.get_target_image_id()
+        cmd = ["podman", "push", built_image, target]
+        # podman prints progress to stderr
+        run_cmd(cmd, print_output=False, log_stderr=False)
+
     def find_python_interpreter(self):
         """
         find python executable in the base image, order:

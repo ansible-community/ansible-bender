@@ -176,9 +176,21 @@ class Build:
         self.layer_index[layer_id] = layer
 
     def get_top_layer_id(self):
-        """ return id of the top layer, or None """
+        """
+        return id of the top layer, or None
+        """
         if self.layers:
             return self.layers[-1].layer_id
+
+    def get_target_image_id(self):
+        """
+        this is the preferred way of getting ID of the built image
+
+        :return: str
+        """
+        if self.state not in [BuildState.DONE, BuildState.FAILED]:
+            raise RuntimeError(f"Build have not finished yet, it is in state '{self.state.value}'.")
+        return self.get_top_layer_id()
 
     def was_last_layer_cached(self):
         if self.layers:
@@ -265,6 +277,16 @@ class Builder:
     def pull(self):
         """
         pull base image
+        """
+
+    def push(self, build, target, force=False):
+        """
+        push built image into a remote location
+
+        :param target: str, transport:details
+        :param build: instance of Build
+        :param force: bool, bypass checks if True
+        :return: None
         """
 
     def find_python_interpreter(self):

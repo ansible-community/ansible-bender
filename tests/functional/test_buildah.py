@@ -159,3 +159,17 @@ def test_buildah_err_output(tmpdir, capfd):
     ab(cmd, str(tmpdir), debug=False, ignore_result=True)
     c = capfd.readouterr()
     assert "error parsing target image name" in c.err
+
+
+def test_push_to_dockerd(target_image, tmpdir):
+    cmd = ["build", basic_playbook_path, base_image, target_image]
+    ab(cmd, str(tmpdir))
+    target = "ab-test-" + random_word(12) + ":oldest"
+    cmd = ["push", "docker-daemon:" + target]
+    ab(cmd, str(tmpdir))
+    try:
+        cmd = ["docker", "run", "--rm", target, "cat", "/fun"]
+        subprocess.check_call(cmd)
+    finally:
+        subprocess.check_call(["docker", "rmi", target])
+

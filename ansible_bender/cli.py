@@ -57,6 +57,7 @@ class CLI:
         self._do_list_builds_interface()
         self._do_get_logs_interface()
         self._do_inspect_interface()
+        self._do_push_interface()
 
         self.args = self.parser.parse_args()
         debug = False
@@ -174,6 +175,33 @@ class CLI:
         )
         self.inspect_parser.set_defaults(subcommand="inspect")
 
+    def _do_push_interface(self):
+        self.push_parser = self.subparsers.add_parser(
+            name="push",
+            description="push built image to a different location (default to latest build)",
+            epilog="This command is thin wrapper on top of `podman push` command. "
+                   "The target is passed directly to podman, for more information, please consult "
+                   " podman-push(1) manpage or skopeo(1)."
+        )
+        self.push_parser.add_argument(
+            "TARGET",
+            help="Target is composed of \"transport:details\"",
+            default=None
+        )
+        self.push_parser.add_argument(
+            "BUILD_ID",
+            help="ID of the build",
+            nargs="?",
+            default=None
+        )
+        # nothing to force so far
+        # self.push_parser.add_argument(
+        #     "--force",
+        #     help="Bypass any checks and just go for it",
+        #     action="store_true"
+        # )
+        self.push_parser.set_defaults(subcommand="push")
+
     def _build(self):
         metadata = ImageMetadata()
         if self.args.workdir:
@@ -239,6 +267,12 @@ class CLI:
         else:
             yaml.safe_dump(inspect_data, sys.stdout, indent=2, default_flow_style=False)
 
+    def _push(self):
+        build_id = self.args.BUILD_ID
+        target = self.args.TARGET
+        # force = self.args.force
+        self.app.push(target, build_id=build_id, force=False)
+
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
@@ -253,6 +287,9 @@ class CLI:
                 return 0
             elif subcommand == "inspect":
                 self._inspect()
+                return 0
+            elif subcommand == "push":
+                self._push()
                 return 0
         except KeyboardInterrupt:
             return 133
