@@ -65,9 +65,12 @@ def test_disabled_caching(target_image, application, build):
     build.cache_tasks = False
     application.build(build)
     build = application.db.get_build(build.build_id)
-    assert len(build.layers) == 2
+    assert len(build.layers) == 5
     assert build.layers[0].cached
     assert not build.layers[1].cached
+    assert not build.layers[2].cached
+    assert not build.layers[3].cached
+    assert not build.layers[4].cached
 
 
 def test_caching_mechanism(target_image, application, build):
@@ -125,7 +128,7 @@ def test_stop_layering(target_image, application, build):
     build.playbook_path = change_layering_playbook
     application.build(build)
     build = application.db.get_build(build.build_id)
-    assert len(build.layers) == 2  # base image, first task (the final layer is not present here)
+    assert len(build.layers) == 3  # base image, first task and the final layer
 
     builder = application.get_builder(build)
     builder.run(build.target_image, ["ls", "-1", "/etc/passwd-lol"])

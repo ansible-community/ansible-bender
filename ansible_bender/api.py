@@ -97,7 +97,7 @@ class Application:
             # commit the final image and apply all metadata
             b.final_layer_id = builder.commit(build.target_image)
 
-            if not b.cache_tasks or not b.is_layering_on():
+            if not b.is_layering_on():
                 self.record_progress(b, None, b.final_layer_id)
             else:
                 self.db.record_build(b)
