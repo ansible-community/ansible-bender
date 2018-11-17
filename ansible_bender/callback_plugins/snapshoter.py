@@ -80,15 +80,17 @@ class CallbackModule(CallbackBase):
             build.stop_layering()
             a.db.record_build(build)
             return
+        if NO_CACHE_TAG in getattr(task, "tags", []):
+            self._display.display("detected tag '%s': won't load from cache from now" % NO_CACHE_TAG)
+            build.cache_tasks = False
+            a.db.record_build(build)
+            return
         if not build.was_last_layer_cached():
             return
         if task.action in FILE_ACTIONS:
             # the task is a file action: unfortunately we can't cache that
             # also ansible doesn't help here since it says changed=True even if the file didn't change
             # let's abort caching
-            return
-        if NO_CACHE_TAG in getattr(task, "tags", []):
-            self._display.display("detected tag '%s': won't load from cache from now" % NO_CACHE_TAG)
             return
         if not build.is_layering_on():
             return
