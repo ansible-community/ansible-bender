@@ -48,6 +48,9 @@ because I care about the problem it solves.**
 * If an image build fails, it's comitted and named with a suffix `-failed` (so
   you can take a look inside and resolve the issue).
 * The tool tries to find python interpreter inside the base image.
+* You can push images you built to remote locations such as:
+  * a registry, a tarball, docker daemon, ...
+  * [`podman push`](https://github.com/containers/libpod/blob/master/docs/podman-push.1.md) is used to perform the push.
 
 
 ## Interface
@@ -60,6 +63,7 @@ Command | Description
 `list-builds` | list all builds
 `get-logs` | display build logs
 `inspect` | provide detailed metadata about the selected build
+`push` | Push images you built to remote locations.
 
 
 ## Installation
