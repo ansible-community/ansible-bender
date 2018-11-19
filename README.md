@@ -79,13 +79,16 @@ python3 interpretter inside your base image.
 ## Usage
 
 You may noticed that I refer to `ansible-bender` as ab. That was the initial
-name and also the name of the CLI tool, so I decided to stick to it.
+name and I used to it. I recommand adding an alias into your shell rc file:
+```
+alias ab="ansible-bender"
+```
 
 ### Building images
 
 If you clone this repository, you can utilize a simple playbook I am using for testing:
 ```
-$ ab build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
+$ ansible-bender build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
 
 PLAY [all] ************************************************************************************************************************
 
@@ -144,7 +147,7 @@ Image 'this-is-my-image' was built successfully \o/
 
 The command line is a bit longer. That's because all metadata about our target image is in there:
 ```
-$ ab build                                       \  # this is the command
+$ ansible-bender build                           \  # this is the command
      -e SOME=VALUE                               \  # -e sets environment variables
      -l some=other-value                         \  # -l sets labels
      --                                          \  # two dashes separate options from arguments
@@ -155,7 +158,7 @@ $ ab build                                       \  # this is the command
 
 If we rerun the build again, we can see that ab loads every task from a cache:
 ```
-$ ab build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
+$ ansible-bender build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
 
 PLAY [all] ************************************************************************************************************************
 
@@ -215,7 +218,7 @@ We can list builds we have done:
 
 Wanna check build logs sometime later? No problem!
 ```
-$ ab get-logs 2
+$ ansible-bender get-logs 2
 
 PLAY [all] ******************************************************************************************************************************************************************
 

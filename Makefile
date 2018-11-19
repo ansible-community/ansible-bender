@@ -6,8 +6,8 @@ check:
 check-pypi-packaging:
 	podman run --rm -ti -v $(CURDIR):/src -w /src registry.fedoraproject.org/fedora:29 bash -c '\
 		pip3 install . \
-		&& ab --help \
-		&& ab build --help'
+		&& ansible-bender --help \
+		&& ansible-bender build --help'
 
 #FIXME: try outer container to be rootless
 #       build tests image
@@ -18,4 +18,4 @@ check-smoke:
 		dnf install -y buildah podman \
 		&& podman pull docker.io/library/python:3-alpine \
 		&& pip3 install . \
-		&& ab build ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine test'
+		&& ansible-bender build ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine test'
