@@ -7,7 +7,8 @@ check-pypi-packaging:
 	podman run --rm -ti -v $(CURDIR):/src -w /src registry.fedoraproject.org/fedora:29 bash -c '\
 		pip3 install . \
 		&& ansible-bender --help \
-		&& ansible-bender build --help'
+		&& ansible-bender build --help' \
+		&& pip3 freeze | grep ansible-bender
 
 #FIXME: try outer container to be rootless
 #       build tests image
