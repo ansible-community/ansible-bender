@@ -8,7 +8,7 @@ check-pypi-packaging:
 		pip3 install . \
 		&& ansible-bender --help \
 		&& ansible-bender build --help' \
-		&& pip3 freeze | grep ansible-bender
+		&& pip3 --version ansible-bender
 
 #FIXME: try outer container to be rootless
 #       build tests image
