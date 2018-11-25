@@ -1,4 +1,5 @@
 TEST_TARGET := ./tests/
+PY_PACKAGE := ansible-bender
 KNIFE := knife
 
 build-knife:
@@ -9,13 +10,15 @@ check:
 
 check-pypi-packaging:
 	podman run --rm -ti -v $(CURDIR):/src -w /src $(KNIFE) bash -c '\
-		pip3 install . \
+		set -x \
+		&& pip3 install . \
 		&& ansible-bender --help \
 		&& ansible-bender build --help \
-		&& pip3 show ansible-bender \
-		## python3 ./setup.py sdist \
+		&& pip3 show $(PY_PACKAGE) \
+		&& python3 ./setup.py sdist \
 		&& twine check ./dist/* \
-		&& python3 -c "import ansible_bender; print(ansible_bender.__version__)
+		&& python3 -c "import ansible_bender; ansible_bender.__version__.startswith(\"0.3.1\")" \
+		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
 		'
 
 #FIXME: try outer container to be rootless
