@@ -1,14 +1,20 @@
 TEST_TARGET := ./tests/
+KNIFE := knife
+
+build-knife:
+	ansible-bender build ./knife.yml registry.fedoraproject.org/fedora:29 $(KNIFE)
 
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src -w /src registry.fedoraproject.org/fedora:29 bash -c '\
+	podman run --rm -ti -v $(CURDIR):/src -w /src $(KNIFE) bash -c '\
 		pip3 install . \
 		&& ansible-bender --help \
-		&& ansible-bender build --help' \
-		&& pip3 --version ansible-bender
+		&& ansible-bender build --help \
+		&& pip3 --version ansible-bender \
+		&& twine check . \
+		'
 
 #FIXME: try outer container to be rootless
 #       build tests image

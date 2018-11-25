@@ -1,0 +1,13 @@
+---
+- name: Pocket knife for ansible-bender
+  hosts: all
+  tasks:
+  - name: Install all packages needed to hack on ab.
+    dnf:
+      name:
+      - python3-pip
+      - python3-setuptools
+      - git
+      - python3-setuptools_scm
+      - python3-setuptools_scm_git_archive
+      - twine
