@@ -12,8 +12,10 @@ check-pypi-packaging:
 		pip3 install . \
 		&& ansible-bender --help \
 		&& ansible-bender build --help \
-		&& pip3 --version ansible-bender \
-		&& twine check . \
+		&& pip3 show ansible-bender \
+		## python3 ./setup.py sdist \
+		&& twine check ./dist/* \
+		&& python3 -c "import ansible_bender; print(ansible_bender.__version__)
 		'
 
 #FIXME: try outer container to be rootless

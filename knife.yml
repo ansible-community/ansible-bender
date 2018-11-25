@@ -11,3 +11,9 @@
       - python3-setuptools_scm
       - python3-setuptools_scm_git_archive
       - twine
+  - name: Install latest twine for sake of check command
+    pip:
+      name:
+      - twine
+      - readme_render[md]
+      state: latest
