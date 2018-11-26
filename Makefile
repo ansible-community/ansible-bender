@@ -15,7 +15,7 @@ check-pypi-packaging:
 		&& ansible-bender --help \
 		&& ansible-bender build --help \
 		&& pip3 show $(PY_PACKAGE) \
-		&& python3 ./setup.py sdist \
+		&& python3 ./setup.py sdist bdist_wheel \
 		&& twine check ./dist/* \
 		&& python3 -c "import ansible_bender; ansible_bender.__version__.startswith(\"0.3.1\")" \
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
