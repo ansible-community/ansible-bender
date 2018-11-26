@@ -8,14 +8,18 @@ build-knife:
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
 
+shell-in-knife:
+	podman run --rm -ti -v $(CURDIR):/src -w /src $(KNIFE) bash
+
 check-pypi-packaging:
 	podman run --rm -ti -v $(CURDIR):/src -w /src $(KNIFE) bash -c '\
 		set -x \
-		&& pip3 install . \
+		&& rm -f dist/* \
+		&& python3 ./setup.py sdist bdist_wheel \
+		&& pip3 install dist/*.tar.gz \
 		&& ansible-bender --help \
 		&& ansible-bender build --help \
 		&& pip3 show $(PY_PACKAGE) \
-		&& python3 ./setup.py sdist bdist_wheel \
 		&& twine check ./dist/* \
 		&& python3 -c "import ansible_bender; ansible_bender.__version__.startswith(\"0.3.1\")" \
 		&& pip3 show -f $(PY_PACKAGE) | ( grep test && exit 1 || :) \
