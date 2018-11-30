@@ -9,10 +9,10 @@ check:
 	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
 
 shell-in-knife:
-	podman run --rm -ti -v $(CURDIR):/src -w /src $(KNIFE) bash
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src -w /src $(KNIFE) bash -c '\
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
@@ -30,7 +30,7 @@ check-pypi-packaging:
 #       run tests as an unpriv user
 # TODO: podman inside needs to use vfs storage driver
 check-smoke:
-	sudo podman run --net=host --rm -ti -v $(CURDIR):/src -w /src registry.fedoraproject.org/fedora:29 bash -c '\
+	sudo podman run --net=host --rm -ti -v $(CURDIR):/src:Z -w /src registry.fedoraproject.org/fedora:29 bash -c '\
 		dnf install -y buildah podman \
 		&& podman pull docker.io/library/python:3-alpine \
 		&& pip3 install . \
