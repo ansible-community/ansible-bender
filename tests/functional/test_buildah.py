@@ -21,7 +21,7 @@ def ab(args, tmpdir_path, debug=False, return_output=False, ignore_result=False)
     """
     cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path]
     if debug:
-        cmd += ["--debug"]
+        cmd += ["--ansible-extra-args=-vvvvvv"]
     if ignore_result:
         return subprocess.call(cmd + args, cwd=project_dir)
     if return_output:
