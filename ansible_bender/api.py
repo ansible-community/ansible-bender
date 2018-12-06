@@ -44,11 +44,12 @@ class Application:
             set_logging(logger_name=OUT_LOGGER, level=logging.INFO, format=OUT_LOGGER_FORMAT,
                         handler_kwargs={"stream": sys.stdout})
 
-    def build(self, build):
+    def build(self, build, extra_ansible_args=None):
         """
         build container image
 
         :param build: instance of Build
+        :param extra_ansible_args: str, extra CLI arguments for ansible-playbook
         """
         if not os.path.isfile(build.playbook_path):
             raise RuntimeError("No such file or directory: %s" % build.playbook_path)
@@ -76,7 +77,8 @@ class Application:
 
         try:
             try:
-                output = a_runner.build(self.db_path, python_interpreter=py_intrprtr)
+                output = a_runner.build(self.db_path, python_interpreter=py_intrprtr,
+                                        extra_ansible_args=extra_ansible_args)
             except AbBuildUnsuccesful as ex:
                 b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
                                          set_finish_time=True)

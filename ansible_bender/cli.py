@@ -135,6 +135,10 @@ class CLI:
             help="path a directory which has daata stored outside of the container",
             nargs="*"
         )
+        self.build_parser.add_argument(
+            "--extra-ansible-args",
+            help="arguments passed to ansible-playbook command (be careful!)"
+        )
         self.build_parser.set_defaults(subcommand="build")
 
     def _do_get_logs_interface(self):
@@ -237,7 +241,7 @@ class CLI:
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
 
-        self.app.build(build)
+        self.app.build(build, extra_ansible_args=self.args.extra_ansible_args)
 
     def _list_builds(self):
         builds = self.app.list_builds()

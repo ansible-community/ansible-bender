@@ -1,5 +1,6 @@
 import os
 import logging
+import shlex
 import subprocess
 import tempfile
 import shutil
@@ -32,7 +33,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     :param a_cfg_path:
     :param connection:
     :param extra_variables:
-    :param ansible_args:
+    :param ansible_args: list of str, extra arguments for a-p
     :param debug:
     :param environment:
 
@@ -53,6 +54,8 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
                         ["{}={}".format(k, v)
                          for k, v in extra_variables.items()]
                     )]
+    if ansible_args:
+        cmd_args += ansible_args
     cmd_args += [playbook_path]
     logger.debug("%s", " ".join(cmd_args))
 
@@ -104,9 +107,13 @@ class AnsibleRunner:
         # hence, let's add the site ab is installed in to sys.path
         return os.path.dirname(os.path.dirname(ansible_bender.__file__))
 
-    def build(self, db_path, python_interpreter="/usr/bin/python3"):
+    def build(self, db_path, python_interpreter="/usr/bin/python3", extra_ansible_args=None):
         """
         run the playbook against the container
+
+        :param db_path, str, path to ab's database
+        :param python_interpreter, str, path to python interpreter to use inside the container
+        :param extra_ansible_args: str, extra CLI arguments for ansible-playbook
 
         :return: str, output
         """
@@ -132,7 +139,10 @@ class AnsibleRunner:
             a_cfg_path = os.path.join(tmp, "ansible.cfg")
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
+            extra_args = None
+            if extra_ansible_args:
+                extra_args = shlex.split(extra_ansible_args)
             return run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
-                                debug=self.debug, environment=environment)
+                                debug=self.debug, environment=environment, ansible_args=extra_args)
         finally:
             shutil.rmtree(tmp)
