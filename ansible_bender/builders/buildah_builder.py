@@ -135,12 +135,13 @@ class BuildahBuilder(Builder):
         self.logs = []
         buildah_command_exists()
 
-    def create(self, build_volumes=None):
+    def create(self):
         """
-        :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
+        create a container where all the work happens
         """
         create_buildah_container(
-            self.build.get_top_layer_id(), self.ansible_host, build_volumes=build_volumes, debug=self.debug)
+            self.build.get_top_layer_id(), self.ansible_host,
+            build_volumes=self.build.build_volumes, debug=self.debug)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
             self.ansible_host, working_dir=self.build.metadata.working_dir,

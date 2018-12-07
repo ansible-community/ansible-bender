@@ -73,7 +73,7 @@ class Application:
             builder.pull()
         py_intrprtr = builder.find_python_interpreter()
 
-        builder.create(build_volumes=build.build_volumes)
+        builder.create()
 
         try:
             try:

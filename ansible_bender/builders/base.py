@@ -245,9 +245,9 @@ class Builder:
             "/usr/local/bin/python",
         )
 
-    def create(self, build_volumes=None):
+    def create(self):
         """
-        :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
+        create a container where all the work happens
         """
 
     def run(self, image_name, command):
