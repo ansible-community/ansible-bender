@@ -1,3 +1,23 @@
+# 0.3.1
+
+## Breaking changes
+
+* Since our executable, `ab`, conflicted with a binary from `httpd` package, I
+  decided to rename it to `ansible-bender`. Please add a shell alias if you
+  want ab back.
+
+## Features
+
+* You can pass extra arguments to `ansible-playbook` command via
+  `--ansible-extra-args=`. Use it with caution!
+* Python packaging was improved, thanks to great help from @webknjaz
+
+## Bug fixes
+
+* Ansible-bender now correctly processes build volumes even when a layer is
+  loaded from cache.
+
+
 # 0.3.0
 
 ## Features
