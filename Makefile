@@ -6,7 +6,7 @@ build-knife:
 	ansible-bender build ./knife.yml registry.fedoraproject.org/fedora:29 $(KNIFE)
 
 check:
-	PYTHONPATH=$(CURDIR) pytest-3 -v $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) pytest-3 --full-trace -l -v $(TEST_TARGET)
 
 shell-in-knife:
 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash
