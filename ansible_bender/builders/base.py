@@ -113,6 +113,7 @@ class Build:
         self.layering = True
         self.debug = None
         self.verbose = None
+        self.pulled = False  # was the base image pulled?
 
     def to_dict(self):
         """ serialize """
@@ -138,7 +139,8 @@ class Build:
             "log_lines": self.log_lines,
             "layering": self.layering,
             "debug": self.debug,
-            "verbose": self.verbose
+            "verbose": self.verbose,
+            "pulled": self.pulled
         }
 
     @classmethod
@@ -171,6 +173,7 @@ class Build:
         b.layering = j["layering"]
         b.debug = j["debug"]
         b.verbose = j["verbose"]
+        b.pulled = j["pulled"]
         return b
 
     def record_layer(self, content, layer_id, base_image_id, cached=None):
