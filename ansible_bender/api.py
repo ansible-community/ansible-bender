@@ -86,7 +86,8 @@ class Application:
                 output = a_runner.build(self.db_path, python_interpreter=py_intrprtr,
                                         extra_ansible_args=extra_ansible_args)
             except AbBuildUnsuccesful as ex:
-                b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
+                b = self.db.record_build(None, build_id=build.build_id,
+                                         build_state=BuildState.FAILED,
                                          set_finish_time=True)
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
