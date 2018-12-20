@@ -4,33 +4,12 @@ Test Application class
 import os
 import shutil
 
-from ansible_bender.api import Application
-from ansible_bender.builders.base import Build, ImageMetadata, BuildState
-from tests.spellbook import dont_cache_playbook_path, change_layering_playbook, data_dir, dont_cache_playbook_path_pre
-from ..spellbook import basic_playbook_path, small_basic_playbook_path, base_image, target_image
+from ansible_bender.builders.base import Build
+from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
+                             dont_cache_playbook_path_pre)
+from ..spellbook import small_basic_playbook_path
 
-import pytest
 import yaml
-
-
-@pytest.fixture()
-def application(tmpdir):
-    database_path = str(tmpdir)
-    application = Application(db_path=database_path)  # use debug=True to hunt errors
-    yield application
-    application.clean()
-
-
-@pytest.fixture()
-def build(target_image):
-    build = Build()
-    build.playbook_path = basic_playbook_path
-    build.base_image = base_image
-    build.target_image = target_image
-    build.metadata = ImageMetadata()
-    build.state = BuildState.NEW
-    build.builder_name = "buildah"  # test with all builders
-    return build
 
 
 def test_build_db_metadata(target_image, application, build):

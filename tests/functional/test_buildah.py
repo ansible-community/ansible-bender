@@ -8,8 +8,9 @@ import subprocess
 
 import pytest
 
-from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, podman_run_cmd
-from ..spellbook import basic_playbook_path, base_image, target_image, project_dir, \
+from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, \
+    podman_run_cmd
+from ..spellbook import basic_playbook_path, base_image, project_dir, \
     bad_playbook_path, random_word, basic_playbook_path_w_bv
 
 
