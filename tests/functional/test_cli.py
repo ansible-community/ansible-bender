@@ -1,8 +1,5 @@
-import pytest
-
 from .test_buildah import ab
-from ..spellbook import basic_playbook_path, base_image, target_image, project_dir, \
-    bad_playbook_path, random_word
+from ..spellbook import basic_playbook_path, base_image
 
 
 def test_inspect_cmd(tmpdir, target_image):

@@ -56,21 +56,27 @@ class Application:
 
         build.debug = self.debug
         build.verbose = self.verbose
+
         # we have to record as soon as possible
         self.db.record_build(build)
 
         builder = self.get_builder(build)
+
+        # before we start messing with the base image, we need to check for its presence first
+        if not builder.is_base_image_present():
+            builder.pull()
+            build.pulled = True
+
         # let's record base image as a first layer
         base_image_id = builder.get_image_id(build.base_image)
         build.record_layer(None, base_image_id, None, cached=True)
 
         a_runner = AnsibleRunner(build.playbook_path, builder, build, debug=self.debug)
 
+        # we are about to perform the build
         build.build_start_time = datetime.datetime.now()
         self.db.record_build(build, build_state=BuildState.IN_PROGRESS)
 
-        if not builder.is_base_image_present():
-            builder.pull()
         py_intrprtr = builder.find_python_interpreter()
 
         builder.create()
@@ -80,7 +86,8 @@ class Application:
                 output = a_runner.build(self.db_path, python_interpreter=py_intrprtr,
                                         extra_ansible_args=extra_ansible_args)
             except AbBuildUnsuccesful as ex:
-                b = self.db.record_build(None, build_id=build.build_id, build_state=BuildState.FAILED,
+                b = self.db.record_build(None, build_id=build.build_id,
+                                         build_state=BuildState.FAILED,
                                          set_finish_time=True)
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)

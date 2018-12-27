@@ -26,17 +26,6 @@ bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 base_image = "docker.io/library/python:3-alpine"
 
 
-@pytest.fixture()
-def target_image():
-    im = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
-    yield im
-    try:
-        buildah("rmi", [im])  # FIXME: use builder interface instead for sake of other backends
-        # FIXME: also remove everything from cache
-    except subprocess.CalledProcessError as ex:
-        print(ex)
-
-
 def random_word(length):
     # https://stackoverflow.com/a/2030081/909579
     letters = string.ascii_lowercase
