@@ -1,18 +1,20 @@
 TEST_TARGET := ./tests/
+BASE_IMAGE := registry.fedoraproject.org/fedora:29
 PY_PACKAGE := ansible-bender
-KNIFE := knife
+# container image with ab inside
+CONT_IMG := $(PY_PACKAGE)
 
-build-knife:
-	ansible-bender build ./knife.yml registry.fedoraproject.org/fedora:29 $(KNIFE)
+build-ab-img: recipe.yml
+	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 --full-trace -l -v $(TEST_TARGET)
 
-shell-in-knife:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash
+shell:
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash -c '\
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \

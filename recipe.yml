@@ -17,3 +17,17 @@
       - twine  # we need newest twine, b/c of the check command
       - readme_renderer[md]
       state: latest
+  - name: stat /src
+    stat:
+      path: /src
+    tags:
+    - no-cache
+    register: src_path
+  - name: Let's make sure /src is present
+    assert:
+      that:
+      - 'src_path.stat.isdir'
+  # this requires to have sources mounted inside at /src
+  - name: Install source-git from the current working directory
+    pip:
+      name: /src
