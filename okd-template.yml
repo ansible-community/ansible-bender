@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: ab-in-okd
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ab-in-okd
+  spec:
+    source:
+      type: Git
+      git:
+        uri: https://github.com/TomasTomecek/ansible-bender
+        ref: master
+    output:
+      to:
+        kind: ImageStreamTag
+        name: just-built-ansible-bender:latest
+    strategy:
+      type: Custom
+      customStrategy:
+        from:
+          kind: DockerImage
+          name: ansible-bender:latest
+        exposeDockerSocket: false
+        forcePull: false
+        metadata:
+          name: ab-in-okd
+        env:
+        - name: AB_BASE_IMAGE
+          value: "registry.fedoraproject.org/fedora:29"
+        - name: AB_PLAYBOOK_PATH
+          value: "recipe.yml"
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: just-built-ansible-bender
+

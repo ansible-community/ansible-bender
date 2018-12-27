@@ -5,13 +5,24 @@ PY_PACKAGE := ansible-bender
 CONT_IMG := $(PY_PACKAGE)
 
 build-ab-img: recipe.yml
-	ansible-bender build --build-volumes $(CURDIR):/src:Z -- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
+	sudo ansible-bender build --build-volumes $(CURDIR):/src:Z \
+		--cmd 'bash /entry.sh' \
+		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
 	PYTHONPATH=$(CURDIR) pytest-3 --full-trace -l -v $(TEST_TARGET)
 
 shell:
 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
+
+push-image-to-dockerd:
+	ansible-bender push docker-daemon:ansible-bender:latest
+
+run-in-okd:
+	ansible-playbook -vv ./run-in-okd.yml
+	oc get all
+	sleep 3  # give oc time to spin the container
+	oc logs -f pod/ab-in-okd-1-build
 
 check-pypi-packaging:
 	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\

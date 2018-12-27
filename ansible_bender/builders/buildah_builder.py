@@ -57,7 +57,7 @@ def create_buildah_container(container_image, container_name, build_volumes=None
         args += ["-v"] + build_volumes
     args += ["--name", container_name, container_image]
     # will pull the image by default if it's not present in buildah's storage
-    buildah("from", args, debug=debug)
+    buildah("from", args, debug=debug, log_stderr=True)
 
 
 def configure_buildah_container(container_name, working_dir=None, env_vars=None,
@@ -101,13 +101,13 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     return container_name
 
 
-def buildah(command, args_and_opts, print_output=False, debug=False):
+def buildah(command, args_and_opts, print_output=False, debug=False, log_stderr=False):
     cmd = ["buildah"]
     # if debug:
     #     cmd += ["--debug"]
     cmd += [command] + args_and_opts
     logger.debug("running command: %s", command)
-    return run_cmd(cmd, print_output=print_output, log_stderr=False)
+    return run_cmd(cmd, print_output=print_output, log_stderr=log_stderr)
 
 
 def buildah_with_output(command, args_and_opts, debug=False):
