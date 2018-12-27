@@ -52,7 +52,6 @@ def build_inside_openshift(app):
 
         build = Build()
         build.metadata = ImageMetadata()  # TODO: needs to be figured out
-        build.state = BuildState.NEW
         build.playbook_path = playbook_path
         build.base_image = base_image
         build.target_image = target_image
