@@ -61,6 +61,12 @@ PATH_CANDIDATES = [
 logger = logging.getLogger(__name__)
 
 
+def generate_working_cont_name(image_name):
+    timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+    san = image_name.replace(".", "-").replace(":", "-").replace("/", "-")
+    return f"{san}-{timestamp}-cont"
+
+
 class Database:
     """ Simple implementation of persistent data store for ab; it's just a locked json file """
 
@@ -170,8 +176,7 @@ class Database:
             if build_state is not None:
                 build_i.state = build_state
             if build_i.build_id is None:
-                timestamp = datetime.datetime.now().strftime("-" + TIMESTAMP_FORMAT)
-                build_i.build_container = build_i.target_image + timestamp + "-cont"
+                build_i.build_container = generate_working_cont_name(build_i.target_image)
                 build_i.build_id = self._get_and_bump_build_id(data)
             if set_finish_time:
                 build_i.build_finished_time = datetime.datetime.now()
