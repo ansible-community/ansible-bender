@@ -10,13 +10,13 @@ build-ab-img: recipe.yml
 		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
-	PYTHONPATH=$(CURDIR) pytest-3 --full-trace -l -v $(TEST_TARGET)
+	sudo PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes bash -c 'cd $(CURDIR) && pytest-3 --full-trace -l -v $(TEST_TARGET)'
 
 shell:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
+	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
 
 push-image-to-dockerd:
-	ansible-bender push docker-daemon:ansible-bender:latest
+	sudo ansible-bender push docker-daemon:ansible-bender:latest
 
 run-in-okd:
 	ansible-playbook -vv ./run-in-okd.yml
@@ -25,7 +25,7 @@ run-in-okd:
 	oc logs -f pod/ab-in-okd-1-build
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\
+	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
