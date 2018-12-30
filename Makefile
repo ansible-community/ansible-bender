@@ -19,10 +19,16 @@ push-image-to-dockerd:
 	sudo ansible-bender push docker-daemon:ansible-bender:latest
 
 run-in-okd:
-	ansible-playbook -vv ./run-in-okd.yml
+	ansible-playbook -vv ./contrib/run-in-okd.yml
 	oc get all
 	sleep 3  # give oc time to spin the container
 	oc logs -f pod/ab-in-okd-1-build
+
+check-in-okd:
+	ansible-playbook -vv ./contrib/check-in-okd.yml
+	oc get all
+	sleep 2
+	oc logs -f pod/ab
 
 check-pypi-packaging:
 	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\

@@ -6,10 +6,10 @@
   connection: local
   vars:
     cont_img: ansible-bender:latest
-    default_oc_object: buildconfig.build.openshift.io/ab-in-okd
+    default_bc: buildconfig.build.openshift.io/ab-in-okd
   tasks:
   - name: Try to remove old bc.
-    command: oc delete {{ default_oc_object }}
+    command: oc delete {{ default_bc }}
     ignore_errors: true
   - name: Process the OKD template and add objects to openshift.
     shell: oc process -f ./okd-template.yml | oc apply -f -
@@ -27,4 +27,4 @@
     - name: Go back to a regular user.
       command: oc login -u developer -p developer
   - name: Start build.
-    command: oc start-build {{ default_oc_object }}
+    command: oc start-build {{ default_bc }}
