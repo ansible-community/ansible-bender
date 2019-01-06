@@ -20,12 +20,8 @@ actually heavily inspired by ansible-container: the main distinction is that
 ansible-container covers the complete lifecycle of a containerized application
 while ab takes care of image builds only.
 
-**Please note that this project is not affiliated with the Ansible project.
-Even though I work for Red Hat, I am not on the Ansible team. I wrote the tool
-because I care about the problem it solves.**
 
-
-**Status**: proof of concept
+**Status**: ready to use
 
 
 ## Features:
