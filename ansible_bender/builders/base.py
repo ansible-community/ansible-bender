@@ -98,7 +98,7 @@ class Build:
         self.playbook_path = None
         self.build_volumes = []  # volumes for the build container
         self.metadata = None  # Image metadata
-        self.state = None  # enum, BuildState
+        self.state = BuildState.NEW
         self.build_start_time = None
         self.build_finished_time = None
         self.base_image = None

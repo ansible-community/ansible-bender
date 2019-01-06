@@ -1,0 +1,31 @@
+# ansible playbook which makes ab to run in openshift
+# it expects okd 3.11 started with `oc cluter up`
+---
+- name: Run ab's test suite in OKD
+  hosts: localhost
+  connection: local
+  vars:
+    cont_img: ansible-bender:latest
+    pod_name: pod/ab
+  tasks:
+  - name: Try to remove old pod.
+    command: oc delete --force --grace-period=0 {{ pod_name }}
+    ignore_errors: true
+  - name: Create new SCC to allow root and all the caps.
+    block:
+    - name: Become admin.
+      command: oc login -u system:admin
+    - name: Grant developer the use of privileged SCC
+      command: oc adm policy add-scc-to-user privileged developer
+    always:
+    - name: Go back to a regular user.
+      command: oc login -u developer -p developer
+  - name: set project_root variable
+    set_fact:
+      project_root: '{{ playbook_dir | dirname | realpath }}'
+  - name: Fill in values to the pod definition.
+    template:
+      src: ab-pod.yml.tmpl
+      dest: ab-pod.yml
+  - name: Start tests.
+    command: oc create -f ab-pod.yml

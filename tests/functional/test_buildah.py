@@ -8,7 +8,7 @@ import subprocess
 
 import pytest
 
-from ansible_bender.builders.buildah_builder import buildah, inspect_buildah_resource, \
+from ansible_bender.builders.buildah_builder import buildah, inspect_resource, \
     podman_run_cmd
 from ..spellbook import basic_playbook_path, base_image, project_dir, \
     bad_playbook_path, random_word, basic_playbook_path_w_bv
@@ -66,9 +66,9 @@ def test_build_basic_image_with_env_vars(tmpdir, target_image):
     cmd = ["build", "-e", a_b, x_y, "--",
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    out = inspect_buildah_resource("image", target_image)
-    assert a_b in out["OCIv1"]["config"]["Env"]
-    assert x_y in out["OCIv1"]["config"]["Env"]
+    out = inspect_resource("image", target_image)
+    assert a_b in out["ContainerConfig"]["Env"]
+    assert x_y in out["ContainerConfig"]["Env"]
     e = podman_run_cmd(target_image, ["env"], return_output=True)
     assert a_b in e
     assert x_y in e
@@ -91,9 +91,9 @@ def test_build_basic_image_with_labels(tmpdir, target_image):
     cmd = ["build", "-l", a_b, x_y, "--",
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    out = inspect_buildah_resource("image", target_image)
-    assert out["OCIv1"]["config"]["Labels"]["A"] == "B"
-    assert out["OCIv1"]["config"]["Labels"]["x"] == "y"
+    out = inspect_resource("image", target_image)
+    assert out["ContainerConfig"]["Labels"]["A"] == "B"
+    assert out["ContainerConfig"]["Labels"]["x"] == "y"
 
 
 def test_build_basic_image_with_build_volumes(tmpdir, target_image):
@@ -135,8 +135,8 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            "--",
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    out = inspect_buildah_resource("image", target_image)
-    co = out["OCIv1"]["config"]
+    out = inspect_resource("image", target_image)
+    co = out["ContainerConfig"]
     assert co["WorkingDir"] == workdir_path
     assert co["Labels"]["A"] == "B"
     assert co["Labels"]["x"] == "y"
@@ -192,6 +192,9 @@ def test_buildah_err_output(tmpdir, capfd):
     assert "error parsing target image name" in c.err
 
 
+@pytest.mark.skipif(
+    not os.path.exists("/var/run/docker.sock"),
+    reason="Docker daemon is not running.")
 def test_push_to_dockerd(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))

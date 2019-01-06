@@ -1,0 +1,66 @@
+---
+- name: Containerized ansible-bender
+  hosts: all
+  tasks:
+  - name: Install all packages needed to hack on ab.
+    dnf:
+      name:
+      - python3-pip
+      - python3-setuptools
+      - git
+      - python3-setuptools_scm
+      - python3-setuptools_scm_git_archive
+      - python3-wheel  # for bdist_wheel
+      - git
+      - containers-common
+      - buildah
+      # - "https://kojipkgs.fedoraproject.org//packages/buildah/1.6/19.dev.giteebbba2.fc30/x86_64/buildah-1.6-19.dev.giteebbba2.fc30.x86_64.rpm"
+      - podman
+      - ansible
+      - python3-pytest
+      - python3-flexmock
+  - name: Install latest twine for sake of check command
+    pip:
+      name:
+      - twine  # we need newest twine, b/c of the check command
+      - readme_renderer[md]
+      state: latest
+  # - name: Change storage driver to vfs (ovl on ovl doesn't work)
+  #   lineinfile:
+  #     path: /etc/containers/storage.conf
+  #     regexp: '^driver = '
+  #     line: 'driver = "vfs"'
+  # - name: Change storage driver graphroot to /tmp/containers
+  #   lineinfile:
+  #     path: /etc/containers/storage.conf
+  #     regexp: '^graphroot = '
+  #     line: 'graphroot = "/tmp/containers"'
+  - name: stat /src
+    stat:
+      path: /src
+    register: src_path
+  - name: Let's make sure /src is present
+    assert:
+      that:
+      - 'src_path.stat.isdir'
+  - name: copy entrypoint script
+    copy:
+      src: contrib/entry.sh
+      dest: /entry.sh
+  - name: copy libpod.conf
+    copy:
+      src: /usr/share/containers/libpod.conf
+      dest: /etc/containers/libpod.conf
+      remote_src: yes
+  - name: Change cgroup driver to cgroupfs.
+    lineinfile:
+      path: /etc/containers/libpod.conf
+      regexp: '^cgroup_manager = '
+      line: 'cgroup_manager = "cgroupfs"'
+  # this requires sources mounted inside at /src
+  - name: Install source-git from the current working directory
+    pip:
+      name: /src
+    tags:
+    - no-cache
+

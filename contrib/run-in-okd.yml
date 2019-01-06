@@ -1,0 +1,30 @@
+# ansible playbook which makes ab to run in openshift
+# it expects okd 3.11 started with `oc cluter up`
+---
+- name: Run ansible-bender in OKD
+  hosts: localhost
+  connection: local
+  vars:
+    cont_img: ansible-bender:latest
+    default_bc: buildconfig.build.openshift.io/ab-in-okd
+  tasks:
+  - name: Try to remove old bc.
+    command: oc delete {{ default_bc }}
+    ignore_errors: true
+  - name: Process the OKD template and add objects to openshift.
+    shell: oc process -f ./okd-template.yml | oc apply -f -
+  - name: Create new SCC to allow root and all the caps.
+    block:
+    - name: Become admin.
+      command: oc login -u system:admin
+    - name: Grant developer the use of privileged SCC
+      command: oc adm policy add-scc-to-user privileged developer
+    - name: Remove restricted from developer.
+      command: oc adm policy remove-scc-from-user restricted developer
+    - name: Allow developer to do custom builds.
+      command: oc adm policy add-cluster-role-to-user system:build-strategy-custom developer
+    always:
+    - name: Go back to a regular user.
+      command: oc login -u developer -p developer
+  - name: Start build.
+    command: oc start-build {{ default_bc }}

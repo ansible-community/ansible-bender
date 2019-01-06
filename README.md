@@ -20,12 +20,8 @@ actually heavily inspired by ansible-container: the main distinction is that
 ansible-container covers the complete lifecycle of a containerized application
 while ab takes care of image builds only.
 
-**Please note that this project is not affiliated with the Ansible project.
-Even though I work for Red Hat, I am not on the Ansible team. I wrote the tool
-because I care about the problem it solves.**
 
-
-**Status**: proof of concept
+**Status**: ready to use
 
 
 ## Features:
@@ -287,3 +283,15 @@ in a layer (certificates, package manager metadata, build artifacts).
 ab allows you to easily disable layering mechanism. All you need to do is to
 add a tag `stop-layering` to a task which will disable layering (and caching)
 for that task and all the following ones.
+
+
+### Ansible-bender in OKD
+
+Recently I started experimenting with running ab inside [OpenShift
+origin](https://github.com/openshift/origin) — imagine that you'd be able to
+build images in your cluster, using Ansible playbooks as definitions.
+
+Openshift by default runs its pods in a
+[restrictive](https://blog.openshift.com/understanding-service-accounts-sccs/)
+environment. In the proof of concept I was forced to run ab in a privileged
+pod. In the end, the whole test suite is passing in that privileged pod.

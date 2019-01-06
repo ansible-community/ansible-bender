@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ab
+spec:
+  containers:
+  - command: ["pytest-3", "-vv"]
+    image: ansible-bender:latest
+    imagePullPolicy: Never
+    name: ab
+    # we still need privileged, buildah can't mount:
+    # level=error msg="'overlay' is not supported over xfs at "/var/lib/containers/storage/overlay""
+    # could not get runtime: kernel does not support overlay fs: 'overlay' is not supported over xfs at "/var/lib/containers/storage/overlay"
+    # : backing file system is unsupported for this graph driver
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /var/lib/containers
+      name: graph
+    - mountPath: /src
+      name: src
+    env:
+    # - name: BUILD_ISOLATION
+    #   value: chroot
+    - name: PYTHONPATH
+      value: '{{ project_root }}'
+    - name: PYTHONDONTWRITEBYTECODE
+      value: ano
+    workingDir: /src
+  restartPolicy: Never
+  volumes:
+  - name: graph
+    emptyDir: {}
+  - name: src
+    hostPath:
+      path: '{{ project_root }}'
+      type: Directory

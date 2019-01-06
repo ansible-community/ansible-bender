@@ -2,11 +2,13 @@
 Utility functions. This module can't depend on anything within ab.
 """
 import logging
+import os
 import shutil
 import subprocess
 import threading
 
 from ansible_bender.constants import OUT_LOGGER
+
 
 logger = logging.getLogger(__name__)
 out_logger = logging.getLogger(OUT_LOGGER)
@@ -105,12 +107,19 @@ class CommandDoesNotExistException(Exception):
     pass
 
 
+def env_get_or_fail_with(env_name, err_msg):
+    try:
+        return os.environ[env_name]
+    except KeyError:
+        raise RuntimeError(err_msg)
+
+
 def one_of_commands_exists(commands, exc_msg):
     """
     Verify that the provided command exists. Raise CommandDoesNotExistException in case of an
     error or if the command does not exist.
 
-    :param command: str, command to check (python 3 only)
+    :param commands: str, command to check (python 3 only)
     :param exc_msg: str, message of exception when command does not exist
     :return: bool, True if everything's all right (otherwise exception is thrown)
     """
@@ -149,6 +158,24 @@ def podman_command_exists():
         "Please follow the upstream instructions "
         "available at https://github.com/containers/libpod/blob/master/install.md"
     )
+
+
+def git_command_exists():
+    return one_of_commands_exists(
+        ["git"],
+        "git command is not available"
+    )
+
+
+def git_clone_to_path(repo_url, path, ref="master"):
+    """
+    clone repo provided as repo_url into directory specified as path
+
+    :param repo_url: str
+    :param path: str
+    :param ref: str, git ref
+    """
+    run_cmd(["git", "clone", "--depth", "1", "-b", ref, repo_url, path])
 
 
 def set_logging(

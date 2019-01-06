@@ -9,24 +9,32 @@ from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, 
 logger = logging.getLogger(__name__)
 
 
-def inspect_buildah_resource(resource_type, resource_id):
+def inspect_resource(resource_type, resource_id):
     try:
-        i = run_cmd(["buildah", "inspect", "-t", resource_type, resource_id],
+        i = run_cmd(["podman", "inspect", "-t", resource_type, resource_id],
                     return_output=True, log_output=False)
     except subprocess.CalledProcessError:
         logger.info("no such %s %s", resource_type, resource_id)
         return None
-    metadata = json.loads(i)
+    try:
+        metadata = json.loads(i)[0]
+    except IndexError:
+        logger.info("no such %s %s", resource_type, resource_id)
+        return None
     return metadata
 
 
 def get_buildah_image_id(container_image):
-    metadata = inspect_buildah_resource("image", container_image)
-    return graceful_get(metadata, "FromImageID")
+    metadata = inspect_resource("image", container_image)
+    return graceful_get(metadata, "Id")
 
 
 def pull_buildah_image(container_image):
     run_cmd(["podman", "pull", container_image])
+
+
+def does_image_exist(container_image):
+    run_cmd(["podman", "image", "exists", container_image])
 
 
 def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
@@ -57,7 +65,7 @@ def create_buildah_container(container_image, container_name, build_volumes=None
         args += ["-v"] + build_volumes
     args += ["--name", container_name, container_image]
     # will pull the image by default if it's not present in buildah's storage
-    buildah("from", args, debug=debug)
+    buildah("from", args, debug=debug, log_stderr=True)
 
 
 def configure_buildah_container(container_name, working_dir=None, env_vars=None,
@@ -101,13 +109,13 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     return container_name
 
 
-def buildah(command, args_and_opts, print_output=False, debug=False):
+def buildah(command, args_and_opts, print_output=False, debug=False, log_stderr=False):
     cmd = ["buildah"]
     # if debug:
     #     cmd += ["--debug"]
     cmd += [command] + args_and_opts
     logger.debug("running command: %s", command)
-    return run_cmd(cmd, print_output=print_output, log_stderr=False)
+    return run_cmd(cmd, print_output=print_output, log_stderr=log_stderr)
 
 
 def buildah_with_output(command, args_and_opts, debug=False):
@@ -190,13 +198,22 @@ class BuildahBuilder(Builder):
 
     def get_image_id(self, image_name):
         """ return image_id for provided image """
-        return get_buildah_image_id(image_name)
+        image_id = get_buildah_image_id(image_name)
+        if not image_id:
+            raise RuntimeError("We haven't got any image ID: the image is not present "
+                               "or buildah/podman is malfunctioning.")
+        return image_id
 
     def is_image_present(self, image_reference):
         """
         :return: True when the selected image is present, False otherwise
         """
-        return bool(self.get_image_id(image_reference))
+        try:
+            does_image_exist(image_reference)
+        except subprocess.CalledProcessError:
+            return False
+        else:
+            return True
 
     def pull(self):
         """

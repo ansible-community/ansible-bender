@@ -12,6 +12,7 @@ from tabulate import tabulate
 from ansible_bender.api import Application
 from ansible_bender.builders.base import ImageMetadata, Build, BuildState
 from ansible_bender.db import PATH_CANDIDATES
+from ansible_bender.okd import build_inside_openshift
 
 
 def split_once_or_fail_with(strink, pattern, error_message):
@@ -141,6 +142,12 @@ class CLI:
         )
         self.build_parser.set_defaults(subcommand="build")
 
+        self.bio_parser = self.subparsers.add_parser(
+            name="build-inside-openshift",
+            description="Build image within an openshift environment.",
+        )
+        self.bio_parser.set_defaults(subcommand="bio")
+
     def _do_get_logs_interface(self):
         self.gl_parser = self.subparsers.add_parser(
             name="get-logs",
@@ -235,13 +242,15 @@ class CLI:
         build.playbook_path = self.args.playbook_path
         build.build_volumes = self.args.build_volumes
         build.metadata = metadata
-        build.state = BuildState.NEW
         build.base_image = self.args.base_image
         build.target_image = self.args.target_image
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
 
         self.app.build(build, extra_ansible_args=self.args.extra_ansible_args)
+
+    def _build_inside_openshift(self):
+        build_inside_openshift(self.app)
 
     def _list_builds(self):
         builds = self.app.list_builds()
@@ -296,6 +305,9 @@ class CLI:
                 return 0
             elif subcommand == "push":
                 self._push()
+                return 0
+            elif subcommand == "bio":
+                self._build_inside_openshift()
                 return 0
         except KeyboardInterrupt:
             return 133

@@ -1,18 +1,37 @@
 TEST_TARGET := ./tests/
+BASE_IMAGE := registry.fedoraproject.org/fedora:29
 PY_PACKAGE := ansible-bender
-KNIFE := knife
+# container image with ab inside
+CONT_IMG := $(PY_PACKAGE)
 
-build-knife:
-	ansible-bender build ./knife.yml registry.fedoraproject.org/fedora:29 $(KNIFE)
+build-ab-img: recipe.yml
+	sudo ansible-bender build --build-volumes $(CURDIR):/src:Z \
+		--cmd 'bash /entry.sh' \
+		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
-	PYTHONPATH=$(CURDIR) pytest-3 --full-trace -l -v $(TEST_TARGET)
+	sudo PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes bash -c 'cd $(CURDIR) && pytest-3 --full-trace -l -v $(TEST_TARGET)'
 
-shell-in-knife:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash
+shell:
+	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
+
+push-image-to-dockerd:
+	sudo ansible-bender push docker-daemon:ansible-bender:latest
+
+run-in-okd:
+	ansible-playbook -vv ./contrib/run-in-okd.yml
+	oc get all
+	sleep 3  # give oc time to spin the container
+	oc logs -f pod/ab-in-okd-1-build
+
+check-in-okd:
+	ansible-playbook -vv ./contrib/check-in-okd.yml
+	oc get all
+	sleep 2
+	oc logs -f pod/ab
 
 check-pypi-packaging:
-	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(KNIFE) bash -c '\
+	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
