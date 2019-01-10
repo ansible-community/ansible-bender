@@ -1,3 +1,16 @@
+# 0.3.2
+
+I experimented with running ansible-bender inside an OpenShift pod. Details can
+be found in a Makefile and in the `contrib/` directory.
+
+## Bug fixes
+
+* Ansible-bender is now able to pull base images properly again if they are not
+  present before a build.
+* `podman` is now used to perform `inspect`.
+* Working container name was improved to be more safe.
+
+
 # 0.3.1
 
 ## Breaking changes
