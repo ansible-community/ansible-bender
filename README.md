@@ -73,8 +73,21 @@ Command | Description
 $ pip3 install ansible-bender
 ```
 
-Ansible bender supports python 3 only. This means that you need to have a
-python3 interpretter inside your base image.
+
+### Requirements (host)
+
+Pip takes care of python dependencies, but ab also requires a few binaries to
+be present.
+
+* [podman](https://github.com/containers/libpod)
+* [buildah](https://github.com/containers/buildah)
+* [ansible](https://github.com/ansible/ansible)
+
+
+### Requirements (base image)
+
+* python interpretter — ansible-bender will try to find it (alternatively you
+  can specify it via `--python-interpreter`)
 
 
 ## Usage
