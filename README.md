@@ -1,18 +1,23 @@
 # ansible-bender
 
-This is a tool which bends containers using [Ansible](https://github.com/ansible/ansible)
-[playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html) and turns them into images.
-It has a pluggable builder selection — it is up to you to pick the tool which
-will be used to construct your container image. Right now the only supported
-builder is [buildah](https://github.com/projectatomic/buildah). [More to come
-in future](#todo-past-010). ansible-bender (ab) relies on [Ansible connection
-plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for performing builds.
+This is a tool which bends containers using
+[Ansible](https://github.com/ansible/ansible)
+[playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html)
+and turns them into container images. It has a pluggable builder selection —
+it is up to you to pick the tool which will be used to construct your container
+image. Right now the only supported builder is
+[buildah](https://github.com/containers/buildah).
+[More](http://github.com/TomasTomecek/ansible-bender/issues/25) [to
+come](http://github.com/TomasTomecek/ansible-bender/issues/26) in the future.
+Ansible-bender (ab) relies on [Ansible connection
+plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for
+performing builds.
 
 tl;dr Ansible is the frontend, buildah is the backend.
 
-I described this concept in these blog posts:
+I described the concept in following blog posts:
 * [Building containers with buildah and ansible](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
-* [Ansible and Podman Can Play Together Now](https://blog.tomecek.net/post/ansible-and-podman-can-play-together-now/)
+* [Ansible and Podman Can Play Together Now](https://blog.tomecek.net/post/ansible-and-podman-can-play-together-now/).
 
 You may be asking: why not
 [ansible-container](https://github.com/ansible/ansible-container)? Ansible bender is
@@ -51,7 +56,7 @@ while ab takes care of image builds only.
 
 ## Interface
 
-ab has these commands:
+Ansible-bender has these commands:
 
 Command | Description
 --------|------------
