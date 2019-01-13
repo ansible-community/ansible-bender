@@ -88,7 +88,10 @@ be present on your host system:
 ### Requirements (base image)
 
 * python interpretter — ansible-bender will try to find it (alternatively you
-  can specify it via `--python-interpreter`)
+  can specify it via `--python-interpreter`).
+  * It can be python 2 or python 3 — on host, you have to have python 3 but
+    inside the base image, it doesn't matter — Ansible is able to utilize
+    python 2 even if it's invoked with python 3 on the control machine.
 
 
 ## Usage
