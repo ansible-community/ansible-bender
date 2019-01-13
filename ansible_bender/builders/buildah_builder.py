@@ -142,6 +142,7 @@ class BuildahBuilder(Builder):
         self.ansible_host = build.build_container
         self.logs = []
         buildah_command_exists()
+        podman_command_exists()
 
     def create(self):
         """
@@ -220,7 +221,6 @@ class BuildahBuilder(Builder):
         pull base image
         """
         logger.info("pulling base image: %s", self.build.base_image)
-        podman_command_exists()
         pull_buildah_image(self.build.base_image)
 
     def push(self, build, target, force=False):
