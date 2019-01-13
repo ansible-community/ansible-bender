@@ -54,3 +54,18 @@ check-smoke:
 		&& podman pull docker.io/library/python:3-alpine \
 		&& pip3 install . \
 		&& ansible-bender build ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine test'
+
+# for CI
+check-in-docker:
+	docker run --rm --privileged -v $(CURDIR):/src -w /src \
+		--tmpfs /tmp \
+		$(BASE_IMAGE) \
+		bash -c " \
+			set -x \
+			&& dnf install -y ansible \
+			&& ansible-playbook -e test_mode=yes -c local ./recipe.yml \
+			&& id \
+			&& pwd \
+			&& podman info \
+			&& buildah info || : \
+			&& pytest-3 -vv . "

@@ -1,6 +1,9 @@
 ---
 - name: Containerized ansible-bender
-  hosts: all
+  hosts: localhost
+  vars:
+    test_mode: no  # yes - test in CI, no - build an image
+    project_dir: /src
   tasks:
   - name: Install all packages needed to hack on ab.
     dnf:
@@ -30,23 +33,26 @@
   #     path: /etc/containers/storage.conf
   #     regexp: '^driver = '
   #     line: 'driver = "vfs"'
-  # - name: Change storage driver graphroot to /tmp/containers
-  #   lineinfile:
-  #     path: /etc/containers/storage.conf
-  #     regexp: '^graphroot = '
-  #     line: 'graphroot = "/tmp/containers"'
+  - name: Change storage driver graphroot to /tmp/containers
+    lineinfile:
+      path: /etc/containers/storage.conf
+      regexp: '^graphroot = '
+      line: 'graphroot = "/tmp/containers"'
   - name: stat /src
     stat:
       path: /src
     register: src_path
+    when: test_mode == "no"
   - name: Let's make sure /src is present
     assert:
       that:
       - 'src_path.stat.isdir'
+    when: test_mode == "no"
   - name: copy entrypoint script
     copy:
       src: contrib/entry.sh
       dest: /entry.sh
+    when: test_mode == "no"
   - name: copy libpod.conf
     copy:
       src: /usr/share/containers/libpod.conf
@@ -58,9 +64,9 @@
       regexp: '^cgroup_manager = '
       line: 'cgroup_manager = "cgroupfs"'
   # this requires sources mounted inside at /src
-  - name: Install source-git from the current working directory
+  - name: Install ansible-bender from the current working directory
     pip:
-      name: /src
+      name: '{{ project_dir }}'
     tags:
     - no-cache
 
