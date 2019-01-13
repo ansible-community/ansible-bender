@@ -77,11 +77,12 @@ $ pip3 install ansible-bender
 ### Requirements (host)
 
 Pip takes care of python dependencies, but ab also requires a few binaries to
-be present.
+be present on your host system:
 
 * [podman](https://github.com/containers/libpod)
 * [buildah](https://github.com/containers/buildah)
 * [ansible](https://github.com/ansible/ansible)
+* python 3
 
 
 ### Requirements (base image)
