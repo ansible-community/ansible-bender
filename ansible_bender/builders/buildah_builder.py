@@ -30,7 +30,8 @@ def get_buildah_image_id(container_image):
 
 
 def pull_buildah_image(container_image):
-    run_cmd(["podman", "pull", container_image])
+    run_cmd(["podman", "pull", container_image],
+            log_stderr=False, print_output=True, log_output=False)
 
 
 def does_image_exist(container_image):

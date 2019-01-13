@@ -95,8 +95,13 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
             else:
                 return process.returncode
         else:
+            out = ""
+            errout = ""
+            if not print_output:
+                out = "\n".join(whole_output)
+                errout = e.get_output()
             raise subprocess.CalledProcessError(cmd=cmd, returncode=process.returncode,
-                                                stderr=e.get_output(), output="\n".join(whole_output))
+                                                stderr=errout, output=out)
     if return_all_output:
         return whole_output
     if return_output:
