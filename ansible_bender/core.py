@@ -106,13 +106,11 @@ class AnsibleRunner:
         # hence, let's add the site ab is installed in to sys.path
         return os.path.dirname(os.path.dirname(ansible_bender.__file__))
 
-    def build(self, db_path, python_interpreter="/usr/bin/python3", extra_ansible_args=None):
+    def build(self, db_path):
         """
         run the playbook against the container
 
         :param db_path, str, path to ab's database
-        :param python_interpreter, str, path to python interpreter to use inside the container
-        :param extra_ansible_args: str, extra CLI arguments for ansible-playbook
 
         :return: str, output
         """
@@ -134,13 +132,13 @@ class AnsibleRunner:
             inv_path = os.path.join(tmp, "inventory")
             logger.info("creating inventory file %s", inv_path)
             with open(inv_path, "w") as fd:
-                self._create_inventory_file(fd, python_interpreter)
+                self._create_inventory_file(fd, self.build_i.python_interpreter)
             a_cfg_path = os.path.join(tmp, "ansible.cfg")
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
             extra_args = None
-            if extra_ansible_args:
-                extra_args = shlex.split(extra_ansible_args)
+            if self.build_i.ansible_extra_args:
+                extra_args = shlex.split(self.build_i.ansible_extra_args)
             return run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
                                 debug=self.debug, environment=environment, ansible_args=extra_args)
         finally:

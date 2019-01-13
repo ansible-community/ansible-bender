@@ -114,6 +114,8 @@ class Build:
         self.debug = None
         self.verbose = None
         self.pulled = False  # was the base image pulled?
+        self.ansible_extra_args = None
+        self.python_interpreter = None
 
     def to_dict(self):
         """ serialize """
@@ -140,7 +142,9 @@ class Build:
             "layering": self.layering,
             "debug": self.debug,
             "verbose": self.verbose,
-            "pulled": self.pulled
+            "pulled": self.pulled,
+            "ansible_extra_args": self.ansible_extra_args,
+            "python_interpreter": self.python_interpreter,
         }
 
     @classmethod
@@ -174,6 +178,8 @@ class Build:
         b.debug = j["debug"]
         b.verbose = j["verbose"]
         b.pulled = j["pulled"]
+        b.ansible_extra_args = j.get("ansible_extra_args", None)
+        b.python_interpreter = j.get("python_interpreter", None)
         return b
 
     def record_layer(self, content, layer_id, base_image_id, cached=None):

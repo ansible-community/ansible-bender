@@ -140,6 +140,10 @@ class CLI:
             "--extra-ansible-args",
             help="arguments passed to ansible-playbook command (be careful!)"
         )
+        self.build_parser.add_argument(
+            "--python-interpreter",
+            help="Path to a python interpreter inside the base image"
+        )
         self.build_parser.set_defaults(subcommand="build")
 
         self.bio_parser = self.subparsers.add_parser(
@@ -246,8 +250,10 @@ class CLI:
         build.target_image = self.args.target_image
         build.builder_name = self.args.builder
         build.cache_tasks = not self.args.no_cache
+        build.ansible_extra_args = self.args.extra_ansible_args
+        build.python_interpreter = self.args.python_interpreter
 
-        self.app.build(build, extra_ansible_args=self.args.extra_ansible_args)
+        self.app.build(build)
 
     def _build_inside_openshift(self):
         build_inside_openshift(self.app)
