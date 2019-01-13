@@ -31,6 +31,7 @@ def get_buildah_image_id(container_image):
 
 def pull_buildah_image(container_image):
     run_cmd(["podman", "pull", container_image],
+            save_output_in_exc=False,
             log_stderr=False, print_output=True, log_output=False)
 
 

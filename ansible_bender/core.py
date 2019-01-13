@@ -68,6 +68,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
         return run_cmd(
             cmd_args,
             print_output=True,
+            save_output_in_exc=True,
             env=env,
             return_all_output=True,
         )

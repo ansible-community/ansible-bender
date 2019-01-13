@@ -57,6 +57,7 @@ class StreamLogger(threading.Thread):
 
 
 def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, log_stderr=True,
+            save_output_in_exc=True,
             log_output=True, return_all_output=False, **kwargs):
     """
     run provided command on host system using the same user as you invoked this code, raises
@@ -71,6 +72,7 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
     :param print_output: bool, print output via print()
     :param log_stderr: bool, log errors to stdout as ERROR level
     :param log_output: bool, print output of the command to logs
+    :param save_output_in_exc: bool, add command output to exception in case of an error
     :return: None or str
     """
     logger.info('running command: "%s"', cmd)
@@ -97,7 +99,7 @@ def run_cmd(cmd, return_output=False, ignore_status=False, print_output=False, l
         else:
             out = ""
             errout = ""
-            if not print_output:
+            if save_output_in_exc:
                 out = "\n".join(whole_output)
                 errout = e.get_output()
             raise subprocess.CalledProcessError(cmd=cmd, returncode=process.returncode,
