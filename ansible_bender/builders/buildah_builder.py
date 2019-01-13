@@ -256,7 +256,9 @@ class BuildahBuilder(Builder):
             else:
                 logger.info("using python interpreter %s", i)
                 return i
-        raise RuntimeError("no python interpreter found in image %s" % self.build.base_image)
+        logger.error("couldn't locate python interpreter, tried these paths: %s", self.python_interpr_prio)
+        raise RuntimeError(f"no python interpreter was found in the base image \"{self.build.base_image}\""
+                           ", you can specify the path via CLI option --python-interpreter")
 
     def get_logs(self):
         """
