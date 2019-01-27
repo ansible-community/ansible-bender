@@ -152,7 +152,7 @@ class Build:
         """ return Build instance from the provided json """
         b = cls()
         b.build_id = j["build_id"]
-        b.playbook_path = j["playbook_path"]
+        b.playbook_path = j.get("playbook_path", None)
         b.build_volumes = j["build_volumes"]
         b.metadata = ImageMetadata.from_json(j["metadata"])
         b.state = BuildState(j["state"])
