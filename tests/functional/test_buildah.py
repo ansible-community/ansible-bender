@@ -67,8 +67,8 @@ def test_build_basic_image_with_env_vars(tmpdir, target_image):
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
     out = inspect_resource("image", target_image)
-    assert a_b in out["ContainerConfig"]["Env"]
-    assert x_y in out["ContainerConfig"]["Env"]
+    assert a_b in out["OCIv1"]["config"]["Env"]
+    assert x_y in out["OCIv1"]["config"]["Env"]
     e = podman_run_cmd(target_image, ["env"], return_output=True)
     assert a_b in e
     assert x_y in e
@@ -92,8 +92,8 @@ def test_build_basic_image_with_labels(tmpdir, target_image):
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
     out = inspect_resource("image", target_image)
-    assert out["ContainerConfig"]["Labels"]["A"] == "B"
-    assert out["ContainerConfig"]["Labels"]["x"] == "y"
+    assert out["OCIv1"]["config"]["Labels"]["A"] == "B"
+    assert out["OCIv1"]["config"]["Labels"]["x"] == "y"
 
 
 def test_build_basic_image_with_build_volumes(tmpdir, target_image):
@@ -136,7 +136,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
     out = inspect_resource("image", target_image)
-    co = out["ContainerConfig"]
+    co = out["Docker"]["config"]
     assert co["WorkingDir"] == workdir_path
     assert co["Labels"]["A"] == "B"
     assert co["Labels"]["x"] == "y"

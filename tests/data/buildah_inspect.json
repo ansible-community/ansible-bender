@@ -1,0 +1,187 @@
+{
+    "Type": "buildah 0.0.1",
+    "FromImage": "registry.fedoraproject.org/fedora:29",
+    "FromImageID": "6aed6d59a707a7040ad25063eafd3a2165961a2c9f4d1d06ed0a73bdf2a89322",
+    "Config": "{\"comment\": \"Created by Image Factory\", \"created\": \"2018-12-17T06:48:33Z\", \"os\": \"linux\", \"container_config\": {\"Systemd\": false, \"Hostname\": \"\", \"Entrypoint\": null, \"Env\": null, \"OnBuild\": null, \"OpenStdin\": false, \"MacAddress\": \"\", \"User\": \"\", \"VolumeDriver\": \"\", \"AttachStderr\": false, \"AttachStdout\": false, \"NetworkDisabled\": false, \"StdinOnce\": false, \"Cmd\": null, \"WorkingDir\": \"\", \"AttachStdin\": false, \"Volumes\": null, \"Tty\": false, \"Domainname\": \"\", \"Image\": \"\", \"Labels\": null, \"ExposedPorts\": null}, \"architecture\": \"amd64\", \"docker_version\": \"1.10.1\", \"rootfs\": {\"type\": \"layers\", \"diff_ids\": [\"sha256:070eba3ae1ab88a863600c5c8857c636249fc40378f831f21258cc4efa5c259a\"]}, \"config\": {\"Systemd\": false, \"Hostname\": \"\", \"Entrypoint\": null, \"Env\": [\"DISTTAG=f29container\", \"FGC=f29\"], \"OnBuild\": null, \"OpenStdin\": false, \"MacAddress\": \"\", \"User\": \"\", \"VolumeDriver\": \"\", \"AttachStderr\": false, \"AttachStdout\": false, \"NetworkDisabled\": false, \"StdinOnce\": false, \"Cmd\": [\"/bin/bash\"], \"WorkingDir\": \"\", \"AttachStdin\": false, \"Volumes\": null, \"Tty\": false, \"Domainname\": \"\", \"Image\": \"\", \"Labels\": {\"version\": \"29\", \"vendor\": \"Fedora Project\", \"name\": \"fedora\", \"license\": \"MIT\"}, \"ExposedPorts\": null}, \"history\": [{\"comment\": \"Created by Image Factory\", \"created\": \"2018-12-17T06:48:33Z\"}]}",
+    "Manifest": "{\"schemaVersion\":2,\"mediaType\":\"application/vnd.docker.distribution.manifest.v2+json\",\"config\":{\"mediaType\":\"application/vnd.docker.container.image.v1+json\",\"size\":1299,\"digest\":\"sha256:6aed6d59a707a7040ad25063eafd3a2165961a2c9f4d1d06ed0a73bdf2a89322\"},\"layers\":[{\"mediaType\":\"application/vnd.docker.image.rootfs.diff.tar.gzip\",\"size\":92969060,\"digest\":\"sha256:e1a69a222298f1f8b3a608d6e22ffee56e103157c2461f674184c3fb1f9b4456\"}]}",
+    "Container": "",
+    "ContainerID": "",
+    "MountPoint": "",
+    "ProcessLabel": "",
+    "MountLabel": "",
+    "ImageAnnotations": {},
+    "ImageCreatedBy": "",
+    "OCIv1": {
+        "created": "2018-12-17T06:48:33Z",
+        "architecture": "amd64",
+        "os": "linux",
+        "config": {
+            "Env": [
+                "DISTTAG=f29container",
+                "FGC=f29"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "Labels": {
+                "license": "MIT",
+                "name": "fedora",
+                "vendor": "Fedora Project",
+                "version": "29"
+            }
+        },
+        "rootfs": {
+            "type": "layers",
+            "diff_ids": [
+                "sha256:070eba3ae1ab88a863600c5c8857c636249fc40378f831f21258cc4efa5c259a"
+            ]
+        },
+        "history": [
+            {
+                "created": "2018-12-17T06:48:33Z",
+                "comment": "Created by Image Factory"
+            }
+        ]
+    },
+    "Docker": {
+        "comment": "Created by Image Factory",
+        "created": "2018-12-17T06:48:33Z",
+        "container_config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "DISTTAG=f29container",
+                "FGC=f29"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "license": "MIT",
+                "name": "fedora",
+                "vendor": "Fedora Project",
+                "version": "29"
+            }
+        },
+        "config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "DISTTAG=f29container",
+                "FGC=f29"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "license": "MIT",
+                "name": "fedora",
+                "vendor": "Fedora Project",
+                "version": "29"
+            }
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "rootfs": {
+            "type": "layers",
+            "diff_ids": [
+                "sha256:070eba3ae1ab88a863600c5c8857c636249fc40378f831f21258cc4efa5c259a"
+            ]
+        },
+        "history": [
+            {
+                "created": "2018-12-17T06:48:33Z",
+                "comment": "Created by Image Factory"
+            }
+        ]
+    },
+    "DefaultMountsFilePath": "",
+    "Isolation": "IsolationDefault",
+    "NamespaceOptions": [
+        {
+            "Name": "cgroup",
+            "Host": true,
+            "Path": ""
+        },
+        {
+            "Name": "ipc",
+            "Host": false,
+            "Path": ""
+        },
+        {
+            "Name": "mount",
+            "Host": false,
+            "Path": ""
+        },
+        {
+            "Name": "network",
+            "Host": false,
+            "Path": ""
+        },
+        {
+            "Name": "pid",
+            "Host": false,
+            "Path": ""
+        },
+        {
+            "Name": "user",
+            "Host": true,
+            "Path": ""
+        },
+        {
+            "Name": "uts",
+            "Host": false,
+            "Path": ""
+        }
+    ],
+    "ConfigureNetwork": "NetworkDefault",
+    "CNIPluginPath": "",
+    "CNIConfigDir": "",
+    "IDMappingOptions": {
+        "HostUIDMapping": true,
+        "HostGIDMapping": true,
+        "UIDMap": [],
+        "GIDMap": []
+    },
+    "DefaultCapabilities": [
+        "CAP_AUDIT_WRITE",
+        "CAP_CHOWN",
+        "CAP_DAC_OVERRIDE",
+        "CAP_FOWNER",
+        "CAP_FSETID",
+        "CAP_KILL",
+        "CAP_MKNOD",
+        "CAP_NET_BIND_SERVICE",
+        "CAP_SETFCAP",
+        "CAP_SETGID",
+        "CAP_SETPCAP",
+        "CAP_SETUID",
+        "CAP_SYS_CHROOT"
+    ],
+    "AddCapabilities": [],
+    "DropCapabilities": []
+}

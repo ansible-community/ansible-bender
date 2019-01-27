@@ -11,13 +11,13 @@ logger = logging.getLogger(__name__)
 
 def inspect_resource(resource_type, resource_id):
     try:
-        i = run_cmd(["podman", "inspect", "-t", resource_type, resource_id],
+        i = run_cmd(["buildah", "inspect", "-t", resource_type, resource_id],
                     return_output=True, log_output=False)
     except subprocess.CalledProcessError:
         logger.info("no such %s %s", resource_type, resource_id)
         return None
     try:
-        metadata = json.loads(i)[0]
+        metadata = json.loads(i)
     except IndexError:
         logger.info("no such %s %s", resource_type, resource_id)
         return None
@@ -26,11 +26,11 @@ def inspect_resource(resource_type, resource_id):
 
 def get_buildah_image_id(container_image):
     metadata = inspect_resource("image", container_image)
-    return graceful_get(metadata, "Id")
+    return graceful_get(metadata, "FromImageID")
 
 
 def pull_buildah_image(container_image):
-    run_cmd(["podman", "pull", container_image],
+    run_cmd(["buildah", "pull", container_image],
             save_output_in_exc=False,
             log_stderr=False, print_output=True, log_output=False)
 
@@ -235,7 +235,7 @@ class BuildahBuilder(Builder):
         :return: None
         """
         built_image = build.get_target_image_id()
-        cmd = ["podman", "push", built_image, target]
+        cmd = ["buildah", "push", built_image, target]
         # podman prints progress to stderr
         run_cmd(cmd, print_output=False, log_stderr=False)
 
