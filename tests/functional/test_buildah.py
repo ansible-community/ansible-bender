@@ -2,6 +2,7 @@
 Make sure that we can build using buildah builder.
 """
 import json
+import logging
 import os
 import re
 import subprocess
@@ -14,27 +15,30 @@ from ..spellbook import basic_playbook_path, base_image, project_dir, \
     bad_playbook_path, random_word, basic_playbook_path_w_bv
 
 
-def ab(args, tmpdir_path, debug=False, return_output=False, ignore_result=False):
+logger = logging.getLogger("ansible_bender")
+
+
+def ab(args, tmpdir_path, return_output=False, ignore_result=False):
     """
     python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
 
     :return:
     """
-    cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path]
-    if debug:
-        cmd += ["--ansible-extra-args=-vvvvvv"]
+    # put --debug in there for debugging
+    cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path] + args
+    logger.debug("cmd = %s", cmd)
     if ignore_result:
-        return subprocess.call(cmd + args, cwd=project_dir)
+        return subprocess.call(cmd, cwd=project_dir)
     if return_output:
-        return subprocess.check_output(cmd + args, cwd=project_dir, universal_newlines=True)
+        return subprocess.check_output(cmd, cwd=project_dir, universal_newlines=True)
     else:
         # don't use run_cmd here, it makes things complicated
-        subprocess.check_call(cmd + args, cwd=project_dir)
+        subprocess.check_call(cmd, cwd=project_dir)
 
 
 def test_output(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
-    out = ab(cmd, str(tmpdir), return_output=True, debug=False)
+    out = ab(cmd, str(tmpdir), return_output=True)
     assert f"Image '{target_image}' was built successfully \\o/" in out
     assert 'Getting image source signatures' in out
     assert not re.match(r'ERROR\s+Getting image source signatures', out)
@@ -187,7 +191,7 @@ def test_two_runs(tmpdir, target_image):
 
 def test_buildah_err_output(tmpdir, capfd):
     cmd = ["build", basic_playbook_path, base_image, "vrerv\\23&^&4//5B/F/BSFD/B"]
-    ab(cmd, str(tmpdir), debug=False, ignore_result=True)
+    ab(cmd, str(tmpdir), ignore_result=True)
     c = capfd.readouterr()
     assert "error parsing target image name" in c.err
 
