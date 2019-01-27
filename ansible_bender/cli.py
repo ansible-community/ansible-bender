@@ -36,7 +36,7 @@ def split_once_or_fail_with(strink, pattern, error_message):
 class CLI:
     def __init__(self):
         self.parser = argparse.ArgumentParser(
-            prog='ab',
+            prog='ansible-bender',
             description='Ansible builder = ansible-playbook + {buildah,docker}  '
                         '# create your container images with Ansible! ',
             epilog="Please use '--' to separate options and arguments."
