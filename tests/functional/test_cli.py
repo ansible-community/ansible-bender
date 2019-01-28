@@ -24,7 +24,7 @@ def test_inspect_cmd(tmpdir, target_image):
            "--",
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    out = ab(["inspect"], str(tmpdir), return_output=True, debug=False)
+    out = ab(["inspect"], str(tmpdir), return_output=True)
 
     assert "base_image: docker.io/library/python:3-alpine" in out
     assert "build_container: " in out
@@ -61,7 +61,7 @@ metadata:
 def test_get_logs(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    out = ab(["get-logs"], str(tmpdir), return_output=True, debug=False)
+    out = ab(["get-logs"], str(tmpdir), return_output=True)
     assert "PLAY [all]" in out
     assert "TASK [Gathering Facts]" in out
     assert "failed=0" in out

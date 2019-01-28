@@ -63,6 +63,12 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
         env.update(environment)
     env["ANSIBLE_CONFIG"] = a_cfg_path
 
+    if os.getuid() != 0:
+        logger.info("we are running rootless, prepending `buildah unshare`")
+        # rootless, we need to `buildah unshare` for sake of `buildah mount`
+        # https://github.com/containers/buildah/issues/1271
+        cmd_args = ["buildah", "unshare"] + cmd_args
+
     # TODO: does ansible have an API?
     try:
         return run_cmd(
