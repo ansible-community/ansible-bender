@@ -287,13 +287,10 @@ If you are familiar with podman and buildah, you know that you can
 these tools. Ansible-bender doesn't change this configuration in any way so
 it's up to you how you set up buildah and podman. The same applies for running
 ansible-bender as root or not: buildah allows you to utilize rootless
-containers. The only problem is that Ansible [is not
-able](https://github.com/ansible/ansible/issues/50583) to interact with
-rootless buildah containers when they are backed up by an overlay storage
-backend.
+containers.
 
-My suggestion is to run ansible-bender as root using the overlay storage
-backend. Vfs backend is slow and inefficient.
+My suggestion is to use the overlay storage backend. Vfs backend is slow and
+inefficient.
 
 
 ### Caching mechanism

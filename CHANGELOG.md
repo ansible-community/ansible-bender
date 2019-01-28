@@ -1,3 +1,25 @@
+# 0.4.0
+Ansible-bender now uses Azure Pipelines as a CI system.
+
+## Features
+* There were updates to documentation in README:
+  * Info about vfs and overlay buildah storage backends.
+  * Rootless containers.
+  * How you can use base images with python2.
+  * Requirements of ansible-bender.
+* Bender now produces a more clear message when a base image doesn't have a
+  python interpreter.
+* You are now able to pass path to the python interpreter inside the base image
+  via CLI.
+
+## Bug fixes
+
+* Bender now uses more buildah commands instead of podman.
+* If bender is invoked with a non-root user, the ansible-playbook session is
+  now wrapped with `buildah unshare`.
+* Don't print to error log when an image is being pulled.
+
+
 # 0.3.2
 
 I experimented with running ansible-bender inside an OpenShift pod. Details can
