@@ -1,9 +1,14 @@
+import json
 import os
 import logging
 import shlex
 import subprocess
 import tempfile
 import shutil
+
+import yaml
+
+from ansible_bender.builders.base import Build, ImageMetadata
 
 import ansible_bender
 from ansible_bender import callback_plugins
@@ -23,7 +28,7 @@ callback_whitelist=snapshoter\n
 
 
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
-                 ansible_args=None, debug=False, environment=None):
+                 ansible_args=None, debug=False, environment=None, try_unshare=True, provide_output=True):
     """
     run selected ansible playbook and return output from ansible-playbook run
 
@@ -35,16 +40,19 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     :param ansible_args: list of str, extra arguments for a-p
     :param debug:
     :param environment:
+    :param try_unshare: bool, do `buildah unshare` if uid > 0
+    :param provide_output: bool, present output to user
 
     :return: output
     """
     ap = ap_command_exists()
     cmd_args = [
         ap,
-        "-i", inventory_path,
         "-c", connection,
 
     ]
+    if inventory_path:
+        cmd_args += ["-i", inventory_path]
     if debug:
         cmd_args += ["-vvv"]
     if extra_variables:
@@ -61,9 +69,10 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     env = os.environ.copy()
     if environment:
         env.update(environment)
-    env["ANSIBLE_CONFIG"] = a_cfg_path
+    if a_cfg_path:
+        env["ANSIBLE_CONFIG"] = a_cfg_path
 
-    if os.getuid() != 0:
+    if try_unshare and os.getuid() != 0:
         logger.info("we are running rootless, prepending `buildah unshare`")
         # rootless, we need to `buildah unshare` for sake of `buildah mount`
         # https://github.com/containers/buildah/issues/1271
@@ -73,10 +82,10 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     try:
         return run_cmd(
             cmd_args,
-            print_output=True,
+            print_output=provide_output,
             save_output_in_exc=True,
             env=env,
-            return_all_output=True,
+            return_all_output=provide_output,
         )
     except subprocess.CalledProcessError as ex:
         raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex, ex.output)
@@ -150,3 +159,69 @@ class AnsibleRunner:
                                 debug=self.debug, environment=environment, ansible_args=extra_args)
         finally:
             shutil.rmtree(tmp)
+
+
+def expand_pb_vars(playbook_path):
+    """
+    populate vars from a playbook, defined in vars section
+
+    :param playbook_path: str, path to playbook
+    :return: dict
+    """
+    with open(playbook_path) as fd:
+        d = yaml.safe_load(fd)
+
+    try:
+        d = d[0]  # what about the other docs?
+    except IndexError:
+        raise RuntimeError("Invalid playbook, can't access the first document.")
+
+    if "vars" not in d:
+        return {}
+
+    tmp = tempfile.mkdtemp(prefix="ab")
+    json_data_path = os.path.join(tmp, "j.json")
+    pb = {
+        "hosts": "localhost",
+        "vars": {
+            "ab_vars": d["vars"],
+        },
+        "gather_facts": False,
+        "tasks": [
+            {"debug": {"msg": "{{ ab_vars }}"}},
+            {
+                "copy": {
+                    "dest": json_data_path,
+                    "content": '{{ ab_vars }}'
+                }
+            }
+        ]
+    }
+    i_path = os.path.join(tmp, "i")
+    with open(i_path, "w") as fd:
+        fd.write("localhost ansible_connection=local")
+
+    tmp_pb_path = os.path.join(tmp, "p.yaml")
+    with open(tmp_pb_path, "w") as fd:
+        yaml.safe_dump([pb], fd)
+
+    try:
+        run_playbook(tmp_pb_path, i_path, None, connection="local", try_unshare=False)
+
+        with open(json_data_path) as fd:
+            return json.load(fd)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def get_build_and_metadata_from_pb(playbook_path):
+    """
+    extra vars from the selected playbook
+
+    :return: Build(), ImageMetadata()
+    """
+    build, metadata = Build(), ImageMetadata()
+
+    data = expand_pb_vars(playbook_path)
+
+    return build, metadata

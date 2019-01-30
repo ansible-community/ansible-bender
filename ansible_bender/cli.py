@@ -218,7 +218,7 @@ class CLI:
         self.push_parser.set_defaults(subcommand="push")
 
     def _build(self):
-        metadata = ImageMetadata()
+        build, metadata = get_build_and_metadata_from_pb(self.args.playbook_path)
         if self.args.workdir:
             metadata.working_dir = self.args.workdir
         if self.args.labels:
@@ -242,7 +242,6 @@ class CLI:
         if self.args.runtime_volumes:
             metadata.volumes = self.args.runtime_volumes
 
-        build = Build()  # we should have a helper for this
         build.playbook_path = self.args.playbook_path
         build.build_volumes = self.args.build_volumes
         build.metadata = metadata
