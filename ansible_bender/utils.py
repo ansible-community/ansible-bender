@@ -14,12 +14,14 @@ logger = logging.getLogger(__name__)
 out_logger = logging.getLogger(OUT_LOGGER)
 
 
-def graceful_get(d, *keys):
+def graceful_get(d, *keys, default=None):
     """
     recursively obtain value from nested dict
 
     :param d: dict
     :param keys:
+    :param default: a value to return by default
+
     :return: value or None
     """
     response = d
@@ -28,6 +30,7 @@ def graceful_get(d, *keys):
             response = response[k]
         except (KeyError, AttributeError, TypeError) as ex:
             logger.error("can't obtain %s: %s", k, ex)
+            return default
     return response
 
 
