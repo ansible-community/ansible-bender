@@ -5,6 +5,7 @@ import datetime
 from enum import Enum
 
 from ansible_bender.constants import TIMESTAMP_FORMAT
+from ansible_bender.utils import graceful_get
 
 
 class ImageMetadata:
@@ -37,6 +38,16 @@ class ImageMetadata:
             "ports": self.ports,
             "volumes": self.volumes
         }
+
+    def update_from_configuration(self, data):
+        """ update current object with data provided from Ansible vars """
+        self.working_dir = data.get("working_dir", None)
+        self.labels.update(data.get("labels", {}))
+        self.env_vars.update(data.get("environment", {}))
+        self.cmd = data.get("cmd", None)
+        self.user = data.get("user", None)
+        self.ports += data.get("ports", [])
+        self.volumes += data.get("volumes", [])
 
     @classmethod
     def from_json(cls, j):
@@ -146,6 +157,18 @@ class Build:
             "ansible_extra_args": self.ansible_extra_args,
             "python_interpreter": self.python_interpreter,
         }
+
+    def update_from_configuration(self, data):
+        """ update current object with data provided from Ansible vars """
+        self.build_volumes += graceful_get(data, "working_container", "volumes", default=[])
+        self.base_image = graceful_get(data, "base_image")
+        self.target_image = graceful_get(data, "target_image", "name")
+        # self.builder_name = None
+        self.cache_tasks = graceful_get(data, "cache_tasks", default=self.cache_tasks)
+        self.layering = graceful_get(data, "layering", default=self.layering)
+        self.ansible_extra_args = graceful_get(data, "ansible_extra_args")
+        # we should probably get this from the official Ansible variable
+        # self.python_interpreter = None
 
     @classmethod
     def from_json(cls, j):

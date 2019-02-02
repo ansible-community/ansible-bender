@@ -1,3 +1,34 @@
+"""
+Module to interact with Ansible, perform ansible-pleybook and extract metadata from Ansible vars
+
+A sample configuration:
+
+- hosts: all
+  vars:
+    ansible_bender:
+
+      base_image: fedora:28
+
+      target_image:
+        name: asdqwe
+        # configure environment variables: same name as ansible
+        environment:
+          X: Y
+        labels:
+          key: value
+        # default working directory
+        working_dir: /path
+
+      working_container:
+        user: 12345  # TODO
+        volumes:
+        - { src: /path/to/my/code, dest: /src:Z }
+
+tasks:
+  ...
+
+"""
+
 import json
 import os
 import logging
@@ -161,67 +192,92 @@ class AnsibleRunner:
             shutil.rmtree(tmp)
 
 
-def expand_pb_vars(playbook_path):
-    """
-    populate vars from a playbook, defined in vars section
+class PbVarsParser:
+    def __init__(self, playbook_path):
+        """
+        :param playbook_path: str, path to playbook
+        """
+        self.playbook_path = playbook_path
+        self.build = Build()
+        self.metadata = ImageMetadata()
+        self.build.metadata = self.metadata
 
-    :param playbook_path: str, path to playbook
-    :return: dict
-    """
-    with open(playbook_path) as fd:
-        d = yaml.safe_load(fd)
+    def expand_pb_vars(self):
+        """
+        populate vars from a playbook, defined in vars section
 
-    try:
-        d = d[0]  # what about the other docs?
-    except IndexError:
-        raise RuntimeError("Invalid playbook, can't access the first document.")
+        :return: dict
+        """
+        with open(self.playbook_path) as fd:
+            d = yaml.safe_load(fd)
 
-    if "vars" not in d:
-        return {}
+        try:
+            # TODO: process all the plays
+            d = d[0]
+        except IndexError:
+            raise RuntimeError("Invalid playbook, can't access the first document.")
 
-    tmp = tempfile.mkdtemp(prefix="ab")
-    json_data_path = os.path.join(tmp, "j.json")
-    pb = {
-        "hosts": "localhost",
-        "vars": {
-            "ab_vars": d["vars"],
-        },
-        "gather_facts": False,
-        "tasks": [
-            {"debug": {"msg": "{{ ab_vars }}"}},
-            {
-                "copy": {
-                    "dest": json_data_path,
-                    "content": '{{ ab_vars }}'
+        if "vars" not in d:
+            return {}
+
+        tmp = tempfile.mkdtemp(prefix="ab")
+        json_data_path = os.path.join(tmp, "j.json")
+        # TODO: implement loading vars from a file (include_vars)
+        pb = {
+            "hosts": "localhost",
+            "vars": {
+                "ab_vars": d["vars"],
+            },
+            "gather_facts": False,
+            "tasks": [
+                {"debug": {"msg": "{{ ab_vars }}"}},
+                {
+                    "copy": {
+                        "dest": json_data_path,
+                        "content": '{{ ab_vars }}'
+                    }
                 }
-            }
-        ]
-    }
-    i_path = os.path.join(tmp, "i")
-    with open(i_path, "w") as fd:
-        fd.write("localhost ansible_connection=local")
+            ]
+        }
+        i_path = os.path.join(tmp, "i")
+        with open(i_path, "w") as fd:
+            fd.write("localhost ansible_connection=local")
 
-    tmp_pb_path = os.path.join(tmp, "p.yaml")
-    with open(tmp_pb_path, "w") as fd:
-        yaml.safe_dump([pb], fd)
+        tmp_pb_path = os.path.join(tmp, "p.yaml")
+        with open(tmp_pb_path, "w") as fd:
+            yaml.safe_dump([pb], fd)
 
-    try:
-        run_playbook(tmp_pb_path, i_path, None, connection="local", try_unshare=False)
+        try:
+            run_playbook(tmp_pb_path, i_path, None, connection="local", try_unshare=False)
 
-        with open(json_data_path) as fd:
-            return json.load(fd)
-    finally:
-        shutil.rmtree(tmp)
+            with open(json_data_path) as fd:
+                return json.load(fd)
+        finally:
+            shutil.rmtree(tmp)
 
+    def process_pb_vars(self, playbook_vars):
+        """
+        accept variables from the playbook and update the Build and ImageMetadata objects with them
 
-def get_build_and_metadata_from_pb(playbook_path):
-    """
-    extra vars from the selected playbook
+        :param playbook_vars: dict with all the playbook variables
+        :return:
+        """
+        try:
+            bender_data = playbook_vars["ansible_bender"]
+        except KeyError:
+            logger.info("no bender data found in the playbook")
+            return
+        self.metadata.update_from_configuration(bender_data.get("target_image", {}))
+        self.build.update_from_configuration(bender_data)
 
-    :return: Build(), ImageMetadata()
-    """
-    build, metadata = Build(), ImageMetadata()
+    def get_build_and_metadata(self):
+        """
+        extra vars from the selected playbook
 
-    data = expand_pb_vars(playbook_path)
+        :return: Build(), ImageMetadata()
+        """
+        data = self.expand_pb_vars()
 
-    return build, metadata
+        self.process_pb_vars(data)
+
+        return self.build, self.metadata

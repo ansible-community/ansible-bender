@@ -10,7 +10,7 @@ import yaml
 from tabulate import tabulate
 
 from ansible_bender.api import Application
-from ansible_bender.builders.base import ImageMetadata, Build, BuildState
+from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
 
@@ -218,7 +218,7 @@ class CLI:
         self.push_parser.set_defaults(subcommand="push")
 
     def _build(self):
-        build, metadata = get_build_and_metadata_from_pb(self.args.playbook_path)
+        build, metadata = PbVarsParser(self.args.playbook_path).get_build_and_metadata()
         if self.args.workdir:
             metadata.working_dir = self.args.workdir
         if self.args.labels:
