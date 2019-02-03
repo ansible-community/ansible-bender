@@ -10,7 +10,7 @@ build-ab-img: recipe.yml
 		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --full-trace -l -v $(TEST_TARGET)
+	eYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender --full-trace -l -v $(TEST_TARGET)
 
 shell:
 	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
