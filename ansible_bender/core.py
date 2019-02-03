@@ -28,7 +28,7 @@ tasks:
   ...
 
 """
-
+import datetime
 import json
 import os
 import logging
@@ -43,9 +43,9 @@ from ansible_bender.builders.base import Build, ImageMetadata
 
 import ansible_bender
 from ansible_bender import callback_plugins
+from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.exceptions import AbBuildUnsuccesful
-from ansible_bender.utils import run_cmd, ap_command_exists
-
+from ansible_bender.utils import run_cmd, ap_command_exists, random_str
 
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
@@ -247,12 +247,20 @@ class PbVarsParser:
         with open(tmp_pb_path, "w") as fd:
             yaml.safe_dump([pb], fd)
 
+        playbook_base = os.path.basename(self.playbook_path).split(".", 1)[0]
+        timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+        symlink_name = f".{playbook_base}-{timestamp}-{random_str()}.yaml"
+        playbook_dir = os.path.dirname(self.playbook_path)
+        symlink_path = os.path.join(playbook_dir, symlink_name)
+        os.symlink(tmp_pb_path, symlink_path)
+
         try:
-            run_playbook(tmp_pb_path, i_path, None, connection="local", try_unshare=False)
+            run_playbook(symlink_path, i_path, None, connection="local", try_unshare=False)
 
             with open(json_data_path) as fd:
                 return json.load(fd)
         finally:
+            os.unlink(symlink_path)
             shutil.rmtree(tmp)
 
     def process_pb_vars(self, playbook_vars):

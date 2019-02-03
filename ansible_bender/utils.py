@@ -3,7 +3,9 @@ Utility functions. This module can't depend on anything within ab.
 """
 import logging
 import os
+import random
 import shutil
+import string
 import subprocess
 import threading
 
@@ -221,3 +223,13 @@ def set_logging(
         logger.addHandler(handler)
 
     return logger
+
+
+def random_str(size=10):
+    """
+    create random string of selected size
+
+    :param size: int, length of the string
+    :return: the string
+    """
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
