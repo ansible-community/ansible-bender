@@ -17,11 +17,12 @@
       - git
       - containers-common
       - buildah
-      # - "https://kojipkgs.fedoraproject.org//packages/buildah/1.6/19.dev.giteebbba2.fc30/x86_64/buildah-1.6-19.dev.giteebbba2.fc30.x86_64.rpm"
       - podman
       - ansible
       - python3-pytest
+      - python3-pytest-cov
       - python3-flexmock
+      - python3-ipdb
   - name: Install latest twine for sake of check command
     pip:
       name:
