@@ -1,0 +1,18 @@
+- hosts: all
+  vars:
+    ansible_bender:
+      base_image: "docker.io/library/python:3-alpine"
+      target_image:
+        name: with-vars-files
+        labels:
+          x: y
+        environment:
+          key: '{{ e }}'
+          path: '{{ p }}'
+
+  vars_files:
+    - v_f.yaml
+
+  tasks:
+  - command: ls /tmp
+  - command: "ls {{ lookup('env', 'path') }}"

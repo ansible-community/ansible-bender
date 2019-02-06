@@ -228,6 +228,7 @@ class PbVarsParser:
             "vars": {
                 "ab_vars": d["vars"],
             },
+            "vars_files": d.get("vars_files", []),
             "gather_facts": False,
             "tasks": [
                 {"debug": {"msg": "{{ ab_vars }}"}},
