@@ -1,4 +1,4 @@
-import getpass
+import os
 
 from ansible_bender.builders.base import Build, ImageMetadata
 from ansible_bender.core import PbVarsParser
@@ -9,7 +9,13 @@ from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_p
 def test_expand_pb_vars():
     p = PbVarsParser(b_p_w_vars_path)
     data = p.expand_pb_vars()
-    assert data == {"key": "value", "key2": getpass.getuser()}
+    assert data["ansible_bender"]["base_image"] == "docker.io/library/python:3-alpine"
+    assert data["ansible_bender"]["ansible_extra_args"] == "-vvv"
+    playbook_dir = os.path.dirname(b_p_w_vars_path)
+    assert data["ansible_bender"]["working_container"]["volumes"] == [f"{playbook_dir}:/src"]
+    assert data["ansible_bender"]["target_image"]["name"] == "challet"
+    assert data["ansible_bender"]["target_image"]["labels"] == {"x": "y"}
+    assert data["ansible_bender"]["target_image"]["environment"] == {"asd": playbook_dir}
 
 
 def test_b_m_empty():
