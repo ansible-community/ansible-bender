@@ -4,7 +4,7 @@ Test Application class
 import os
 import shutil
 
-from ansible_bender.builders.base import Build
+from ansible_bender.conf import Build
 from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
                              dont_cache_playbook_path_pre)
 from ..spellbook import small_basic_playbook_path

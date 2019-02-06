@@ -43,7 +43,7 @@ import os
 import time
 from contextlib import contextmanager
 
-from ansible_bender.builders.base import Build
+from ansible_bender.conf import Build
 from ansible_bender.constants import TIMESTAMP_FORMAT
 
 DEFAULT_DATA = {

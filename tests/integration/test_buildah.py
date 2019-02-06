@@ -1,6 +1,6 @@
 import pytest
 
-from ansible_bender.builders.base import Build
+from ansible_bender.conf import Build
 from ansible_bender.builders.buildah_builder import BuildahBuilder
 
 

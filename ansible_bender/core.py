@@ -39,7 +39,7 @@ import shutil
 
 import yaml
 
-from ansible_bender.builders.base import Build, ImageMetadata
+from ansible_bender.conf import ImageMetadata, Build
 
 import ansible_bender
 from ansible_bender import callback_plugins

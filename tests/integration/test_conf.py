@@ -1,6 +1,6 @@
 import os
 
-from ansible_bender.builders.base import Build, ImageMetadata
+from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.core import PbVarsParser
 
 from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_path

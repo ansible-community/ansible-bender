@@ -2,7 +2,8 @@ import logging
 import subprocess
 
 from ansible_bender.api import Application
-from ansible_bender.builders.base import Build, ImageMetadata, BuildState
+from ansible_bender.builders.base import BuildState
+from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.builders.buildah_builder import buildah
 
 from .spellbook import random_word, basic_playbook_path, base_image, project_dir
