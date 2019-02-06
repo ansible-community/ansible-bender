@@ -39,7 +39,7 @@ def test_set_all_params():
     assert b.base_image == "mona_lisa"
     assert b.layering == "yes-please"
     assert b.cache_tasks == "never!"
-    assert b.ansible_extra_args == ["--some", "--args"]
+    assert b.ansible_extra_args == "--some --args"
     assert b.build_volumes == ["/c:/d"]
     assert b.target_image == "funky-mona-lisa"
 
