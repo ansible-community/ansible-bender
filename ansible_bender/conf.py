@@ -7,10 +7,105 @@ from ansible_bender.builders.base import BuildState
 from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.utils import graceful_get
 
+import jsonschema
+
+
+# thanks https://www.jsonschema.net/
+IMAGE_META_SCHENA = {
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "1",
+    "type": "object",
+    "title": "Image Metadata Schema",
+    "optional": [
+        "working_dir",
+        "labels",
+        "env_vars",
+        "cmd",
+        "user",
+        "ports",
+        "volumes"
+    ],
+    "properties": {
+        "working_dir": {
+            "$id": "#/properties/working_dir",
+            "type": ["string", "null"],
+            "title": "Path to a working directory within a container image",
+            "default": "",
+            "examples": [
+                "/workshop"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "labels": {
+            "$id": "#/properties/labels",
+            "type": "object",
+            "title": "Key/value data to apply to the final image",
+            "additionalProperties": {"type": "string"}
+        },
+        "env_vars": {
+            "$id": "#/properties/env_vars",
+            "type": "object",
+            "title": "Implicit environment variables to set in a container",
+            "additionalProperties": {"type": "string"}
+        },
+        "cmd": {
+            "$id": "#/properties/cmd",
+            "type": ["string", "null"],
+            "title": "A command to use to invoke the container",
+            "default": "",
+            "examples": [
+                "command -x -y z"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "user": {
+            "$id": "#/properties/user",
+            "type": ["string", "null"],
+            "title": "UID or username used to invoke the container",
+            "default": "",
+            "examples": [
+                "leonardo"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "ports": {
+            "$id": "#/properties/ports",
+            "type": "array",
+            "title": "The Ports Schema",
+            "items": {
+                "$id": "#/properties/volumes/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "80", "443"
+                ],
+                "pattern": "^(.*)$"
+            }
+        },
+        "volumes": {
+            "$id": "#/properties/volumes",
+            "type": "array",
+            "title": "The Volumes Schema",
+            "items": {
+                "$id": "#/properties/volumes/items",
+                "type": "string",
+                "title": "The Items Schema",
+                "default": "",
+                "examples": [
+                    "/path/to/a/directory"
+                ],
+                "pattern": "^(.*)$"
+            }
+        }
+    }
+}
+
 
 class ImageMetadata:
     """
-    working_dir: str, path to a working directory within container image
+    working_dir: str,
     labels: dict with labels
     env_vars: dict with env vars
     cmd: str, command to run by default in the container
@@ -61,6 +156,9 @@ class ImageMetadata:
         m.ports = j["ports"]
         m.volumes = j["volumes"]
         return m
+
+    def validate(self):
+        jsonschema.validate(self.to_dict(), IMAGE_META_SCHENA)
 
 
 class Layer:
