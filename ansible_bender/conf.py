@@ -5,102 +5,10 @@ import datetime
 
 from ansible_bender.builders.base import BuildState
 from ansible_bender.constants import TIMESTAMP_FORMAT
+from ansible_bender.schema import IMAGE_META_SCHENA, BUILD_SCHEMA
 from ansible_bender.utils import graceful_get
 
 import jsonschema
-
-
-# thanks https://www.jsonschema.net/
-IMAGE_META_SCHENA = {
-    "definitions": {},
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "1",
-    "type": "object",
-    "title": "Image Metadata Schema",
-    "optional": [
-        "working_dir",
-        "labels",
-        "env_vars",
-        "cmd",
-        "user",
-        "ports",
-        "volumes"
-    ],
-    "properties": {
-        "working_dir": {
-            "$id": "#/properties/working_dir",
-            "type": ["string", "null"],
-            "title": "Path to a working directory within a container image",
-            "default": "",
-            "examples": [
-                "/workshop"
-            ],
-            "pattern": "^(.*)$"
-        },
-        "labels": {
-            "$id": "#/properties/labels",
-            "type": "object",
-            "title": "Key/value data to apply to the final image",
-            "additionalProperties": {"type": "string"}
-        },
-        "env_vars": {
-            "$id": "#/properties/env_vars",
-            "type": "object",
-            "title": "Implicit environment variables to set in a container",
-            "additionalProperties": {"type": "string"}
-        },
-        "cmd": {
-            "$id": "#/properties/cmd",
-            "type": ["string", "null"],
-            "title": "A command to use to invoke the container",
-            "default": "",
-            "examples": [
-                "command -x -y z"
-            ],
-            "pattern": "^(.*)$"
-        },
-        "user": {
-            "$id": "#/properties/user",
-            "type": ["string", "null"],
-            "title": "UID or username used to invoke the container",
-            "default": "",
-            "examples": [
-                "leonardo"
-            ],
-            "pattern": "^(.*)$"
-        },
-        "ports": {
-            "$id": "#/properties/ports",
-            "type": "array",
-            "title": "The Ports Schema",
-            "items": {
-                "$id": "#/properties/volumes/items",
-                "type": "string",
-                "title": "The Items Schema",
-                "default": "",
-                "examples": [
-                    "80", "443"
-                ],
-                "pattern": "^(.*)$"
-            }
-        },
-        "volumes": {
-            "$id": "#/properties/volumes",
-            "type": "array",
-            "title": "The Volumes Schema",
-            "items": {
-                "$id": "#/properties/volumes/items",
-                "type": "string",
-                "title": "The Items Schema",
-                "default": "",
-                "examples": [
-                    "/path/to/a/directory"
-                ],
-                "pattern": "^(.*)$"
-            }
-        }
-    }
-}
 
 
 class ImageMetadata:
@@ -220,8 +128,8 @@ class Build:
         self.cache_tasks = True  # we cache by default, a user can opt out
         self.log_lines = []  # a list of strings
         self.layering = True
-        self.debug = None
-        self.verbose = None
+        self.debug = False
+        self.verbose = False
         self.pulled = False  # was the base image pulled?
         self.ansible_extra_args = None
         self.python_interpreter = None
@@ -345,3 +253,6 @@ class Build:
 
     def is_layering_on(self):
         return self.layering
+
+    def validate(self):
+        jsonschema.validate(self.to_dict(), BUILD_SCHEMA)

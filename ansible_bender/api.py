@@ -53,6 +53,9 @@ class Application:
         if not os.path.isfile(build.playbook_path):
             raise RuntimeError("No such file or directory: %s" % build.playbook_path)
 
+        build.validate()
+        build.metadata.validate()
+
         build.debug = self.debug
         build.verbose = self.verbose
 

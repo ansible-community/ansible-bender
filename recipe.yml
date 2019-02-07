@@ -23,6 +23,7 @@
       - python3-pytest-cov
       - python3-flexmock
       - python3-ipdb
+      - python3-jsonschema
   - name: Install latest twine for sake of check command
     pip:
       name:

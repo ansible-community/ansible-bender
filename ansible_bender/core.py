@@ -289,6 +289,4 @@ class PbVarsParser:
 
         self.process_pb_vars(data)
 
-        self.metadata.validate()
-
         return self.build, self.metadata
