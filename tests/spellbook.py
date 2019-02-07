@@ -15,7 +15,7 @@ set_logging(level=logging.DEBUG)
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(tests_dir)
-data_dir = os.path.join(tests_dir, "data")
+data_dir = os.path.abspath(os.path.join(tests_dir, "data"))
 buildah_inspect_data_path = os.path.join(data_dir, "buildah_inspect.json")
 basic_playbook_path = os.path.join(data_dir, "basic_playbook.yaml")
 b_p_w_vars_path = os.path.join(data_dir, "b_p_w_vars.yaml")

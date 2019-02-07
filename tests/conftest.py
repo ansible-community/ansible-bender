@@ -57,7 +57,7 @@ def ab(args, tmpdir_path, return_output=False, ignore_result=False):
     if ignore_result:
         return subprocess.call(cmd, cwd=project_dir)
     if return_output:
-        return subprocess.check_output(cmd, cwd=project_dir, universal_newlines=True)
+        return subprocess.check_output(cmd, cwd=project_dir, universal_newlines=True, stderr=subprocess.STDOUT)
     else:
         # don't use run_cmd here, it makes things complicated
         subprocess.check_call(cmd, cwd=project_dir)

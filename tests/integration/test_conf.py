@@ -1,5 +1,8 @@
 import os
 
+import jsonschema
+import pytest
+
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.core import PbVarsParser
 
@@ -61,3 +64,17 @@ def test_set_all_params():
     assert m.labels == {"x": "y"}
     assert m.cmd == "command -x -y z"
     assert m.user == "leonardo"
+
+
+def test_validation_err_ux():
+    """ Test that validation errors are useful """
+    p = PbVarsParser(basic_playbook_path)
+    b, m = p.get_build_and_metadata()
+
+    with pytest.raises(jsonschema.exceptions.ValidationError) as ex:
+        b.validate()
+
+    s = str(ex.value)
+
+    assert "is not of type" in s
+    assert "Failed validating 'type' in schema" in s

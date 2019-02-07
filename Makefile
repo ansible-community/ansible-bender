@@ -10,7 +10,7 @@ build-ab-img: recipe.yml
 		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
-	eYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender --full-trace -l -v $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v $(TEST_TARGET)
 
 shell:
 	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
@@ -62,10 +62,10 @@ check-in-docker:
 		$(BASE_IMAGE) \
 		bash -c " \
 			set -x \
-			&& dnf install -y ansible \
+			&& dnf install -y ansible make \
 			&& ansible-playbook -e test_mode=yes -c local ./recipe.yml \
 			&& id \
 			&& pwd \
 			&& podman info \
 			&& buildah info || : \
-			&& pytest-3 -vv . "
+			&& make check"
