@@ -58,6 +58,7 @@ check-smoke:
 # for CI
 check-in-docker:
 	docker run --rm --privileged -v $(CURDIR):/src -w /src \
+		-e ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
 		--tmpfs /tmp \
 		$(BASE_IMAGE) \
 		bash -c " \
