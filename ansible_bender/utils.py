@@ -31,7 +31,7 @@ def graceful_get(d, *keys, default=None):
         try:
             response = response[k]
         except (KeyError, AttributeError, TypeError) as ex:
-            logger.error("can't obtain %s: %s", k, ex)
+            logger.debug("can't obtain %s: %s", k, ex)
             return default
     return response
 
