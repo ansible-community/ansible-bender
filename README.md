@@ -93,6 +93,23 @@ be present on your host system:
     inside the base image, it doesn't matter — Ansible is able to utilize
     python 2 even if it's invoked with python 3 on the control machine.
 
+### Requirements (Ansible playbook)
+
+You need to set `hosts` to `all`:
+```yaml
+$ cat playbook.yaml
+---
+- name: Playbook to build my fancy image
+  hosts: all
+```
+
+Setting `hosts` to localhost will result running the playbook against localhost and not a container.
+
+## Configuration
+
+You can configure ansible-bender and set metadata on your final image, in order
+to do that, please check out [docs/configuration.md](docs/configuration.md).
+
 
 ## Usage
 

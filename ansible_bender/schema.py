@@ -111,7 +111,7 @@ BUILD_SCHEMA = {
         "target_image": {
             "$id": "#/properties/target_image",
             "type": "string",
-            "title": "Name of the which we build",
+            "title": "Name of the final image which we build",
             "examples": [
                 "my-funky-image"
             ],
@@ -258,7 +258,7 @@ IMAGE_META_SCHENA = {
         "cmd": {
             "$id": "#/properties/cmd",
             "type": ["string", "null"],
-            "title": "A command to use to invoke the container",
+            "title": "A default command to invoke the container",
             "default": "",
             "examples": [
                 "command -x -y z"
@@ -278,9 +278,9 @@ IMAGE_META_SCHENA = {
         "ports": {
             "$id": "#/properties/ports",
             "type": "array",
-            "title": "The Ports Schema",
+            "title": "A list of ports which are meant to be exposed on the host",
             "items": {
-                "$id": "#/properties/volumes/items",
+                "$id": "#/properties/ports/items",
                 "type": "string",
                 "title": "The Items Schema",
                 "default": "",
@@ -293,7 +293,7 @@ IMAGE_META_SCHENA = {
         "volumes": {
             "$id": "#/properties/volumes",
             "type": "array",
-            "title": "The Volumes Schema",
+            "title": "A list of paths which are meant to be hosted outside of the container",
             "items": {
                 "$id": "#/properties/volumes/items",
                 "type": "string",
