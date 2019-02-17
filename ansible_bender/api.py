@@ -93,6 +93,7 @@ class Application:
                                          set_finish_time=True)
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
+                # TODO: since this overwrites previous runs, we should likely add timestamp here
                 image_name = build.target_image + "-failed"
                 b.target_image = image_name
                 image_id = builder.commit(image_name)
