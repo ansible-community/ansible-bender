@@ -258,9 +258,12 @@ class PbVarsParser:
         symlink_path = os.path.join(playbook_dir, symlink_name)
         os.symlink(tmp_pb_path, symlink_path)
 
+        # yeah, ansible is not very smart for connection=local
+        args = ["-e", f"ansible_python_interpreter={sys.executable}"]
+
         try:
             run_playbook(symlink_path, i_path, None, connection="local", try_unshare=False,
-                         provide_output=False)
+                         provide_output=False, log_stderr=True, ansible_args=args)
 
             with open(json_data_path) as fd:
                 return json.load(fd)
