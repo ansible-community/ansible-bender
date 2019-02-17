@@ -34,6 +34,13 @@ def test_basic(tmpdir):
         assert ab_inspect_data["playbook_path"] == b_p_w_vars_path
         assert ab_inspect_data["pulled"] is False
         assert ab_inspect_data["target_image"] == "challet"
+
+        cmd = ["podman", "inspect", "--type", "image", "challet"]
+        inspect_data = json.loads(subprocess.check_output(cmd))[0]
+
+        assert inspect_data["Config"]["Labels"] == {"x": "y"}
+        assert f"asd={data_dir}" in inspect_data["Config"]["Env"]
+        assert inspect_data["Config"]["WorkingDir"] == "/src"
     finally:
         try:
             buildah("rmi", ["challet"])  # FIXME: use builder interface instead for sake of other backends
