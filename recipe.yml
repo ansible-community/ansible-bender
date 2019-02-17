@@ -1,6 +1,6 @@
 ---
 - name: Containerized ansible-bender
-  hosts: localhost
+  hosts: all
   vars:
     test_mode: no  # yes - test in CI, no - build an image
     project_dir: /src
