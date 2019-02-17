@@ -221,7 +221,8 @@ class CLI:
         self.push_parser.set_defaults(subcommand="push")
 
     def _build(self):
-        build, metadata = PbVarsParser(self.args.playbook_path).get_build_and_metadata()
+        pb_vars_p = PbVarsParser(self.args.playbook_path)
+        build, metadata = pb_vars_p.get_build_and_metadata()
         build.metadata = metadata
         if self.args.workdir:
             metadata.working_dir = self.args.workdir
