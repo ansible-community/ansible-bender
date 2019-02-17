@@ -10,7 +10,7 @@ import yaml
 from tabulate import tabulate
 
 from ansible_bender.api import Application
-from ansible_bender.builders.base import ImageMetadata, Build, BuildState
+from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
 
@@ -80,11 +80,13 @@ class CLI:
         )
         self.build_parser.add_argument(
             "base_image", metavar="BASE_IMAGE",
-            help="name of a container image to use as a base"
+            help="name of a container image to use as a base",
+            nargs="?"
         )
         self.build_parser.add_argument(
             "target_image", metavar="TARGET_IMAGE",
-            help="name of the built container image"
+            help="name of the built container image",
+            nargs="?"
         )
         self.build_parser.add_argument("--builder", help="pick preferred builder backend",
                                        default="buildah",
@@ -92,6 +94,7 @@ class CLI:
         self.build_parser.add_argument(
             "--no-cache",
             action="store_true",
+            default=None,
             help="disable caching mechanism: storing layers and loading them if a task is unchanged; "
                  "this option also implies the final image is composed of a base image and one additional layer"
         )
@@ -218,7 +221,9 @@ class CLI:
         self.push_parser.set_defaults(subcommand="push")
 
     def _build(self):
-        metadata = ImageMetadata()
+        pb_vars_p = PbVarsParser(self.args.playbook_path)
+        build, metadata = pb_vars_p.get_build_and_metadata()
+        build.metadata = metadata
         if self.args.workdir:
             metadata.working_dir = self.args.workdir
         if self.args.labels:
@@ -242,16 +247,21 @@ class CLI:
         if self.args.runtime_volumes:
             metadata.volumes = self.args.runtime_volumes
 
-        build = Build()  # we should have a helper for this
         build.playbook_path = self.args.playbook_path
-        build.build_volumes = self.args.build_volumes
-        build.metadata = metadata
-        build.base_image = self.args.base_image
-        build.target_image = self.args.target_image
-        build.builder_name = self.args.builder
-        build.cache_tasks = not self.args.no_cache
-        build.ansible_extra_args = self.args.extra_ansible_args
-        build.python_interpreter = self.args.python_interpreter
+        if self.args.build_volumes:
+            build.build_volumes = self.args.build_volumes
+        if self.args.base_image:
+            build.base_image = self.args.base_image
+        if self.args.target_image:
+            build.target_image = self.args.target_image
+        if self.args.builder:
+            build.builder_name = self.args.builder
+        if self.args.no_cache is not None:
+            build.cache_tasks = not self.args.no_cache
+        if self.args.extra_ansible_args:
+            build.ansible_extra_args = self.args.extra_ansible_args
+        if self.args.python_interpreter:
+            build.python_interpreter = self.args.python_interpreter
 
         self.app.build(build)
 

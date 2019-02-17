@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 
 from ansible.plugins.callback import CallbackBase
@@ -8,6 +9,7 @@ from ansible_bender.api import Application
 from ansible_bender.constants import NO_CACHE_TAG
 
 FILE_ACTIONS = ["file", "copy", "synchronize", "unarchive", "template"]
+logger = logging.getLogger("ansible_bender")
 
 
 class CallbackModule(CallbackBase):
@@ -63,6 +65,7 @@ class CallbackModule(CallbackBase):
     def get_task_content(serialized_data):
         assert serialized_data
         c = json.dumps(serialized_data, sort_keys=True).encode("utf-8")
+        logger.debug("content = %s", c)
         m = hashlib.sha512(c)
         return m.hexdigest()
 
@@ -95,6 +98,7 @@ class CallbackModule(CallbackBase):
         if not build.is_layering_on():
             return
         content = self.get_task_content(task.get_ds())
+        logger.debug("hash = %s", content)
         status = a.maybe_load_from_cache(content, build_id=build.build_id)
         if status:
             self._display.display("loaded from cache: '%s'" % status)

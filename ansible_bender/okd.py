@@ -4,7 +4,8 @@ import os
 import shutil
 import tempfile
 
-from ansible_bender.builders.base import Build, ImageMetadata, BuildState
+from ansible_bender.builders.base import BuildState
+from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.utils import env_get_or_fail_with, graceful_get, git_clone_to_path
 
 

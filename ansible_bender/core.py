@@ -1,20 +1,55 @@
-import os
+"""
+Module to interact with Ansible, perform ansible-pleybook and extract metadata from Ansible vars
+
+A sample configuration:
+
+- hosts: all
+  vars:
+    ansible_bender:
+
+      base_image: fedora:28
+
+      target_image:
+        name: asdqwe
+        # configure environment variables: same name as ansible
+        environment:
+          X: Y
+        labels:
+          key: value
+        # default working directory
+        working_dir: /path
+
+      working_container:
+        user: 12345  # TODO
+        volumes:
+        - { src: /path/to/my/code, dest: /src:Z }
+
+tasks:
+  ...
+
+"""
+import datetime
+import json
 import logging
+import os
 import shlex
-import subprocess
-import tempfile
 import shutil
+import subprocess
+import sys
+import tempfile
+
+import yaml
 
 import ansible_bender
 from ansible_bender import callback_plugins
+from ansible_bender.conf import ImageMetadata, Build
+from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.exceptions import AbBuildUnsuccesful
-from ansible_bender.utils import run_cmd, ap_command_exists
-
+from ansible_bender.utils import run_cmd, ap_command_exists, random_str
 
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
 [defaults]
-retry_files_enabled = False
 # when user is changed, ansible might not be able to write to /.ansible
 remote_tmp = /tmp
 callback_plugins={0}
@@ -23,7 +58,8 @@ callback_whitelist=snapshoter\n
 
 
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
-                 ansible_args=None, debug=False, environment=None):
+                 ansible_args=None, debug=False, environment=None, try_unshare=True,
+                 provide_output=True, log_stderr=False):
     """
     run selected ansible playbook and return output from ansible-playbook run
 
@@ -35,16 +71,20 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     :param ansible_args: list of str, extra arguments for a-p
     :param debug:
     :param environment:
+    :param try_unshare: bool, do `buildah unshare` if uid > 0
+    :param provide_output: bool, present output to user
+    :param log_stderr: bool, log errors coming from stderr to our logger
 
     :return: output
     """
     ap = ap_command_exists()
     cmd_args = [
         ap,
-        "-i", inventory_path,
         "-c", connection,
 
     ]
+    if inventory_path:
+        cmd_args += ["-i", inventory_path]
     if debug:
         cmd_args += ["-vvv"]
     if extra_variables:
@@ -59,24 +99,27 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     logger.debug("%s", " ".join(cmd_args))
 
     env = os.environ.copy()
+    env["ANSIBLE_RETRY_FILES_ENABLED"] = "0"
     if environment:
         env.update(environment)
-    env["ANSIBLE_CONFIG"] = a_cfg_path
+    if a_cfg_path:
+        env["ANSIBLE_CONFIG"] = a_cfg_path
 
-    if os.getuid() != 0:
+    if try_unshare and os.getuid() != 0:
         logger.info("we are running rootless, prepending `buildah unshare`")
         # rootless, we need to `buildah unshare` for sake of `buildah mount`
         # https://github.com/containers/buildah/issues/1271
         cmd_args = ["buildah", "unshare"] + cmd_args
 
-    # TODO: does ansible have an API?
+    # ansible has no official python API, the API they have is internal and said to break compat
     try:
         return run_cmd(
             cmd_args,
-            print_output=True,
+            print_output=provide_output,
             save_output_in_exc=True,
             env=env,
-            return_all_output=True,
+            return_all_output=provide_output,
+            log_stderr=log_stderr,
         )
     except subprocess.CalledProcessError as ex:
         raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex, ex.output)
@@ -108,8 +151,8 @@ class AnsibleRunner:
 
     def _get_path_our_site(self):
         """ return a path to a directory which contains ansible_bender installation """
-        # pip in Fedora installs to /usr/local which is on default pythonpath but when ansible invokes
-        # the callback plugin, that directory is not on sys.path: wat?
+        # pip in Fedora installs to /usr/local which is on default pythonpath
+        # but when ansible invokes the callback plugin, that directory is not on sys.path: wat?
         # hence, let's add the site ab is installed in to sys.path
         return os.path.dirname(os.path.dirname(ansible_bender.__file__))
 
@@ -150,3 +193,107 @@ class AnsibleRunner:
                                 debug=self.debug, environment=environment, ansible_args=extra_args)
         finally:
             shutil.rmtree(tmp)
+
+
+class PbVarsParser:
+    def __init__(self, playbook_path):
+        """
+        :param playbook_path: str, path to playbook
+        """
+        self.playbook_path = playbook_path
+        self.build = Build()
+        self.metadata = ImageMetadata()
+        self.build.metadata = self.metadata
+
+    def expand_pb_vars(self):
+        """
+        populate vars from a playbook, defined in vars section
+
+        :return: dict
+        """
+        with open(self.playbook_path) as fd:
+            d = yaml.safe_load(fd)
+
+        try:
+            # TODO: process all the plays
+            d = d[0]
+        except IndexError:
+            raise RuntimeError("Invalid playbook, can't access the first document.")
+
+        if "vars" not in d:
+            return {}
+
+        tmp = tempfile.mkdtemp(prefix="ab")
+        json_data_path = os.path.join(tmp, "j.json")
+        pb = {
+            "name": "Let Ansible expand variables",
+            "hosts": "localhost",
+            "vars": {
+                "ab_vars": d["vars"],
+            },
+            "vars_files": d.get("vars_files", []),
+            "gather_facts": False,
+            "tasks": [
+                {"debug": {"msg": "{{ ab_vars }}"}},
+                {
+                    "copy": {
+                        "dest": json_data_path,
+                        "content": '{{ ab_vars }}'
+                    }
+                }
+            ]
+        }
+        i_path = os.path.join(tmp, "i")
+        with open(i_path, "w") as fd:
+            fd.write("localhost ansible_connection=local")
+
+        tmp_pb_path = os.path.join(tmp, "p.yaml")
+        with open(tmp_pb_path, "w") as fd:
+            yaml.safe_dump([pb], fd)
+
+        playbook_base = os.path.basename(self.playbook_path).split(".", 1)[0]
+        timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+        symlink_name = f".{playbook_base}-{timestamp}-{random_str()}.yaml"
+        playbook_dir = os.path.dirname(self.playbook_path)
+        symlink_path = os.path.join(playbook_dir, symlink_name)
+        os.symlink(tmp_pb_path, symlink_path)
+
+        # yeah, ansible is not very smart for connection=local
+        args = ["-e", f"ansible_python_interpreter={sys.executable}"]
+
+        try:
+            run_playbook(symlink_path, i_path, None, connection="local", try_unshare=False,
+                         provide_output=False, log_stderr=True, ansible_args=args)
+
+            with open(json_data_path) as fd:
+                return json.load(fd)
+        finally:
+            os.unlink(symlink_path)
+            shutil.rmtree(tmp)
+
+    def process_pb_vars(self, playbook_vars):
+        """
+        accept variables from the playbook and update the Build and ImageMetadata objects with them
+
+        :param playbook_vars: dict with all the playbook variables
+        :return:
+        """
+        try:
+            bender_data = playbook_vars["ansible_bender"]
+        except KeyError:
+            logger.info("no bender data found in the playbook")
+            return
+        self.metadata.update_from_configuration(bender_data.get("target_image", {}))
+        self.build.update_from_configuration(bender_data)
+
+    def get_build_and_metadata(self):
+        """
+        extra vars from the selected playbook
+
+        :return: Build(), ImageMetadata()
+        """
+        data = self.expand_pb_vars()
+
+        self.process_pb_vars(data)
+
+        return self.build, self.metadata

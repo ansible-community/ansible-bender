@@ -1,12 +1,17 @@
+import logging
 import subprocess
 
 from ansible_bender.api import Application
-from ansible_bender.builders.base import Build, ImageMetadata, BuildState
+from ansible_bender.builders.base import BuildState
+from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.builders.buildah_builder import buildah
 
-from .spellbook import random_word, basic_playbook_path, base_image
+from .spellbook import random_word, basic_playbook_path, base_image, project_dir
 
 import pytest
+
+
+logger = logging.getLogger("ansible_bender")
 
 
 @pytest.fixture()
@@ -38,3 +43,21 @@ def build(target_image):
     build.state = BuildState.NEW
     build.builder_name = "buildah"  # test with all builders
     return build
+
+
+def ab(args, tmpdir_path, return_output=False, ignore_result=False):
+    """
+    python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
+
+    :return:
+    """
+    # put --debug in there for debugging
+    cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path] + args
+    logger.debug("cmd = %s", cmd)
+    if ignore_result:
+        return subprocess.call(cmd, cwd=project_dir)
+    if return_output:
+        return subprocess.check_output(cmd, cwd=project_dir, universal_newlines=True, stderr=subprocess.STDOUT)
+    else:
+        # don't use run_cmd here, it makes things complicated
+        subprocess.check_call(cmd, cwd=project_dir)

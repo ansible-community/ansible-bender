@@ -3,7 +3,9 @@ Utility functions. This module can't depend on anything within ab.
 """
 import logging
 import os
+import random
 import shutil
+import string
 import subprocess
 import threading
 
@@ -14,12 +16,14 @@ logger = logging.getLogger(__name__)
 out_logger = logging.getLogger(OUT_LOGGER)
 
 
-def graceful_get(d, *keys):
+def graceful_get(d, *keys, default=None):
     """
     recursively obtain value from nested dict
 
     :param d: dict
     :param keys:
+    :param default: a value to return by default
+
     :return: value or None
     """
     response = d
@@ -27,7 +31,8 @@ def graceful_get(d, *keys):
         try:
             response = response[k]
         except (KeyError, AttributeError, TypeError) as ex:
-            logger.error("can't obtain %s: %s", k, ex)
+            logger.debug("can't obtain %s: %s", k, ex)
+            return default
     return response
 
 
@@ -218,3 +223,13 @@ def set_logging(
         logger.addHandler(handler)
 
     return logger
+
+
+def random_str(size=10):
+    """
+    create random string of selected size
+
+    :param size: int, length of the string
+    :return: the string
+    """
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))

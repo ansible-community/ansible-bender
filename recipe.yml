@@ -1,27 +1,38 @@
 ---
 - name: Containerized ansible-bender
-  hosts: localhost
+  hosts: all
   vars:
     test_mode: no  # yes - test in CI, no - build an image
     project_dir: /src
+    ansible_bender:
+      target_image:
+        workging_dir: /src
+        cmd: /entry.sh
+      working_container:
+        volumes:
+        - "{{ playbook_dir }}:/src"
   tasks:
   - name: Install all packages needed to hack on ab.
     dnf:
       name:
+      - git
+      - make
       - python3-pip
       - python3-setuptools
-      - git
       - python3-setuptools_scm
       - python3-setuptools_scm_git_archive
       - python3-wheel  # for bdist_wheel
-      - git
       - containers-common
       - buildah
-      # - "https://kojipkgs.fedoraproject.org//packages/buildah/1.6/19.dev.giteebbba2.fc30/x86_64/buildah-1.6-19.dev.giteebbba2.fc30.x86_64.rpm"
       - podman
       - ansible
       - python3-pytest
+      - python3-pytest-cov
       - python3-flexmock
+      - python3-ipdb
+      - python3-jsonschema
+      - docker  # one test uses it
+      state: present
   - name: Install latest twine for sake of check command
     pip:
       name:

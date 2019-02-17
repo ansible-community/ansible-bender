@@ -3,14 +3,23 @@ BASE_IMAGE := registry.fedoraproject.org/fedora:29
 PY_PACKAGE := ansible-bender
 # container image with ab inside
 CONT_IMG := $(PY_PACKAGE)
+ANSIBLE_BENDER := python3 -m ansible_bender.cli
 
 build-ab-img: recipe.yml
-	sudo ansible-bender build --build-volumes $(CURDIR):/src:Z \
-		--cmd 'bash /entry.sh' \
-		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
+	$(ANSIBLE_BENDER) build -- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
-	sudo PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes bash -c 'cd $(CURDIR) && pytest-3 --full-trace -l -v $(TEST_TARGET)'
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v $(TEST_TARGET)
+
+check-in-container:
+	podman run -ti --rm \
+		--tmpfs /tmp:rw,noexec,nosuid,nodev,size=1000000k \
+		--privileged \
+		-v $(CURDIR):/src \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-w /src \
+		$(CONT_IMG) \
+		make check TEST_TARGET='$(TEST_TARGET)'
 
 shell:
 	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
@@ -58,14 +67,15 @@ check-smoke:
 # for CI
 check-in-docker:
 	docker run --rm --privileged -v $(CURDIR):/src -w /src \
+		-v /var/run/docker.sock:/var/run/docker.sock \
 		--tmpfs /tmp \
 		$(BASE_IMAGE) \
 		bash -c " \
 			set -x \
-			&& dnf install -y ansible \
-			&& ansible-playbook -e test_mode=yes -c local ./recipe.yml \
+			&& dnf install -y ansible make \
+			&& ansible-playbook -i 'localhost,' -e ansible_python_interpreter=/usr/bin/python3 -e test_mode=yes -c local ./recipe.yml \
 			&& id \
 			&& pwd \
 			&& podman info \
 			&& buildah info || : \
-			&& pytest-3 -vv . "
+			&& make check"

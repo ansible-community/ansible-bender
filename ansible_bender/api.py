@@ -53,6 +53,9 @@ class Application:
         if not os.path.isfile(build.playbook_path):
             raise RuntimeError("No such file or directory: %s" % build.playbook_path)
 
+        build.validate()
+        build.metadata.validate()
+
         build.debug = self.debug
         build.verbose = self.verbose
 
@@ -90,6 +93,7 @@ class Application:
                                          set_finish_time=True)
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
+                # TODO: since this overwrites previous runs, we should likely add timestamp here
                 image_name = build.target_image + "-failed"
                 b.target_image = image_name
                 image_id = builder.commit(image_name)
