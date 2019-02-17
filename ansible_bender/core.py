@@ -50,7 +50,6 @@ from ansible_bender.utils import run_cmd, ap_command_exists, random_str
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
 [defaults]
-retry_files_enabled = False
 # when user is changed, ansible might not be able to write to /.ansible
 remote_tmp = /tmp
 callback_plugins={0}
@@ -100,6 +99,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     logger.debug("%s", " ".join(cmd_args))
 
     env = os.environ.copy()
+    env["ANSIBLE_RETRY_FILES_ENABLED"] = "0"
     if environment:
         env.update(environment)
     if a_cfg_path:
