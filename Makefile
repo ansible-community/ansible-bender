@@ -3,11 +3,10 @@ BASE_IMAGE := registry.fedoraproject.org/fedora:29
 PY_PACKAGE := ansible-bender
 # container image with ab inside
 CONT_IMG := $(PY_PACKAGE)
+ANSIBLE_BENDER := python3 -m ansible_bender.cli
 
 build-ab-img: recipe.yml
-	sudo ansible-bender build --build-volumes $(CURDIR):/src:Z \
-		--cmd 'bash /entry.sh' \
-		-- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
+	$(ANSIBLE_BENDER) build -- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
 	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v $(TEST_TARGET)

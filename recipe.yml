@@ -4,6 +4,13 @@
   vars:
     test_mode: no  # yes - test in CI, no - build an image
     project_dir: /src
+    ansible_bender:
+      target_image:
+        workging_dir: /src
+        cmd: /entry.sh
+      working_container:
+        volumes:
+        - "{{ playbook_dir }}:/src"
   tasks:
   - name: Install all packages needed to hack on ab.
     dnf:
