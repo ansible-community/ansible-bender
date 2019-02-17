@@ -67,12 +67,13 @@ check-smoke:
 # for CI
 check-in-docker:
 	docker run --rm --privileged -v $(CURDIR):/src -w /src \
+		-v /var/run/docker.sock:/var/run/docker.sock \
 		--tmpfs /tmp \
 		$(BASE_IMAGE) \
 		bash -c " \
 			set -x \
 			&& dnf install -y ansible make \
-			&& ansible-playbook -i 'localhost,' -e test_mode=yes -c local ./recipe.yml \
+			&& ansible-playbook -i 'localhost,' -e ansible_python_interpreter=/usr/bin/python3 -e test_mode=yes -c local ./recipe.yml \
 			&& id \
 			&& pwd \
 			&& podman info \

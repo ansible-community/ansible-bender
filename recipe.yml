@@ -31,6 +31,7 @@
       - python3-flexmock
       - python3-ipdb
       - python3-jsonschema
+      - docker  # one test uses it
       state: present
   - name: Install latest twine for sake of check command
     pip:
