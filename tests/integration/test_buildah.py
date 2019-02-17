@@ -5,7 +5,7 @@ from ansible_bender.builders.buildah_builder import BuildahBuilder
 
 
 @pytest.mark.parametrize("image_name,found", [
-    ("registry.fedoraproject.org/fedora:28", True),
+    ("registry.fedoraproject.org/fedora:29", True),
     ("docker.io/library/python:3-alpine", True),
     ("docker.io/library/busybox", False),
     ])
