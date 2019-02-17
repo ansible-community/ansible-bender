@@ -15,13 +15,13 @@
   - name: Install all packages needed to hack on ab.
     dnf:
       name:
+      - git
+      - make
       - python3-pip
       - python3-setuptools
-      - git
       - python3-setuptools_scm
       - python3-setuptools_scm_git_archive
       - python3-wheel  # for bdist_wheel
-      - git
       - containers-common
       - buildah
       - podman
@@ -31,6 +31,7 @@
       - python3-flexmock
       - python3-ipdb
       - python3-jsonschema
+      state: present
   - name: Install latest twine for sake of check command
     pip:
       name:

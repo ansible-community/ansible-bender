@@ -11,6 +11,16 @@ build-ab-img: recipe.yml
 check:
 	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v $(TEST_TARGET)
 
+check-in-container:
+	podman run -ti --rm \
+		--tmpfs /tmp:rw,noexec,nosuid,nodev,size=1000000k \
+		--privileged \
+		-v $(CURDIR):/src \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-w /src \
+		$(CONT_IMG) \
+		make check TEST_TARGET='$(TEST_TARGET)'
+
 shell:
 	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
 
@@ -57,7 +67,6 @@ check-smoke:
 # for CI
 check-in-docker:
 	docker run --rm --privileged -v $(CURDIR):/src -w /src \
-		-e ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
 		--tmpfs /tmp \
 		$(BASE_IMAGE) \
 		bash -c " \
