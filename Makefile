@@ -72,7 +72,7 @@ check-in-docker:
 		bash -c " \
 			set -x \
 			&& dnf install -y ansible make \
-			&& ansible-playbook -e test_mode=yes -c local ./recipe.yml \
+			&& ansible-playbook -i 'localhost,' -e test_mode=yes -c local ./recipe.yml \
 			&& id \
 			&& pwd \
 			&& podman info \
