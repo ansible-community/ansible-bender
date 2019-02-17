@@ -30,19 +30,19 @@ tasks:
 """
 import datetime
 import json
-import os
 import logging
+import os
 import shlex
-import subprocess
-import tempfile
 import shutil
+import subprocess
+import sys
+import tempfile
 
 import yaml
 
-from ansible_bender.conf import ImageMetadata, Build
-
 import ansible_bender
 from ansible_bender import callback_plugins
+from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.exceptions import AbBuildUnsuccesful
 from ansible_bender.utils import run_cmd, ap_command_exists, random_str
@@ -59,7 +59,8 @@ callback_whitelist=snapshoter\n
 
 
 def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_variables=None,
-                 ansible_args=None, debug=False, environment=None, try_unshare=True, provide_output=True):
+                 ansible_args=None, debug=False, environment=None, try_unshare=True,
+                 provide_output=True, log_stderr=False):
     """
     run selected ansible playbook and return output from ansible-playbook run
 
@@ -73,6 +74,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     :param environment:
     :param try_unshare: bool, do `buildah unshare` if uid > 0
     :param provide_output: bool, present output to user
+    :param log_stderr: bool, log errors coming from stderr to our logger
 
     :return: output
     """
@@ -109,7 +111,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
         # https://github.com/containers/buildah/issues/1271
         cmd_args = ["buildah", "unshare"] + cmd_args
 
-    # TODO: does ansible have an API?
+    # ansible has no official python API, the API they have is internal and said to break compat
     try:
         return run_cmd(
             cmd_args,
@@ -117,6 +119,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
             save_output_in_exc=True,
             env=env,
             return_all_output=provide_output,
+            log_stderr=log_stderr,
         )
     except subprocess.CalledProcessError as ex:
         raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex, ex.output)
@@ -148,8 +151,8 @@ class AnsibleRunner:
 
     def _get_path_our_site(self):
         """ return a path to a directory which contains ansible_bender installation """
-        # pip in Fedora installs to /usr/local which is on default pythonpath but when ansible invokes
-        # the callback plugin, that directory is not on sys.path: wat?
+        # pip in Fedora installs to /usr/local which is on default pythonpath
+        # but when ansible invokes the callback plugin, that directory is not on sys.path: wat?
         # hence, let's add the site ab is installed in to sys.path
         return os.path.dirname(os.path.dirname(ansible_bender.__file__))
 
@@ -222,8 +225,8 @@ class PbVarsParser:
 
         tmp = tempfile.mkdtemp(prefix="ab")
         json_data_path = os.path.join(tmp, "j.json")
-        # TODO: implement loading vars from a file (include_vars)
         pb = {
+            "name": "Let Ansible expand variables",
             "hosts": "localhost",
             "vars": {
                 "ab_vars": d["vars"],
@@ -256,7 +259,8 @@ class PbVarsParser:
         os.symlink(tmp_pb_path, symlink_path)
 
         try:
-            run_playbook(symlink_path, i_path, None, connection="local", try_unshare=False)
+            run_playbook(symlink_path, i_path, None, connection="local", try_unshare=False,
+                         provide_output=False)
 
             with open(json_data_path) as fd:
                 return json.load(fd)
