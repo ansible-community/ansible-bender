@@ -38,11 +38,11 @@ BUILD_SCHEMA = {
     "properties": {
         "build_id": {
             "$id": "#/properties/build_id",
-            "type": ["null", "integer"],
+            "type": ["null", "string"],
             "title": "Unique build identifier",
             "default": None,
             "examples": [
-                1, 42, None
+                "1", "42", None
             ]
         },
         "playbook_path": {
