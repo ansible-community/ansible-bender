@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+  - name: print all remote env vars
+    debug:
+      msg: '{{ ansible_env }}'

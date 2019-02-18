@@ -12,6 +12,8 @@ from ansible_bender.db import Database
 from ansible_bender.exceptions import AbBuildUnsuccesful
 from ansible_bender.utils import set_logging
 
+
+logger = logging.getLogger(__name__)
 out_logger = logging.getLogger(OUT_LOGGER)
 
 
@@ -213,6 +215,10 @@ class Application:
             # skipped task, it was cached
             if content:
                 layer_id = self.get_layer(content, base_image_id)
+                builder = self.get_builder(build)
+                if not builder.is_image_present(layer_id):
+                    logger.info("layer %s for content %s does not exist", layer_id, content)
+                    layer_id = None
             if not layer_id:
                 return None, None
             was_cached = True

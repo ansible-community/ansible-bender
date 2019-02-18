@@ -4,12 +4,15 @@ Test Application class
 import os
 import shutil
 
-from ansible_bender.conf import Build
-from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
-                             dont_cache_playbook_path_pre)
-from ..spellbook import small_basic_playbook_path
-
 import yaml
+from flexmock import flexmock
+
+from ansible_bender.api import Application
+from ansible_bender.conf import Build
+from ansible_bender.utils import random_str, run_cmd
+from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
+                             dont_cache_playbook_path_pre, non_ex_pb)
+from ..spellbook import small_basic_playbook_path
 
 
 def test_build_db_metadata(target_image, application, build):
@@ -162,3 +165,67 @@ def test_file_caching_mechanism(tmpdir, target_image, application, build):
     builder = application.get_builder(second_build)
     out = builder.run(second_build.target_image, ["cat", "/fun"])
     assert out == fun_content
+
+
+def test_caching_non_ex_image(tmpdir, application, build):
+    """
+    scenario: we perform a build, we remove an image from cache, we perform the build again, ab should recover
+    """
+    t = str(tmpdir)
+    non_ex_pb_basename = os.path.basename(non_ex_pb)
+    p = os.path.join(t, non_ex_pb_basename)
+
+    shutil.copy(non_ex_pb, p)
+
+    with open(p) as fd:
+        d = yaml.safe_load(fd)
+        d[0]["tasks"][0]["debug"]["msg"] = f"Hello {random_str()}"
+    with open(p, "w") as fd:
+        yaml.safe_dump(d, fd)
+
+    image_name = random_str(5)
+    build.playbook_path = p
+    build.target_image = image_name
+    application.build(build)
+    build = application.db.get_build(build.build_id)
+
+    # for debugging
+    layers = build.layers
+    final_layer_id = build.final_layer_id
+    import subprocess
+    subprocess.call(["podman", "images", "--all"])
+    subprocess.call(["podman", "inspect", build.target_image])
+
+    # FIXME: this command fails in CI, which is super weird
+    run_cmd(["buildah", "rmi", build.target_image], ignore_status=True, print_output=True)
+    run_cmd(["buildah", "rmi", build.final_layer_id], ignore_status=True, print_output=True)
+    # now remove all images from the cache
+    layers = build.layers[1:]
+    layers.reverse()
+
+    for l in layers:
+        if l.base_image_id:
+            run_cmd(["buildah", "rmi", l.layer_id], ignore_status=True, print_output=True)
+
+    second_build = Build.from_json(build.to_dict())
+    second_build.build_id = "33"
+    application.build(second_build)
+    run_cmd(["buildah", "rmi", build.target_image], ignore_status=True, print_output=True)
+
+
+def test_caching_non_ex_image_w_mocking(tmpdir, build):
+    """
+    scenario: we perform a build, we remove an image from cache, we perform the build again, ab should recover
+    """
+    build.playbook_path = non_ex_pb
+    flexmock(Application, get_layer=lambda a, b, c: "i-certainly-dont-exist")
+
+    database_path = str(tmpdir)
+    application = Application(db_path=database_path)
+    try:
+        application.build(build)
+
+        build = application.db.get_build(build.build_id)
+        assert not build.layers[-1].cached
+    finally:
+        application.clean()
