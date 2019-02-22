@@ -211,6 +211,8 @@ class BuildahBuilder(Builder):
         """
         :return: True when the selected image is present, False otherwise
         """
+        if not image_reference:
+            return False
         try:
             does_image_exist(image_reference)
         except subprocess.CalledProcessError:
