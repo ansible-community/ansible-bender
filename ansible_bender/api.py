@@ -114,7 +114,7 @@ class Application:
             else:
                 self.db.record_build(b)
 
-            out_logger.info("Image '%s' was built successfully \o/",  build.target_image)
+            out_logger.info("Image '%s' was built successfully \\o/",  build.target_image)
         finally:
             builder.clean()
 
