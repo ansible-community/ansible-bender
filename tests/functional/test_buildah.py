@@ -174,7 +174,8 @@ def test_buildah_err_output(tmpdir, capfd):
     cmd = ["build", basic_playbook_path, base_image, "vrerv\\23&^&4//5B/F/BSFD/B"]
     ab(cmd, str(tmpdir), ignore_result=True)
     c = capfd.readouterr()
-    assert "error parsing target image name" in c.err
+    assert "There was an error during execution" in c.err
+    assert "buildah" in c.err
 
 
 @pytest.mark.skipif(
