@@ -73,6 +73,16 @@ Command | Description
 $ pip3 install ansible-bender
 ```
 
+If you are brave enough, please install bender directly from git master:
+```
+$ pip3 install git+https://github.com/TomasTomecek/ansible-bender
+```
+
+If `pip3` command is not available on your system, you can run pip like this:
+```
+$ python3 -m pip install ...
+```
+
 
 ### Requirements (host)
 
