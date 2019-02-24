@@ -45,7 +45,7 @@ def build(target_image):
     return build
 
 
-def ab(args, tmpdir_path, return_output=False, ignore_result=False):
+def ab(args, tmpdir_path, return_output=False, ignore_result=False, env=None):
     """
     python3 -m ab.cli -v build ./playbook.yaml registry.fedoraproject.org/fedora:28 asdqwe-image
 
@@ -55,9 +55,10 @@ def ab(args, tmpdir_path, return_output=False, ignore_result=False):
     cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path] + args
     logger.debug("cmd = %s", cmd)
     if ignore_result:
-        return subprocess.call(cmd, cwd=project_dir)
+        return subprocess.call(cmd, cwd=project_dir, env=env)
     if return_output:
-        return subprocess.check_output(cmd, cwd=project_dir, universal_newlines=True, stderr=subprocess.STDOUT)
+        return subprocess.check_output(
+            cmd, cwd=project_dir, universal_newlines=True, stderr=subprocess.STDOUT, env=env)
     else:
         # don't use run_cmd here, it makes things complicated
-        subprocess.check_call(cmd, cwd=project_dir)
+        subprocess.check_call(cmd, cwd=project_dir, env=env)
