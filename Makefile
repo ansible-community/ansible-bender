@@ -13,7 +13,7 @@ check:
 
 check-in-container:
 	podman run -ti --rm \
-		--tmpfs /tmp:rw,nosuid,exec,nodev,size=1000000k \
+		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		--privileged \
 		-v $(CURDIR):/src \
 		-v /var/run/docker.sock:/var/run/docker.sock \
@@ -68,7 +68,7 @@ check-smoke:
 check-in-docker:
 	docker run --rm --privileged -v $(CURDIR):/src -w /src \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		--tmpfs /tmp:rw,exec,nosuid,nodev,size=256000k \
+		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		$(BASE_IMAGE) \
 		bash -c " \
 			set -x \
@@ -84,6 +84,6 @@ check-in-docker:
 check-in-docker-easy:
 	docker run -ti --rm --privileged -v $(CURDIR):/src -w /src \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		--tmpfs /tmp:rw,exec,nosuid,nodev,size=256000k \
+		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		$(CONT_IMG) \
 		make check TEST_TARGET='$(TEST_TARGET)'
