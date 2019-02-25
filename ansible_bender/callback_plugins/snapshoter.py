@@ -2,9 +2,12 @@ import hashlib
 import json
 import logging
 import os
+import traceback
 
 from ansible.plugins.callback import CallbackBase
 from ansible.executor.task_result import TaskResult
+from ansible_bender.builders.base import BuildState
+
 from ansible_bender.api import Application
 from ansible_bender.constants import NO_CACHE_TAG
 
@@ -38,6 +41,8 @@ class CallbackModule(CallbackBase):
         if task_result.is_failed() or task_result._result.get("rc", 0) > 0:
             return
         a, build = self._get_app_and_build()
+        if build.is_failed():
+            return
         if "stop-layering" in getattr(task_result._task, "tags", []):
             build.stop_layering()
             a.db.record_build(build)
@@ -79,6 +84,10 @@ class CallbackModule(CallbackBase):
             # we ignore setup
             return
         a, build = self._get_app_and_build()
+        if build.is_failed():
+            # build failed, skip the task
+            task.when = "0"  # skip
+            return
         if "stop-layering" in getattr(task, "tags", []):
             build.stop_layering()
             a.db.record_build(build)
@@ -104,8 +113,17 @@ class CallbackModule(CallbackBase):
             self._display.display("loaded from cache: '%s'" % status)
             task.when = "0"  # skip
 
+    def abort_build(self):
+        logger.debug("%s", traceback.format_exc())
+        a, build = self._get_app_and_build()
+        a.db.record_build(build, build_state=BuildState.FAILED)
+
     def v2_playbook_on_task_start(self, task, is_conditional):
-        return self._maybe_load_from_cache(task)
+        try:
+            return self._maybe_load_from_cache(task)
+        except Exception as ex:
+            logger.error("error while running the build: %s", ex)
+            self.abort_build()
 
     def v2_on_any(self, *args, **kwargs):
         try:
@@ -113,4 +131,8 @@ class CallbackModule(CallbackBase):
         except IndexError:
             return
         if isinstance(first_arg, TaskResult):
-            return self._snapshot(first_arg)
+            try:
+                return self._snapshot(first_arg)
+            except Exception as ex:
+                logger.error("error while running the build: %s", ex)
+                self.abort_build()

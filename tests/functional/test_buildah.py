@@ -193,3 +193,65 @@ def test_push_to_dockerd(target_image, tmpdir):
     finally:
         subprocess.check_call(["docker", "rmi", target])
 
+
+# first buildah run command is setup, that should pass
+# the second run command is our task, that one should fail
+MAGIKO = """\
+#!/bin/bash
+set -x
+echo $@ >>{tmpdir}/commands-executed
+if [ "$1" == "run" ]; then
+  if [ -f {tmpdir}/run-count ]; then
+    run_count=$(cat {tmpdir}/run-count)
+    echo $(( ++run_count )) >{tmpdir}/run-count
+  else
+    echo 1 >>{tmpdir}/run-count 
+  fi
+  run_count=$(cat {tmpdir}/run-count)
+  if [ $run_count -ge 2 ]; then
+    exit 42
+  fi
+fi
+exec /usr/bin/buildah "$@"
+"""
+
+
+def test_tback_in_callback(tmpdir):
+    # this code may look really crazy: we test a real-world scenario here
+    # it may happen that something goes wrong while the callback plugin is running
+    # in such case, the build should be aborted
+    # that's exactly what we do here: we simulate buildah failure
+    im = "registry.example.com/ab-will-fail-" + random_word(12) + ":oldest"
+    new_path = f"{tmpdir}:" + os.environ["PATH"]
+    new_buildah_path = os.path.join(str(tmpdir), "buildah")
+    with open(new_buildah_path, "w") as fd:
+        fd.write(MAGIKO.format(tmpdir=str(tmpdir)))
+    os.chmod(new_buildah_path, 0o755)
+
+    # make sure our new buildah gets called
+    good_env = os.environ
+    new_env = os.environ.copy()
+    new_env["PATH"] = new_path
+    new_env["ANSIBLE_STDOUT_CALLBACK"] = "debug"
+    os.environ = new_env
+    # assert subprocess.call(["env", f"PATH={new_path}", "buildah", "run"]) == 42
+
+    try:
+        cmd = ["--debug", "build", "--extra-ansible-args=-vvvvvv", basic_playbook_path, base_image, im]
+        with pytest.raises(subprocess.CalledProcessError):
+            ab(cmd, str(tmpdir), env=new_env)
+
+        im += "-failed"
+        try:
+            cmd = ["inspect", "--json"]
+            ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
+            assert ab_inspect_data["state"] == "failed"
+            assert ab_inspect_data["target_image"] == im
+            assert len(ab_inspect_data["layers"]) == 2
+            with pytest.raises(subprocess.CalledProcessError) as ex:
+                podman_run_cmd(im, ["ls", "/fun"], return_output=True)
+            assert "No such file or directory" in ex.value.output
+        finally:
+            subprocess.call(["buildah", "rmi", im])
+    finally:
+        os.environ = good_env

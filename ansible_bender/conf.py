@@ -256,3 +256,6 @@ class Build:
 
     def validate(self):
         jsonschema.validate(self.to_dict(), BUILD_SCHEMA)
+
+    def is_failed(self):
+        return self.state == BuildState.FAILED

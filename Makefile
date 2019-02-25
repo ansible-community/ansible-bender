@@ -13,7 +13,7 @@ check:
 
 check-in-container:
 	podman run -ti --rm \
-		--tmpfs /tmp:rw,noexec,nosuid,nodev,size=1000000k \
+		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		--privileged \
 		-v $(CURDIR):/src \
 		-v /var/run/docker.sock:/var/run/docker.sock \
@@ -22,10 +22,10 @@ check-in-container:
 		make check TEST_TARGET='$(TEST_TARGET)'
 
 shell:
-	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash
 
 push-image-to-dockerd:
-	sudo ansible-bender push docker-daemon:ansible-bender:latest
+	podman push $(CONT_IMG) docker-daemon:ansible-bender:latest
 
 run-in-okd:
 	ansible-playbook -vv ./contrib/run-in-okd.yml
@@ -40,7 +40,7 @@ check-in-okd:
 	oc logs -f pod/ab
 
 check-pypi-packaging:
-	sudo podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\
+	podman run --rm -ti -v $(CURDIR):/src:Z -w /src $(CONT_IMG) bash -c '\
 		set -x \
 		&& rm -f dist/* \
 		&& python3 ./setup.py sdist bdist_wheel \
@@ -58,7 +58,7 @@ check-pypi-packaging:
 #       run tests as an unpriv user
 # TODO: podman inside needs to use vfs storage driver
 check-smoke:
-	sudo podman run --net=host --rm -ti -v $(CURDIR):/src:Z -w /src registry.fedoraproject.org/fedora:29 bash -c '\
+	podman run --net=host --rm -ti -v $(CURDIR):/src:Z -w /src registry.fedoraproject.org/fedora:29 bash -c '\
 		dnf install -y buildah podman \
 		&& podman pull docker.io/library/python:3-alpine \
 		&& pip3 install . \
@@ -68,7 +68,7 @@ check-smoke:
 check-in-docker:
 	docker run --rm --privileged -v $(CURDIR):/src -w /src \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		--tmpfs /tmp \
+		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		$(BASE_IMAGE) \
 		bash -c " \
 			set -x \
@@ -79,3 +79,11 @@ check-in-docker:
 			&& podman info \
 			&& buildah info || : \
 			&& make check"
+
+# we need exec since we create arbitrary buildah binary
+check-in-docker-easy:
+	docker run -ti --rm --privileged -v $(CURDIR):/src -w /src \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
+		$(CONT_IMG) \
+		make check TEST_TARGET='$(TEST_TARGET)'
