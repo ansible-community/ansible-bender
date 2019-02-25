@@ -1,0 +1,10 @@
+- hosts: all
+  tasks:
+  - name: Run a sample command
+    command: 'ls -lha /'
+- hosts: localhost
+  tasks:
+  - name: create a file
+    copy:
+      content: "killer"
+      dest: /queen
