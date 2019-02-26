@@ -23,8 +23,8 @@ def test_build_db_metadata(target_image, application, build):
     assert build.build_finished_time is not None
     assert build.build_start_time is not None
     assert build.log_lines is not None
-    logs = "\n".join(build.log_lines)
-    assert "PLAY [all]" in logs
+    logs = "\n".join([l for l in build.log_lines if l])
+    assert logs.startswith("PLAY [registry")
     assert "TASK [Gathering Facts]" in logs
     assert "failed=0" in logs
 

@@ -135,13 +135,15 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
 
 
 def test_build_failure(tmpdir):
-    target_image = "registry.example.com/ab-test-" + random_word(12) + ":oldest"
+    target_image_name = "registry.example.com/ab-test-" + random_word(12)
+    target_image_tag = "oldest"
+    target_image = f"{target_image_name}:{target_image_tag}"
     target_failed_image = target_image + "-failed"
     cmd = ["build", bad_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError):
         ab(cmd, str(tmpdir))
-    out = ab(["get-logs"], str(tmpdir), return_output=True)
-    assert "PLAY [all]" in out
+    out = ab(["get-logs"], str(tmpdir), return_output=True).lstrip()
+    assert out.startswith("PLAY [registry")
 
     p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_failed_image]))[0]
     image_id = p_inspect_data["Id"]
