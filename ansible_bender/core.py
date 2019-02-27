@@ -109,7 +109,8 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
         logger.info("we are running rootless, prepending `buildah unshare`")
         # rootless, we need to `buildah unshare` for sake of `buildah mount`
         # https://github.com/containers/buildah/issues/1271
-        cmd_args = ["buildah", "unshare"] + cmd_args
+        # the need for `--` https://github.com/containers/buildah/issues/1374
+        cmd_args = ["buildah", "unshare", "--"] + cmd_args
 
     # ansible has no official python API, the API they have is internal and said to break compat
     try:
