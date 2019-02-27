@@ -2,11 +2,12 @@ import os
 
 import jsonschema
 import pytest
+from ansible_bender.utils import set_logging
 
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.core import PbVarsParser
 
-from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_path
+from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_path, multiplay_path
 
 
 def test_expand_pb_vars():
@@ -78,3 +79,13 @@ def test_validation_err_ux():
 
     assert "is not of type" in s
     assert "Failed validating 'type' in schema" in s
+
+
+def test_multiplay(caplog):
+    set_logging()
+    p = PbVarsParser(multiplay_path)
+    b, m = p.get_build_and_metadata()
+
+    assert b.target_image != "nope"
+    assert "Variables are loaded only from the first play." == caplog.records[0].msg
+    assert "no bender data found in the playbook" == caplog.records[1].msg

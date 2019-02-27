@@ -45,7 +45,7 @@ from ansible_bender import callback_plugins
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.exceptions import AbBuildUnsuccesful
-from ansible_bender.utils import run_cmd, ap_command_exists, random_str
+from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get
 
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
@@ -234,15 +234,21 @@ class PbVarsParser:
         :return: dict
         """
         with open(self.playbook_path) as fd:
-            d = yaml.safe_load(fd)
+            plays = yaml.safe_load(fd)
+
+        for play in plays[1:]:
+            bender_vars = graceful_get(play, "vars", "ansible_bender")
+            if bender_vars:
+                logger.warning("Variables are loaded only from the first play.")
 
         try:
             # we care only about the first play, we don't want to merge dicts
-            d = d[0]
+            d = plays[0]
         except IndexError:
             raise RuntimeError("Invalid playbook, can't access the first document.")
 
-        if "vars" not in d:
+        bender_vars = graceful_get(d, "vars", "ansible_bender")
+        if not bender_vars:
             return {}
 
         tmp = tempfile.mkdtemp(prefix="ab")
