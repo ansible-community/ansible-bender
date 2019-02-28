@@ -110,10 +110,11 @@ class CLI:
             help="path to an implicit working directory in the container"
         )
         self.build_parser.add_argument(
-            "-l", "--labels",
+            "-l", "--label",
             help="add a label to the metadata of the image, "
                  "should be specified as 'key=value'",
-            nargs="*"
+            nargs="*",
+            dest="labels"
         )
         self.build_parser.add_argument(
             "--annotation",

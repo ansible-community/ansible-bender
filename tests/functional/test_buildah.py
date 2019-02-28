@@ -112,7 +112,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     runtime_volume = "/var/lib/asdqwe"
     cmd = ["build",
            "-w", workdir_path,
-           "-l", l_a_b, l_x_y,
+           "--label", l_a_b, l_x_y,
            "--annotation", ann,
            "-e", e_a_b, e_x_y,
            "--cmd", cmd,
