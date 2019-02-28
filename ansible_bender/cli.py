@@ -122,7 +122,7 @@ class CLI:
             nargs="*",
             dest=ANNOTATIONS_KEY
         )
-        # docker allows -e KEY and it is inherited from the current env
+        # TODO: docker allows -e KEY and it is inherited from the current env
         self.build_parser.add_argument(
             "-e", "--env-vars",
             help="add an environment variable to the metadata of the image, "
