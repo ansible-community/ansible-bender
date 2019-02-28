@@ -90,10 +90,14 @@ $ python3 -m pip install ...
 Pip takes care of python dependencies, but ab also requires a few binaries to
 be present on your host system:
 
-* [podman](https://github.com/containers/libpod)
-* [buildah](https://github.com/containers/buildah)
-* [ansible](https://github.com/ansible/ansible)
-* python 3
+* [Podman](https://github.com/containers/libpod)
+* [Buildah](https://github.com/containers/buildah)
+* [Ansible](https://github.com/ansible/ansible)
+  * Ansible needs to be built against python 3
+* Python 3
+
+I understand that the last two requirements are pretty tough: you can always
+run bender in a privileged container.
 
 
 ### Requirements (base image)
