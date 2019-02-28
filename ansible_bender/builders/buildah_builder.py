@@ -249,17 +249,14 @@ class BuildahBuilder(Builder):
 
     def find_python_interpreter(self):
         """
-        find python executable in the base image, order:
-         * /usr/bin/python3
-         * /usr/bin/python2
-         * /usr/bin/python
+        find python executable in the base image
 
         :return: str, path to python interpreter
         """
         for i in self.python_interpr_prio:
             cmd = ["ls", i]
             try:
-                podman_run_cmd(self.build.base_image, cmd, log_stderr=False)
+                podman_run_cmd(self.build.base_image, cmd, log_stderr=True)
             except subprocess.CalledProcessError:
                 logger.info("python interpreter %s does not exist", i)
                 continue

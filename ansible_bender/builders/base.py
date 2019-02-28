@@ -26,6 +26,10 @@ class Builder:
         self.python_interpr_prio = (
             "/usr/bin/python3",
             "/usr/local/bin/python3",
+            "/usr/bin/python3.7",
+            "/usr/bin/python37",
+            "/usr/bin/python3.6",
+            "/usr/bin/python36",
             "/usr/bin/python2",
             "/usr/local/bin/python2",
             "/usr/bin/python",
