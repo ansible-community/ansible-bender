@@ -41,6 +41,7 @@ def test_inspect_cmd(tmpdir, target_image):
     assert "target_image: " in out
     metadata = """\
 metadata:
+  annotations: {}
   cmd: ls -lha
   env_vars:
     A: B

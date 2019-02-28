@@ -4,7 +4,7 @@ This is a configuration module
 import datetime
 
 from ansible_bender.builders.base import BuildState
-from ansible_bender.constants import TIMESTAMP_FORMAT
+from ansible_bender.constants import TIMESTAMP_FORMAT, ANNOTATIONS_KEY
 from ansible_bender.schema import IMAGE_META_SCHENA, BUILD_SCHEMA
 from ansible_bender.utils import graceful_get
 
@@ -25,6 +25,7 @@ class ImageMetadata:
     def __init__(self):
         self.working_dir = None
         self.labels = {}
+        self.annotations = {}
         self.env_vars = {}
         self.cmd = None
         self.user = None
@@ -35,6 +36,7 @@ class ImageMetadata:
         return {
             "working_dir": self.working_dir,
             "labels": self.labels,
+            ANNOTATIONS_KEY: self.annotations,
             "env_vars": self.env_vars,
             "cmd": self.cmd,
             "user": self.user,
@@ -46,6 +48,7 @@ class ImageMetadata:
         """ update current object with data provided from Ansible vars """
         self.working_dir = data.get("working_dir", None)
         self.labels.update(data.get("labels", {}))
+        self.annotations.update(data.get(ANNOTATIONS_KEY, {}))
         self.env_vars.update(data.get("environment", {}))
         self.cmd = data.get("cmd", None)
         self.user = data.get("user", None)
@@ -58,6 +61,7 @@ class ImageMetadata:
         m = cls()
         m.working_dir = j["working_dir"]
         m.labels = j["labels"]
+        m.annotations = j[ANNOTATIONS_KEY]
         m.env_vars = j["env_vars"]
         m.cmd = j["cmd"]
         m.user = j["user"]

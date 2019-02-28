@@ -71,7 +71,8 @@ def create_buildah_container(container_image, container_name, build_volumes=None
 
 
 def configure_buildah_container(container_name, working_dir=None, env_vars=None,
-                                labels=None, user=None, cmd=None, ports=None, volumes=None,
+                                labels=None, annotations=None,
+                                user=None, cmd=None, ports=None, volumes=None,
                                 debug=False):
     """
     apply metadata on the container so they get inherited in an image
@@ -79,6 +80,7 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     :param container_name: name of the container to work in
     :param working_dir: str, path to a working directory within container image
     :param labels: dict with labels
+    :param annotations: dict with annotations
     :param env_vars: dict with env vars
     :param cmd: str, command to run by default in the container
     :param user: str, username or uid; the container gets invoked with this user by default
@@ -96,6 +98,9 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     if labels:
         for k, v in labels.items():
             config_args += ["-l", "%s=%s" % (k, v)]
+    if annotations:
+        for k, v in annotations.items():
+            config_args += ["--annotation", "%s=%s" % (k, v)]
     if user:
         config_args += ["--user", user]
     if cmd:
@@ -160,6 +165,7 @@ class BuildahBuilder(Builder):
             ports=self.build.metadata.ports,
             labels=self.build.metadata.labels,  # labels are not applied when they are configured
                                                 # before doing commit
+            annotations=self.build.metadata.annotations,
             debug=self.debug
         )
 

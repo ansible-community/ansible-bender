@@ -63,6 +63,7 @@ def test_set_all_params():
     assert m.volumes == ["/a"]
     assert m.working_dir == "/workshop"
     assert m.labels == {"x": "y"}
+    assert m.annotations == {"bohemian": "rhapsody"}
     assert m.cmd == "command -x -y z"
     assert m.user == "leonardo"
 
