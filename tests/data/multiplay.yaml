@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars:
+    ansible_bender: {}
+  tasks:
+  - name: Run a sample command
+    command: 'ls -lha /'
+- hosts: localhost
+  vars:
+    ansible_bender:
+      target_image:
+        name: nope
+  tasks:
+  - name: create a file
+    copy:
+      content: "killer"
+      dest: /queen

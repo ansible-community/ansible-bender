@@ -97,7 +97,7 @@ be present on your host system:
 
 ### Requirements (base image)
 
-* python interpretter — ansible-bender will try to find it (alternatively you
+* python interpreter — ansible-bender will try to find it (alternatively you
   can specify it via `--python-interpreter`).
   * It can be python 2 or python 3 — on host, you have to have python 3 but
     inside the base image, it doesn't matter — Ansible is able to utilize
@@ -105,15 +105,13 @@ be present on your host system:
 
 ### Requirements (Ansible playbook)
 
-You need to set `hosts` to `all`:
-```yaml
-$ cat playbook.yaml
----
-- name: Playbook to build my fancy image
-  hosts: all
-```
+None.
 
-Setting `hosts` to localhost will result running the playbook against localhost and not a container.
+Bender copies the playbook you provide so that it can be processed. `hosts`
+variable is being overwritten in the copy and changed to the name of the
+working container — where the build happens.  So it doesn't matter what's the
+content of the hosts variable.
+
 
 ## Configuration
 

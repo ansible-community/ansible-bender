@@ -5,13 +5,14 @@ import os
 import shutil
 
 import yaml
+from ansible_bender.builders.buildah_builder import podman_run_cmd
 from flexmock import flexmock
 
 from ansible_bender.api import Application
 from ansible_bender.conf import Build
 from ansible_bender.utils import random_str, run_cmd
 from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
-                             dont_cache_playbook_path_pre, non_ex_pb)
+                             dont_cache_playbook_path_pre, non_ex_pb, multiplay_path)
 from ..spellbook import small_basic_playbook_path
 
 
@@ -22,8 +23,8 @@ def test_build_db_metadata(target_image, application, build):
     assert build.build_finished_time is not None
     assert build.build_start_time is not None
     assert build.log_lines is not None
-    logs = "\n".join(build.log_lines)
-    assert "PLAY [all]" in logs
+    logs = "\n".join([l for l in build.log_lines if l])
+    assert logs.startswith("PLAY [registry")
     assert "TASK [Gathering Facts]" in logs
     assert "failed=0" in logs
 
@@ -229,3 +230,16 @@ def test_caching_non_ex_image_w_mocking(tmpdir, build):
         assert not build.layers[-1].cached
     finally:
         application.clean()
+
+
+def test_multiplay(build, application):
+    im = "multiplay"
+    build.playbook_path = multiplay_path
+    build.target_image = im
+    application.build(build)
+    try:
+        build = application.db.get_build(build.build_id)
+        podman_run_cmd(im, ["ls", "/queen"])  # the file has to be in there
+        assert len(build.layers) == 3
+    finally:
+        run_cmd(["buildah", "rmi", im], ignore_status=True, print_output=True)

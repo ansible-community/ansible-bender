@@ -45,7 +45,7 @@ from ansible_bender import callback_plugins
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.exceptions import AbBuildUnsuccesful
-from ansible_bender.utils import run_cmd, ap_command_exists, random_str
+from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get
 
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
@@ -187,11 +187,33 @@ class AnsibleRunner:
             a_cfg_path = os.path.join(tmp, "ansible.cfg")
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
+
+            tmp_pb_path = os.path.join(tmp, "p.yaml")
+            with open(self.pb, "r") as fd_r:
+                pb_dict = yaml.safe_load(fd_r)
+            for idx, doc in enumerate(pb_dict):
+                host = doc["hosts"]
+                logger.debug("play[%s], host = %s", idx, host)
+                doc["hosts"] = self.builder.ansible_host
+            with open(tmp_pb_path, "w") as fd:
+                yaml.safe_dump(pb_dict, fd)
+            playbook_base = os.path.basename(self.pb).split(".", 1)[0]
+            timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+            symlink_name = f".{playbook_base}-{timestamp}-{random_str()}.yaml"
+            playbook_dir = os.path.dirname(self.pb)
+            symlink_path = os.path.join(playbook_dir, symlink_name)
+            os.symlink(tmp_pb_path, symlink_path)
+
             extra_args = None
-            if self.build_i.ansible_extra_args:
-                extra_args = shlex.split(self.build_i.ansible_extra_args)
-            return run_playbook(self.pb, inv_path, a_cfg_path, self.builder.ansible_connection,
-                                debug=self.debug, environment=environment, ansible_args=extra_args)
+            try:
+                if self.build_i.ansible_extra_args:
+                    extra_args = shlex.split(self.build_i.ansible_extra_args)
+                return run_playbook(
+                    symlink_path, inv_path, a_cfg_path, self.builder.ansible_connection,
+                    debug=self.debug, environment=environment, ansible_args=extra_args
+                )
+            finally:
+                os.unlink(symlink_path)
         finally:
             shutil.rmtree(tmp)
 
@@ -213,15 +235,21 @@ class PbVarsParser:
         :return: dict
         """
         with open(self.playbook_path) as fd:
-            d = yaml.safe_load(fd)
+            plays = yaml.safe_load(fd)
+
+        for play in plays[1:]:
+            bender_vars = graceful_get(play, "vars", "ansible_bender")
+            if bender_vars:
+                logger.warning("Variables are loaded only from the first play.")
 
         try:
-            # TODO: process all the plays
-            d = d[0]
+            # we care only about the first play, we don't want to merge dicts
+            d = plays[0]
         except IndexError:
             raise RuntimeError("Invalid playbook, can't access the first document.")
 
-        if "vars" not in d:
+        bender_vars = graceful_get(d, "vars", "ansible_bender")
+        if not bender_vars:
             return {}
 
         tmp = tempfile.mkdtemp(prefix="ab")

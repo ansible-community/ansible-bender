@@ -17,6 +17,9 @@ Configuration is done using a top-level Ansible variable `ansible_bender`. All
 the values are nested under it. The values are processed before a build starts.
 The changes to values are not reflected during a playbook run.
 
+If your playbook has multiple plays, the `ansible_bender` variable is processed
+only from the first play. All the plays will end up in a single container image.
+
 
 #### Top-level keys
 

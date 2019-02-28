@@ -61,8 +61,8 @@ metadata:
 def test_get_logs(target_image, tmpdir):
     cmd = ["build", basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
-    out = ab(["get-logs"], str(tmpdir), return_output=True)
-    assert "PLAY [all]" in out
+    out = ab(["get-logs"], str(tmpdir), return_output=True).lstrip()
+    assert out.startswith("PLAY [registry")
     assert "TASK [Gathering Facts]" in out
     assert "failed=0" in out
     assert "TASK [print local env vars]" in out
