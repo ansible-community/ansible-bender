@@ -15,6 +15,7 @@ check-in-container:
 	podman run -ti --rm \
 		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		--privileged \
+		-e CGROUP_MANAGER=cgroupfs \
 		-v $(CURDIR):/src \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-w /src \
@@ -82,7 +83,10 @@ check-in-docker:
 
 # we need exec since we create arbitrary buildah binary
 check-in-docker-easy:
-	docker run -ti --rm --privileged -v $(CURDIR):/src -w /src \
+	docker run -ti --rm \
+		-v $(CURDIR):/src -w /src \
+		-e CGROUP_MANAGER=cgroupfs \
+		--privileged \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
 		$(CONT_IMG) \
