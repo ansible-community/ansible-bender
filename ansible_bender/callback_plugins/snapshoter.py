@@ -17,7 +17,7 @@ logger = logging.getLogger("ansible_bender")
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'notification'
+    CALLBACK_TYPE = 'hard-worker'
     CALLBACK_NAME = 'a_container_image_snapshoter'
     CALLBACK_NEEDS_WHITELIST = True
 
