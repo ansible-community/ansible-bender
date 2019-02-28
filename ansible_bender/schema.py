@@ -226,6 +226,7 @@ IMAGE_META_SCHENA = {
     "optional": [
         "working_dir",
         "labels",
+        "annotations",
         "env_vars",
         "cmd",
         "user",
@@ -245,6 +246,12 @@ IMAGE_META_SCHENA = {
         },
         "labels": {
             "$id": "#/properties/labels",
+            "type": "object",
+            "title": "Key/value data to apply to the final image",
+            "additionalProperties": {"type": "string"}
+        },
+        "annotations": {
+            "$id": "#/properties/annotations",
             "type": "object",
             "title": "Key/value data to apply to the final image",
             "additionalProperties": {"type": "string"}

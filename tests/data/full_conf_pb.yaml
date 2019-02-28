@@ -19,6 +19,8 @@
         working_dir: /workshop
         labels:
           x: y
+        annotations:
+          bohemian: rhapsody
         environment:
           z: x
         cmd: command -x -y z

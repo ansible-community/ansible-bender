@@ -10,6 +10,7 @@ import yaml
 from tabulate import tabulate
 
 from ansible_bender.api import Application
+from ansible_bender.constants import ANNOTATIONS_KEY
 from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
@@ -113,6 +114,12 @@ class CLI:
             help="add a label to the metadata of the image, "
                  "should be specified as 'key=value'",
             nargs="*"
+        )
+        self.build_parser.add_argument(
+            "--annotation",
+            help="Add key=value annotation for the target image",
+            nargs="*",
+            dest=ANNOTATIONS_KEY
         )
         # docker allows -e KEY and it is inherited from the current env
         self.build_parser.add_argument(
@@ -232,6 +239,12 @@ class CLI:
                           "specified in format 'KEY=VALUE'.".format(label)
                 k, v = split_once_or_fail_with(label, "=", err_msg)
                 metadata.labels[k] = v
+        if self.args.annotations:
+            for ann in self.args.annotations:
+                err_msg = "Annotation {} doesn't seem to be " + \
+                          "specified in format 'KEY=VALUE'.".format(ann)
+                k, v = split_once_or_fail_with(ann, "=", err_msg)
+                metadata.annotations[k] = v
         if self.args.env_vars:
             for e_v in self.args.env_vars:
                 err_msg = "Environment variable {} doesn't seem to be " + \

@@ -104,6 +104,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     l_x_y = "x=y"
     e_a_b = "A=B"
     e_x_y = "X=Y"
+    ann = "bohemian=rhapsody"
     cmd, cmd_e = "ls -lha", ["ls", "-lha"]
     # FIXME: this doesn't work with user namespaces
     # user = "1000"
@@ -112,6 +113,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     cmd = ["build",
            "-w", workdir_path,
            "-l", l_a_b, l_x_y,
+           "--annotation", ann,
            "-e", e_a_b, e_x_y,
            "--cmd", cmd,
            # "-u", user,
@@ -121,6 +123,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
     out = inspect_resource("image", target_image)
+    assert out['ImageAnnotations'] == {'bohemian': 'rhapsody'}
     co = out["Docker"]["config"]
     assert co["WorkingDir"] == workdir_path
     assert co["Labels"]["A"] == "B"
