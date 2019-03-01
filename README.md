@@ -313,7 +313,7 @@ cf41883b24b8         docker.io/library/python:3-alpine                        Oc
 ### Buildah configuration
 
 If you are familiar with podman and buildah, you know that you can
-[conifgure](https://github.com/containers/buildah/blob/master/docs/buildah.md#files)
+[configure](https://github.com/containers/buildah/blob/master/docs/buildah.md#files)
 these tools. Ansible-bender doesn't change this configuration in any way so
 it's up to you how you set up buildah and podman. The same applies for running
 ansible-bender as root or not: buildah allows you to utilize rootless
