@@ -34,7 +34,7 @@ while ab takes care of image builds only.
 
 * You can build your container images with buildah as a backend.
 * Ansible playbook is your build recipe.
-* You are able to set various image metadata via CLI:
+* You are able to set various image metadata via CLI or as specific Ansible vars:
   * working directory
   * environment variables
   * labels
@@ -134,120 +134,134 @@ alias ab="ansible-bender"
 
 ### Building images
 
-If you clone this repository, you can utilize a simple playbook I am using for testing:
-```
-$ ansible-bender build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
+There is a simple playbook present in the root of this repository to showcase the functionality:
+```bash
+$ ansible-bender build ./simple-playbook.yaml
 
-PLAY [all] ************************************************************************************************************************
+PLAY [Demonstration of ansible-bender functionality] ****************************************
 
-TASK [Gathering Facts] ************************************************************************************************************
-ok: [this-is-my-image-20181031-121858148338-cont]
+TASK [Gathering Facts] **********************************************************************
+ok: [a-very-nice-image-20190302-153257279579-cont]
 
-TASK [print local env vars] *******************************************************************************************************
-ok: [this-is-my-image-20181031-121858148338-cont] => {
-    "msg": "/tmp/ab1nsv_c9b/ansible.cfg,,"
-}
-caching the task result in an image 'this-is-my-image-20181931-121904'
+TASK [Run a sample command] *****************************************************************
+changed: [a-very-nice-image-20190302-153257279579-cont]
+caching the task result in an image 'a-very-nice-image-20193302-153306'
 
-TASK [print all remote env vars] **************************************************************************************************
-ok: [this-is-my-image-20181031-121858148338-cont] => {
-    "msg": {
-        "GPG_KEY": "0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
-        "HOME": "/root",
-        "LANG": "C.UTF-8",
-        "PATH": "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-        "PWD": "/",
-        "PYTHON_PIP_VERSION": "18.1",
-        "PYTHON_VERSION": "3.7.0",
-        "SHLVL": "1",
-        "SOME": "VALUE"
-    }
-}
-caching the task result in an image 'this-is-my-image-20181931-121905'
+TASK [Stat a file] **************************************************************************
+ok: [a-very-nice-image-20190302-153257279579-cont]
+caching the task result in an image 'a-very-nice-image-20193302-153310'
 
-TASK [Run a sample command] *******************************************************************************************************
-changed: [this-is-my-image-20181031-121858148338-cont]
-caching the task result in an image 'this-is-my-image-20181931-121908'
-
-TASK [create a file] **************************************************************************************************************
-changed: [this-is-my-image-20181031-121858148338-cont]
-caching the task result in an image 'this-is-my-image-20181931-121912'
-
-PLAY RECAP ************************************************************************************************************************
-this-is-my-image-20181031-121858148338-cont : ok=5    changed=2    unreachable=0    failed=0
+PLAY RECAP **********************************************************************************
+a-very-nice-image-20190302-153257279579-cont : ok=3    changed=1    unreachable=0    failed=0
 
 Getting image source signatures
-Skipping fetch of repeat blob sha256:df64d3292fd6194b7865d7326af5255db6d81e9df29f48adde61a918fbd8c332
-Skipping fetch of repeat blob sha256:beefb6beb20fa287cfcfaf083c0fda606f9c7f4b2830a286a50f1bbcacd52cf3
-Skipping fetch of repeat blob sha256:e2986b5e7ba21a779988ffeb8bd4c0ca5b0fddaaf1ea8a4b02da1c60492f51e4
-Skipping fetch of repeat blob sha256:6795dbd93463993b8257a1500534c1fe8566aa79dfc08a03c9d823b26d08b8d8
-Skipping fetch of repeat blob sha256:3b3df229744dd8a66aa6713ce8084f529712e96c4d01fa7b0a4cb49fe2e2ebff
-Skipping fetch of repeat blob sha256:3e8ad7a0bc8fa42dfb6e11bb57ec6cafd865426b1557e29ee58c4ffd8b077aba
-Copying config sha256:bbf10af5c37b2c7f6098f07308df4addcd81598e16d1e432bb5c5b1916c9d912
 
- 0 B / 5.11 KiB [--------------------------------------------------------------]
- 5.11 KiB / 5.11 KiB [======================================================] 0s
+Skipping blob 767f936afb51 (already present): 4.46 MiB / 4.46 MiB [=========] 0s
+
+Skipping blob b211a7fc6e85 (already present): 819.00 KiB / 819.00 KiB [=====] 0s
+
+Skipping blob 8d092d3e44bb (already present): 67.20 MiB / 67.20 MiB [=======] 0s
+
+Skipping blob 767f936afb51 (already present): 4.46 MiB / 4.46 MiB [=========] 0s
+
+Skipping blob b211a7fc6e85 (already present): 819.00 KiB / 819.00 KiB [=====] 0s
+
+Skipping blob 8d092d3e44bb (already present): 67.20 MiB / 67.20 MiB [=======] 0s
+
+Skipping blob 492c5c55da84 (already present): 4.50 KiB / 4.50 KiB [=========] 0s
+
+Skipping blob 6f55b6e55d8a (already present): 6.15 MiB / 6.15 MiB [=========] 0s
+
+Skipping blob 80ea48511c5d (already present): 1021.00 KiB / 1021.00 KiB [===] 0s
+
+Copying config 6b6dc5878fb2: 0 B / 5.15 KiB [----------------------------------]
+Copying config 6b6dc5878fb2: 5.15 KiB / 5.15 KiB [==========================] 0s
 Writing manifest to image destination
 Storing signatures
-bbf10af5c37b2c7f6098f07308df4addcd81598e16d1e432bb5c5b1916c9d912
-Image 'this-is-my-image' was built successfully \o/
+6b6dc5878fb2c2c10099adbb4458c2fc78cd894134df6e4dee0bf8656e93825a
+Image 'a-very-nice-image' was built successfully \o/
 ```
 
-The command line is a bit longer. That's because all metadata about our target image is in there:
+This is how the playbook looks:
+```bash
+---
+- name: Demonstration of ansible-bender functionality
+  hosts: all
+  vars:
+    ansible_bender:
+      base_image: python:3-alpine
+
+      working_container:
+        volumes:
+          - '{{ playbook_dir }}:/src'
+
+      target_image:
+        name: a-very-nice-image
+        working_dir: /src
+        labels:
+          built-by: '{{ ansible_user }}'
+        environment:
+          FILE_TO_PROCESS: README.md
+  tasks:
+  - name: Run a sample command
+    command: 'ls -lha /src'
+  - name: Stat a file
+    stat:
+      path: "{{ lookup('env','FILE_TO_PROCESS') }}"
 ```
-$ ansible-bender build                           \  # this is the command
-     -e SOME=VALUE                               \  # -e sets environment variables
-     -l some=other-value                         \  # -l sets labels
-     --                                          \  # two dashes separate options from arguments
-     ./tests/functional/data/basic_playbook.yaml \  # first argument is a path to a playbook
-     docker.io/library/python:3-alpine           \  # second one is a base image (and is pulled if it's not present)
-     this-is-my-image                            \  # and finally, target image name
+
+As you can see, the whole build processed is configured by the variable
+`ansible_bender`.
+
+If we rerun the build again, we can see that ab loads every task from cache:
 ```
+$ ansible-bender build ./simple-playbook.yaml
 
-If we rerun the build again, we can see that ab loads every task from a cache:
-```
-$ ansible-bender build -e SOME=VALUE -l some=other-value -- ./tests/data/basic_playbook.yaml docker.io/library/python:3-alpine this-is-my-image
+PLAY [Demonstration of ansible-bender functionality] ****************************************
 
-PLAY [all] ************************************************************************************************************************
+TASK [Gathering Facts] **********************************************************************
+ok: [a-very-nice-image-20190302-153526013757-cont]
 
-TASK [Gathering Facts] ************************************************************************************************************
-ok: [this-is-my-image-20181031-121917088731-cont]
+TASK [Run a sample command] *****************************************************************
+loaded from cache: '7c69668c42987446cc78adbf6620fc2faf90ad10c3497662fe38940dd6de998f'
+skipping: [a-very-nice-image-20190302-153526013757-cont]
 
-TASK [print local env vars] *******************************************************************************************************
-loaded from cache: '2cf027dce668d168f73c67e3aa42175e89c42458f6c5f6844ebf74f3064080d2'
-skipping: [this-is-my-image-20181031-121917088731-cont]
+TASK [Stat a file] **************************************************************************
+loaded from cache: '4a4f54285928c03eea65745ee9feead88026c780a40126d94e79d5842bcdbe62'
+skipping: [a-very-nice-image-20190302-153526013757-cont]
 
-TASK [print all remote env vars] **************************************************************************************************
-loaded from cache: 'e6b4f418907ca31d5e52e2b971f8224637daa610a1b54467ee2919001d4caf37'
-skipping: [this-is-my-image-20181031-121917088731-cont]
-
-TASK [Run a sample command] *******************************************************************************************************
-loaded from cache: '96aaa104e30b394652639d56122bbf8bb3ba8e75c1bdf8ea01fa879930c07bc6'
-skipping: [this-is-my-image-20181031-121917088731-cont]
-
-TASK [create a file] **************************************************************************************************************
-loaded from cache: '91dd37d6c6cf05b5505cb7b799534757c89a5e22230fceff1ad01999c766a2a0'
-skipping: [this-is-my-image-20181031-121917088731-cont]
-
-PLAY RECAP ************************************************************************************************************************
-this-is-my-image-20181031-121917088731-cont : ok=1    changed=0    unreachable=0    failed=0
+PLAY RECAP **********************************************************************************
+a-very-nice-image-20190302-153526013757-cont : ok=1    changed=0    unreachable=0    failed=0
 
 Getting image source signatures
-Skipping fetch of repeat blob sha256:df64d3292fd6194b7865d7326af5255db6d81e9df29f48adde61a918fbd8c332
-Skipping fetch of repeat blob sha256:beefb6beb20fa287cfcfaf083c0fda606f9c7f4b2830a286a50f1bbcacd52cf3
-Skipping fetch of repeat blob sha256:e2986b5e7ba21a779988ffeb8bd4c0ca5b0fddaaf1ea8a4b02da1c60492f51e4
-Skipping fetch of repeat blob sha256:6795dbd93463993b8257a1500534c1fe8566aa79dfc08a03c9d823b26d08b8d8
-Skipping fetch of repeat blob sha256:3b3df229744dd8a66aa6713ce8084f529712e96c4d01fa7b0a4cb49fe2e2ebff
-Skipping fetch of repeat blob sha256:eca799d88ff3ae1f5a17bd5569a54f7de3694b3b6a134c16cda1216a3b8a2779
-Skipping fetch of repeat blob sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1
-Copying config sha256:8eabbd9aef50ae41499a5720ec6a1be6bad29095b278e58fccb9f04c2eaa459a
 
- 0 B / 5.22 KiB [--------------------------------------------------------------]
- 5.22 KiB / 5.22 KiB [======================================================] 0s
+Skipping blob 767f936afb51 (already present): 4.46 MiB / 4.46 MiB [=========] 0s
+
+Skipping blob b211a7fc6e85 (already present): 819.00 KiB / 819.00 KiB [=====] 0s
+
+Skipping blob 8d092d3e44bb (already present): 67.20 MiB / 67.20 MiB [=======] 0s
+
+Skipping blob 492c5c55da84 (already present): 4.50 KiB / 4.50 KiB [=========] 0s
+Skipping blob 767f936afb51 (already present): 4.46 MiB / 4.46 MiB [=========] 0s
+Skipping blob 6f55b6e55d8a (already present): 6.15 MiB / 6.15 MiB [=========] 0s
+Skipping blob b211a7fc6e85 (already present): 819.00 KiB / 819.00 KiB [=====] 0s
+Skipping blob 80ea48511c5d (already present): 1021.00 KiB / 1021.00 KiB [===] 0s
+Skipping blob 8d092d3e44bb (already present): 67.20 MiB / 67.20 MiB [=======] 0s
+Skipping blob 5f70bf18a086 (already present): 1.00 KiB / 1.00 KiB [=========] 0s
+Skipping blob 492c5c55da84 (already present): 4.50 KiB / 4.50 KiB [=========] 0s
+
+Skipping blob 6f55b6e55d8a (already present): 6.15 MiB / 6.15 MiB [=========] 0s
+
+Skipping blob 80ea48511c5d (already present): 1021.00 KiB / 1021.00 KiB [===] 0s
+
+Skipping blob 5f70bf18a086 (already present): 1.00 KiB / 1.00 KiB [=========] 0s
+
+Copying config 354752b97084: 0 B / 5.26 KiB [----------------------------------]
+Copying config 354752b97084: 5.26 KiB / 5.26 KiB [==========================] 0s
 Writing manifest to image destination
 Storing signatures
-8eabbd9aef50ae41499a5720ec6a1be6bad29095b278e58fccb9f04c2eaa459a
-Image 'this-is-my-image' was built successfully \o/
+354752b97084fcf349a28a2f66839d270e728559883dd1edb5ec22e8c9c6adb9
+Image 'a-very-nice-image' was built successfully \o/
 ```
 
 
@@ -255,10 +269,11 @@ Image 'this-is-my-image' was built successfully \o/
 
 We can list builds we have done:
 ```
-  BUILD ID  IMAGE NAME        STATUS           DATE                        BUILD TIME
-----------  ----------------  ---------------  --------------------------  --------------
-         1  this-is-my-image  BuildState.DONE  2018-10-31 12:19:13.847864  0:00:15.699248
-         2  this-is-my-image  BuildState.DONE  2018-10-31 12:19:27.341574  0:00:10.252394
+$ ansible-bender list-builds
+  BUILD ID  IMAGE NAME         STATUS    DATE                        BUILD TIME
+----------  -----------------  --------  --------------------------  --------------
+         1  a-very-nice-image  done      2019-03-02 16:07:47.471912  0:00:12.347721
+         2  a-very-nice-image  done      2019-03-02 16:07:58.858699  0:00:06.242378
 ```
 
 
@@ -268,45 +283,31 @@ Wanna check build logs sometime later? No problem!
 ```
 $ ansible-bender get-logs 2
 
-PLAY [all] ******************************************************************************************************************************************************************
+PLAY [Demonstration of ansible-bender functionality] *********************************
 
-TASK [Gathering Facts] ******************************************************************************************************************************************************
-ok: [this-is-my-image-20181031-121917088731-cont]
+TASK [Gathering Facts] ***************************************************************
+ok: [a-very-nice-image-20190302-160751828671-cont]
 
-TASK [print local env vars] *************************************************************************************************************************************************
-loaded from cache: '2cf027dce668d168f73c67e3aa42175e89c42458f6c5f6844ebf74f3064080d2'
-skipping: [this-is-my-image-20181031-121917088731-cont]
+TASK [Run a sample command] **********************************************************
+loaded from cache: 'cd27cfb71a161f3333232b97cc6b2a89354ff52de71bce9058c52cdf536735f9'
+skipping: [a-very-nice-image-20190302-160751828671-cont]
 
-TASK [print all remote env vars] ********************************************************************************************************************************************
-loaded from cache: 'e6b4f418907ca31d5e52e2b971f8224637daa610a1b54467ee2919001d4caf37'
-skipping: [this-is-my-image-20181031-121917088731-cont]
+TASK [Stat a file] *******************************************************************
+loaded from cache: '89ba4efc31358d688f035bf8159d900f1552314f0af6bf6c338b4897da593ccf'
+skipping: [a-very-nice-image-20190302-160751828671-cont]
 
-TASK [Run a sample command] *************************************************************************************************************************************************
-loaded from cache: '96aaa104e30b394652639d56122bbf8bb3ba8e75c1bdf8ea01fa879930c07bc6'
-skipping: [this-is-my-image-20181031-121917088731-cont]
-
-TASK [create a file] ********************************************************************************************************************************************************
-loaded from cache: '91dd37d6c6cf05b5505cb7b799534757c89a5e22230fceff1ad01999c766a2a0'
-skipping: [this-is-my-image-20181031-121917088731-cont]
-
-PLAY RECAP ******************************************************************************************************************************************************************
-this-is-my-image-20181031-121917088731-cont : ok=1    changed=0    unreachable=0    failed=0
+PLAY RECAP ***************************************************************************
+a-very-nice-image-20190302-160751828671-cont : ok=1    changed=0    unreachable=0    failed=0
 ```
 
 
 ### Locating built images with podman
 
-Here is a proof that the image is in there:
+Once they are built, you can use them with podman right away:
 ```
-$ podman images
-REPOSITORY                                   TAG                      IMAGE ID       CREATED         SIZE
-localhost/this-is-my-image                   latest                   8eabbd9aef50   7 minutes ago   83.1MB
-docker.io/library/python                     3-alpine                 cf41883b24b8   3 weeks ago     81.9MB
-
-$ buildah images
-IMAGE ID             IMAGE NAME                                               CREATED AT             SIZE
-cf41883b24b8         docker.io/library/python:3-alpine                        Oct 10, 2018 00:28     81.9 MB
-8eabbd9aef50         localhost/this-is-my-image:latest                        Oct 31, 2018 12:19     83.1 MB
+$ podman images a-very-nice-image
+REPOSITORY                    TAG      IMAGE ID       CREATED         SIZE
+localhost/a-very-nice-image   latest   5202048d9a0e   2 minutes ago   83.5 MB
 ```
 
 
