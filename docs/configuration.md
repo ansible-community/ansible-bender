@@ -3,15 +3,13 @@
 ## Target image metadata
 
 With dockerfiles, this is being usally done with instructions such as `LABEL`,
-`ENV` or `EXPOSE`.  Bender supports two ways of configuring the metadata:
+`ENV` or `EXPOSE`. Bender supports two ways of configuring the metadata:
 
 * Setting specific Ansible variables inside your playbook.
 * CLI options of `ansible-bender build`.
 
 
 ### Via playbook vars
-
-**This feature is present in git master only, it was not released yet.**
 
 Configuration is done using a top-level Ansible variable `ansible_bender`. All
 the values are nested under it. The values are processed before a build starts.
@@ -51,6 +49,7 @@ only from the first play. All the plays will end up in a single container image.
 |----------------------|-----------------|----------------------------------------------------------------------|
 | `name`               | string          | name of the image                                                    |
 | `labels`             | dict            | key/value data to apply to the final image                           |
+| `annotations`        | dict            | key/value data to apply to the final image (buildah/runc specific)   |
 | `environment`        | dict            | implicit environment variables to set in a container                 |
 | `cmd`                | string          | a default command to invoke the container                            |
 | `user`               | string          | UID or username used to invoke the container                         |
@@ -91,6 +90,24 @@ Please bear in mind that most of the facts won't be available.
 Please check out `ansible-bender build --help` for up to date options:
 
 ```
+$ ansible-bender build -h
+usage: ansible-bender build [-h] [--builder {docker,buildah}] [--no-cache]
+                            [--build-volumes [BUILD_VOLUMES [BUILD_VOLUMES ...]]]
+                            [-w WORKDIR] [-l [LABELS [LABELS ...]]]
+                            [--annotation [ANNOTATIONS [ANNOTATIONS ...]]]
+                            [-e [ENV_VARS [ENV_VARS ...]]] [--cmd CMD]
+                            [-u USER] [-p [PORTS [PORTS ...]]]
+                            [--runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]]
+                            [--extra-ansible-args EXTRA_ANSIBLE_ARGS]
+                            [--python-interpreter PYTHON_INTERPRETER]
+                            PLAYBOOK_PATH [BASE_IMAGE] [TARGET_IMAGE]
+
+positional arguments:
+  PLAYBOOK_PATH         path to Ansible playbook
+  BASE_IMAGE            name of a container image to use as a base
+  TARGET_IMAGE          name of the built container image
+
+optional arguments:
   -h, --help            show this help message and exit
   --builder {docker,buildah}
                         pick preferred builder backend
@@ -104,9 +121,11 @@ Please check out `ansible-bender build --help` for up to date options:
                         '/host/dir:/container/dir'
   -w WORKDIR, --workdir WORKDIR
                         path to an implicit working directory in the container
-  -l [LABELS [LABELS ...]], --labels [LABELS [LABELS ...]]
+  -l [LABELS [LABELS ...]], --label [LABELS [LABELS ...]]
                         add a label to the metadata of the image, should be
                         specified as 'key=value'
+  --annotation [ANNOTATIONS [ANNOTATIONS ...]]
+                        Add key=value annotation for the target image
   -e [ENV_VARS [ENV_VARS ...]], --env-vars [ENV_VARS [ENV_VARS ...]]
                         add an environment variable to the metadata of the
                         image, should be specified as 'KEY=VALUE'
@@ -122,4 +141,6 @@ Please check out `ansible-bender build --help` for up to date options:
                         careful!)
   --python-interpreter PYTHON_INTERPRETER
                         Path to a python interpreter inside the base image
+
+Please use '--' to separate options and arguments.
 ```
