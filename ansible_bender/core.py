@@ -45,7 +45,8 @@ from ansible_bender import callback_plugins
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.constants import TIMESTAMP_FORMAT
 from ansible_bender.exceptions import AbBuildUnsuccesful
-from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get
+from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get, \
+    is_ansibles_python_2
 
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
@@ -78,6 +79,12 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     :return: output
     """
     ap = ap_command_exists()
+    if is_ansibles_python_2(ap):
+        raise RuntimeError(
+            "ansible-bender is written in python 3 and does not work in python 2,\n"
+            f"it seems that {ap} is using python 2 - ansible-bender will not"
+            "work in such environment\n"
+        )
     cmd_args = [
         ap,
         "-c", connection,
