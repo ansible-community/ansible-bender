@@ -256,7 +256,8 @@ class BuildahBuilder(Builder):
         for i in self.python_interpr_prio:
             cmd = ["ls", i]
             try:
-                podman_run_cmd(self.build.base_image, cmd, log_stderr=True)
+                run_cmd(["podman", "run", "--rm", self.build.base_image] + cmd,
+                        log_stderr=False, log_output=True)
             except subprocess.CalledProcessError:
                 logger.info("python interpreter %s does not exist", i)
                 continue

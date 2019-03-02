@@ -1,7 +1,45 @@
+# 0.5.0
+
+## Breaking changes
+
+* Option `--labels` was renamed to `--label` to match other container tooling.
+
+
+## Features
+
+* Ansible-bender can now be configured using Ansible variables. For more info,
+  please [read the documentation](/docs/configuration.md)
+  * Given this change, base image and target image name are now optional
+    arguments of the `build` command.
+* Bender now uses more candidates when searching for python interpreter in the
+  base image, namely `/usr/bin/python3.7` and so on.
+* You can now set annotations on the target image.
+* When bender invokes a playbook against a container, it now changes hosts
+  variable (in a copy), so that it's not accidentally executed in localhost
+  environment.
+* Json schema is now used to validate input.
+* Before starting the build process, bender checks if the container backend
+  works.
+
+
+## Bug fixes
+
+* When ansible-playbook command uses python 2, bender refuses to continue since
+  the build will not work.
+* Errors are now being properly logged when bender looks for python interpreter
+  in the base image.
+* There was a need for a compatibility fix with buildah 1.7.
+* A build will terminate if there was an exception thrown during the caching or
+  layering process.
+* Bender will not try to load non-existent layers from cache.
+
+
 # 0.4.0
+
 Ansible-bender now uses Azure Pipelines as a CI system.
 
 ## Features
+
 * There were updates to documentation in README:
   * Info about vfs and overlay buildah storage backends.
   * Rootless containers.

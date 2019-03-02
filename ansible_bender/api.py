@@ -64,30 +64,36 @@ class Application:
         # we have to record as soon as possible
         self.db.record_build(build)
 
-        builder = self.get_builder(build)
-        builder.sanity_check()
+        try:
+            builder = self.get_builder(build)
+            builder.sanity_check()
 
-        # before we start messing with the base image, we need to check for its presence first
-        if not builder.is_base_image_present():
-            builder.pull()
-            build.pulled = True
+            # before we start messing with the base image, we need to check for its presence first
+            if not builder.is_base_image_present():
+                builder.pull()
+                build.pulled = True
 
-        builder.check_container_creation()
+            builder.check_container_creation()
 
-        # let's record base image as a first layer
-        base_image_id = builder.get_image_id(build.base_image)
-        build.record_layer(None, base_image_id, None, cached=True)
+            # let's record base image as a first layer
+            base_image_id = builder.get_image_id(build.base_image)
+            build.record_layer(None, base_image_id, None, cached=True)
 
-        a_runner = AnsibleRunner(build.playbook_path, builder, build, debug=self.debug)
+            a_runner = AnsibleRunner(build.playbook_path, builder, build, debug=self.debug)
 
-        # we are about to perform the build
-        build.build_start_time = datetime.datetime.now()
-        self.db.record_build(build, build_state=BuildState.IN_PROGRESS)
+            # we are about to perform the build
+            build.build_start_time = datetime.datetime.now()
+            self.db.record_build(build, build_state=BuildState.IN_PROGRESS)
 
-        if not build.python_interpreter:
-            build.python_interpreter = builder.find_python_interpreter()
+            if not build.python_interpreter:
+                build.python_interpreter = builder.find_python_interpreter()
 
-        builder.create()
+            builder.create()
+        except Exception:
+            self.db.record_build(None, build_id=build.build_id,
+                                     build_state=BuildState.FAILED,
+                                     set_finish_time=True)
+            raise
 
         try:
             try:

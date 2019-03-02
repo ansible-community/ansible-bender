@@ -1,0 +1,25 @@
+---
+- name: Demonstration of ansible-bender functionality
+  hosts: all
+  vars:
+    ansible_bender:
+      base_image: python:3-alpine
+
+      working_container:
+        volumes:
+          - '{{ playbook_dir }}:/src'
+
+      target_image:
+        name: a-very-nice-image
+        working_dir: /src
+        labels:
+          built-by: '{{ ansible_user }}'
+        environment:
+          FILE_TO_PROCESS: README.md
+  tasks:
+  - name: Run a sample command
+    command: 'ls -lha /src'
+  - name: Stat a file
+    stat:
+      path: "{{ lookup('env','FILE_TO_PROCESS') }}"
+
