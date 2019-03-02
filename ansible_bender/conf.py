@@ -61,7 +61,7 @@ class ImageMetadata:
         m = cls()
         m.working_dir = j["working_dir"]
         m.labels = j["labels"]
-        m.annotations = j[ANNOTATIONS_KEY]
+        m.annotations = graceful_get(j, ANNOTATIONS_KEY, default={})
         m.env_vars = j["env_vars"]
         m.cmd = j["cmd"]
         m.user = j["user"]
