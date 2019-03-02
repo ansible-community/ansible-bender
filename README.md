@@ -47,7 +47,7 @@ while ab takes care of image builds only.
   * You can turn this off with `--no-cache`.
   * You can disable caching from a certain point by adding a tag `no-cache` to a task.
 * You can stop creating new image layers by adding tag `stop-layering` to a task.
-* If an image build fails, it's comitted and named with a suffix `-failed` (so
+* If an image build fails, it's committed and named with a suffix `-failed` (so
   you can take a look inside and resolve the issue).
 * The tool tries to find python interpreter inside the base image.
 * You can push images you built to remote locations such as:
@@ -127,7 +127,7 @@ to do that, please check out [docs/configuration.md](docs/configuration.md).
 ## Usage
 
 You may noticed that I refer to `ansible-bender` as ab. That was the initial
-name and I used to it. I recommand adding an alias into your shell rc file:
+name and I used to it. I recommend adding an alias into your shell rc file:
 ```
 alias ab="ansible-bender"
 ```
@@ -183,7 +183,7 @@ Image 'a-very-nice-image' was built successfully \o/
 ```
 
 This is how the playbook looks:
-```bash
+```yaml
 ---
 - name: Demonstration of ansible-bender functionality
   hosts: all
@@ -214,7 +214,7 @@ As you can see, the whole build processed is configured by the variable
 `ansible_bender`.
 
 If we rerun the build again, we can see that ab loads every task from cache:
-```
+```bash
 $ ansible-bender build ./simple-playbook.yaml
 
 PLAY [Demonstration of ansible-bender functionality] ****************************************
@@ -268,7 +268,7 @@ Image 'a-very-nice-image' was built successfully \o/
 ### Listing builds
 
 We can list builds we have done:
-```
+```bash
 $ ansible-bender list-builds
   BUILD ID  IMAGE NAME         STATUS    DATE                        BUILD TIME
 ----------  -----------------  --------  --------------------------  --------------
@@ -280,7 +280,7 @@ $ ansible-bender list-builds
 ### Getting logs of a build
 
 Wanna check build logs sometime later? No problem!
-```
+```bash
 $ ansible-bender get-logs 2
 
 PLAY [Demonstration of ansible-bender functionality] *********************************
@@ -304,7 +304,7 @@ a-very-nice-image-20190302-160751828671-cont : ok=1    changed=0    unreachable=
 ### Locating built images with podman
 
 Once they are built, you can use them with podman right away:
-```
+```bash
 $ podman images a-very-nice-image
 REPOSITORY                    TAG      IMAGE ID       CREATED         SIZE
 localhost/a-very-nice-image   latest   5202048d9a0e   2 minutes ago   83.5 MB

@@ -2,7 +2,7 @@
 
 ## Target image metadata
 
-With dockerfiles, this is being usally done with instructions such as `LABEL`,
+With dockerfiles, this is being usually done with instructions such as `LABEL`,
 `ENV` or `EXPOSE`. Bender supports two ways of configuring the metadata:
 
 * Setting specific Ansible variables inside your playbook.
