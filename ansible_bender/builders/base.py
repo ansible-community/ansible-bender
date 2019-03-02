@@ -104,3 +104,13 @@ class Builder:
 
         :return: list of str
         """
+
+    def sanity_check(self):
+        """
+        invoke container tooling and thus verify they work well
+        """
+
+    def check_container_creation(self):
+        """
+        check that containers can be created
+        """

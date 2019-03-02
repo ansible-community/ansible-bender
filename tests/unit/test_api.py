@@ -16,6 +16,7 @@ def test_build_pulls_base_img_if_not_present(application, build, is_base_present
     flexmock(BuildahBuilder)
     BuildahBuilder.should_receive("is_base_image_present").and_return(is_base_present).once()
     BuildahBuilder.should_receive("pull").times(times_called)
+    BuildahBuilder.should_receive("check_container_creation").and_return(None).once()
     BuildahBuilder.should_receive("get_image_id").and_return("1").once()
     BuildahBuilder.should_receive("find_python_interpreter").and_return("").once()
     BuildahBuilder.should_receive("create").once()

@@ -65,11 +65,14 @@ class Application:
         self.db.record_build(build)
 
         builder = self.get_builder(build)
+        builder.sanity_check()
 
         # before we start messing with the base image, we need to check for its presence first
         if not builder.is_base_image_present():
             builder.pull()
             build.pulled = True
+
+        builder.check_container_creation()
 
         # let's record base image as a first layer
         base_image_id = builder.get_image_id(build.base_image)
