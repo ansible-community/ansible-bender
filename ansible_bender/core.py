@@ -80,6 +80,8 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
     """
     ap = ap_command_exists()
     if is_ansibles_python_2(ap):
+        # I just realized it could work, we would just had to disable the
+        # callback plugin: no caching and layering
         raise RuntimeError(
             "ansible-bender is written in python 3 and does not work in python 2,\n"
             f"it seems that {ap} is using python 2 - ansible-bender will not"
