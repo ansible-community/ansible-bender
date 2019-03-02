@@ -31,6 +31,15 @@ change_layering_playbook = os.path.join(data_dir, "change_layering.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 base_image = "docker.io/library/python:3-alpine"
 
+C7_AP_VER_OUT = """\
+ansible-playbook 2.4.2.0
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Oct 30 2018, 23:45:53) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+"""
+
 
 def random_word(length):
     # https://stackoverflow.com/a/2030081/909579

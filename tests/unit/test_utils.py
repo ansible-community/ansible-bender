@@ -1,9 +1,12 @@
 import re
 
 import pytest
+from flexmock import flexmock
 
+from ansible_bender import utils
 from ansible_bender.db import generate_working_cont_name
-from ansible_bender.utils import run_cmd, graceful_get
+from ansible_bender.utils import run_cmd, graceful_get, ap_command_exists, is_ansibles_python_2
+from tests.spellbook import C7_AP_VER_OUT
 
 
 def test_run_cmd():
@@ -39,3 +42,20 @@ def test_graceful_g_w_default():
     assert graceful_get(inp, 1, default="asd") == {2: 3}
     assert graceful_get(inp, 1, 2, default="asd") == 3
     assert graceful_get(inp, 1, 2, 4, default="asd") == "asd"
+
+
+@pytest.mark.parametrize("m,is_py2", (
+    (object, False),  # no mocking
+    (
+        lambda: flexmock(utils, run_cmd=lambda *args, **kwargs: C7_AP_VER_OUT),
+        True
+    ),
+    (
+        lambda: flexmock(utils, run_cmd=lambda *args, **kwargs: "nope"),
+        False
+    ),
+))
+def test_ansibles_python(m, is_py2):
+    m()
+    cmd = ap_command_exists()
+    assert is_ansibles_python_2(cmd) == is_py2

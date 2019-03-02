@@ -4,6 +4,7 @@ Utility functions. This module can't depend on anything within ab.
 import logging
 import os
 import random
+import re
 import shutil
 import string
 import subprocess
@@ -126,14 +127,14 @@ def env_get_or_fail_with(env_name, err_msg):
         raise RuntimeError(err_msg)
 
 
-def one_of_commands_exists(commands, exc_msg):
+def one_of_commands_exists(commands, exc_msg) -> str:
     """
     Verify that the provided command exists. Raise CommandDoesNotExistException in case of an
     error or if the command does not exist.
 
     :param commands: str, command to check (python 3 only)
     :param exc_msg: str, message of exception when command does not exist
-    :return: bool, True if everything's all right (otherwise exception is thrown)
+    :return: str, the command which exists
     """
     found = False
     for command in commands:
@@ -233,3 +234,29 @@ def random_str(size=10):
     :return: the string
     """
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(size))
+
+
+def is_ansibles_python_2(ap_exe: str) -> bool:
+    """
+    Discover whether ansible-playbook is using python 2.
+
+    :param ap_exe: path to the python executable
+
+    :return: True if it's 2
+    """
+    out = run_cmd([ap_exe, "--version"], log_stderr=True, return_output=True)
+
+    # python version = 3.7.2
+    reg = r"python version = (\d)"
+
+    reg_grp = re.findall(reg, out)
+    try:
+        py_version = reg_grp[0]
+    except IndexError:
+        logger.warning("could not figure out which python is %s using", ap_exe)
+        return False  # we don't know, fingers crossed
+    if py_version == "2":
+        logger.info("%s is using python 2", ap_exe)
+        return True
+    logger.debug("it seems that %s is not using python 2", ap_exe)
+    return False
