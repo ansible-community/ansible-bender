@@ -273,3 +273,20 @@ class BuildahBuilder(Builder):
 
         :return: list of str
         """
+
+    def sanity_check(self):
+        """
+        invoke container tooling and thus verify they work well
+        """
+        # doing podman info would be super-handy, but it will immensely clutter the output
+        logger.debug("checking that podman command works")
+        run_cmd(["podman", "version"], log_stderr=True, log_output=True)
+        logger.debug("checking that buildah command works")
+        run_cmd(["buildah", "version"], log_stderr=True, log_output=True)
+
+    def check_container_creation(self):
+        """
+        check that containers can be created
+        """
+        logger.debug("trying to create a dummy container using podman")
+        podman_run_cmd(self.build.base_image, ["true"], log_stderr=True)
