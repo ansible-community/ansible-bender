@@ -87,8 +87,8 @@ $ python3 -m pip install ...
 
 ### Requirements (host)
 
-Pip takes care of python dependencies, but ab also requires a few binaries to
-be present on your host system:
+Pip takes care of python dependencies, but ansible-bender also requires a few
+binaries to be present on your host system:
 
 * [Podman](https://github.com/containers/libpod)
 * [Buildah](https://github.com/containers/buildah)
@@ -98,6 +98,28 @@ be present on your host system:
 
 I understand that the last two requirements are pretty tough: you can always
 run bender in a privileged container.
+
+
+#### Setting up buildah and podman
+
+If you run ansible-bender as root, you don't need to do anything. Just install
+the packages and you are good to go.
+
+On the other hand, if you want to utilize [the rootless
+mode](https://github.com/containers/libpod/blob/master/docs/podman-create.1.md#rootless-containers),
+you need to set up the UID mapping. It is documented in
+[podman's](https://github.com/containers/libpod/blob/master/troubleshooting.md#10-podman-fails-to-run-in-user-namespace-because-etcsubuid-is-not-properly-populated)
+documentation. All you need to do is to add an entry into /etc/subuid and
+/etc/subgid:
+
+```bash
+$ sudo sh -c "printf \"\n$(whoami):100000:65536\n\" >>/etc/subuid"
+$ sudo sh -c "printf \"\n$(whoami):100000:65536\n\" >>/etc/subgid"
+```
+
+You should consult [podman's troubleshooting
+guide](https://github.com/containers/libpod/blob/master/troubleshooting.md) if
+you are running into issues.
 
 
 ### Requirements (base image)
@@ -122,6 +144,16 @@ content of the hosts variable.
 
 You can configure ansible-bender and set metadata on your final image, in order
 to do that, please check out [docs/configuration.md](docs/configuration.md).
+
+
+## Debugging Bender
+
+It may happen there is something wrong in your setup or the tooling Bender is
+relying on is not in the best shape. The best way to find the root cause is to
+run Bender in debug mode and run ansible as verbosely as possible:
+```
+$ ansible-bender --debug build --extra-ansible-args='-vvvvvv'
+```
 
 
 ## Usage
