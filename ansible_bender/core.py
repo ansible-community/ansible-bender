@@ -28,6 +28,7 @@ tasks:
   ...
 
 """
+import copy
 import datetime
 import json
 import logging
@@ -43,7 +44,7 @@ import yaml
 import ansible_bender
 from ansible_bender import callback_plugins
 from ansible_bender.conf import ImageMetadata, Build
-from ansible_bender.constants import TIMESTAMP_FORMAT
+from ansible_bender.constants import TIMESTAMP_FORMAT, TIMESTAMP_FORMAT_TOGETHER
 from ansible_bender.exceptions import AbBuildUnsuccesful
 from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get, \
     is_ansibles_python_2
@@ -241,7 +242,7 @@ class PbVarsParser:
         """
         populate vars from a playbook, defined in vars section
 
-        :return: dict
+        :return: dict with the content of ansible_bender var
         """
         with open(self.playbook_path) as fd:
             plays = yaml.safe_load(fd)
@@ -259,38 +260,49 @@ class PbVarsParser:
 
         bender_vars = graceful_get(d, "vars", "ansible_bender")
         if not bender_vars:
+            logger.info("no bender data found in the playbook")
             return {}
 
         tmp = tempfile.mkdtemp(prefix="ab")
         json_data_path = os.path.join(tmp, "j.json")
+
+        # we cannot use "vars" variable because the variables are not expanded in there
+        pb_vars = copy.deepcopy(d["vars"])
+        while True:
+            # just in case the variable is already defined
+            timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER)
+            ab_vars_key = f"ab_vars_{timestamp}"
+            if ab_vars_key not in pb_vars:
+                logger.debug("ab vars key = %s", ab_vars_key)
+                pb_vars[ab_vars_key] = d["vars"]
+                break
+        jinja_pb_vars_key = '{{ %s }}' % ab_vars_key
         pb = {
             "name": "Let Ansible expand variables",
             "hosts": "localhost",
-            "vars": {
-                "ab_vars": d["vars"],
-            },
+            "vars": pb_vars,
             "vars_files": d.get("vars_files", []),
             "gather_facts": False,
             "tasks": [
-                {"debug": {"msg": "{{ ab_vars }}"}},
+                {"debug": {"msg": jinja_pb_vars_key}},
                 {
                     "copy": {
                         "dest": json_data_path,
-                        "content": '{{ ab_vars }}'
+                        "content": jinja_pb_vars_key
                     }
                 }
             ]
         }
+
         i_path = os.path.join(tmp, "i")
         with open(i_path, "w") as fd:
             fd.write("localhost ansible_connection=local")
 
-        tmp_pb_path = os.path.join(tmp, "p.yaml")
+        tmp_pb_path = os.path.join(tmp, "p.json")
         with open(tmp_pb_path, "w") as fd:
-            yaml.safe_dump([pb], fd)
+            json.dump([pb], fd)
 
         playbook_base = os.path.basename(self.playbook_path).split(".", 1)[0]
-        timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
         symlink_name = f".{playbook_base}-{timestamp}-{random_str()}.yaml"
         playbook_dir = os.path.dirname(self.playbook_path)
         symlink_path = os.path.join(playbook_dir, symlink_name)
@@ -304,22 +316,19 @@ class PbVarsParser:
                          provide_output=False, log_stderr=True, ansible_args=args)
 
             with open(json_data_path) as fd:
-                return json.load(fd)
+                return json.load(fd)["ansible_bender"]
         finally:
             os.unlink(symlink_path)
             shutil.rmtree(tmp)
 
-    def process_pb_vars(self, playbook_vars):
+    def process_pb_vars(self, bender_data):
         """
         accept variables from the playbook and update the Build and ImageMetadata objects with them
 
-        :param playbook_vars: dict with all the playbook variables
+        :param bender_data: dict with the content of ansible_bender vars
         :return:
         """
-        try:
-            bender_data = playbook_vars["ansible_bender"]
-        except KeyError:
-            logger.info("no bender data found in the playbook")
+        if not bender_data:
             return
         self.metadata.update_from_configuration(bender_data.get("target_image", {}))
         self.build.update_from_configuration(bender_data)
@@ -330,8 +339,8 @@ class PbVarsParser:
 
         :return: Build(), ImageMetadata()
         """
-        data = self.expand_pb_vars()
+        bender_data = self.expand_pb_vars()
 
-        self.process_pb_vars(data)
+        self.process_pb_vars(bender_data)
 
         return self.build, self.metadata
