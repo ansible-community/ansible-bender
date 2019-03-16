@@ -21,7 +21,6 @@ only from the first play. All the plays will end up in a single container image.
 
 #### Top-level keys
 
-|----------------------|--------|---------------------------------------------------------|
 | Key name             | type   | description                                             |
 |----------------------|--------|---------------------------------------------------------|
 | `base_image`         | string | name of the container image to use as a base            |
@@ -30,21 +29,17 @@ only from the first play. All the plays will end up in a single container image.
 | `target_image`       | dict   | metadata of the final image which we built              |
 | `cache_tasks`        | bool   | When true, enable caching mechanism                     |
 | `layering`           | bool   | When true, snapshot the image after a task is executed  |
-|----------------------|--------|---------------------------------------------------------|
 
 
 #### `working_container`
 
-|----------------------|-----------------|----------------------------------------------------------------------|
 | Key name             | type            | description                                                          |
 |----------------------|-----------------|----------------------------------------------------------------------|
 | `volumes`            | list of strings | volumes mappings for the working container (`HOST:CONTAINER:PARAMS`) |
-|----------------------|-----------------|----------------------------------------------------------------------|
 
 #### `target_image`
 
 
-|----------------------|-----------------|----------------------------------------------------------------------|
 | Key name             | type            | description                                                          |
 |----------------------|-----------------|----------------------------------------------------------------------|
 | `name`               | string          | name of the image                                                    |
@@ -56,7 +51,6 @@ only from the first play. All the plays will end up in a single container image.
 | `ports`              | list of strings | a list of ports which are meant to be exposed on the host            |
 | `volumes`            | list of strings | a list of paths which are meant to be hosted outside of the container|
 | `working_dir`        | string          | path to a working directory within a container image                 |
-|----------------------|-----------------|----------------------------------------------------------------------|
 
 
 Example of a playbook with variables:
