@@ -22,7 +22,7 @@
         annotations:
           bohemian: rhapsody
         environment:
-          z: x
+          z: '{{ key }}'
         cmd: command -x -y z
         user: leonardo
 

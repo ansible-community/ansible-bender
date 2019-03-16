@@ -13,13 +13,13 @@ from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_p
 def test_expand_pb_vars():
     p = PbVarsParser(b_p_w_vars_path)
     data = p.expand_pb_vars()
-    assert data["ansible_bender"]["base_image"] == "docker.io/library/python:3-alpine"
-    assert data["ansible_bender"]["ansible_extra_args"] == "-vvv"
+    assert data["base_image"] == "docker.io/library/python:3-alpine"
+    assert data["ansible_extra_args"] == "-vvv"
     playbook_dir = os.path.dirname(b_p_w_vars_path)
-    assert data["ansible_bender"]["working_container"]["volumes"] == [f"{playbook_dir}:/src"]
-    assert data["ansible_bender"]["target_image"]["name"] == "challet"
-    assert data["ansible_bender"]["target_image"]["labels"] == {"x": "y"}
-    assert data["ansible_bender"]["target_image"]["environment"] == {"asd": playbook_dir}
+    assert data["working_container"]["volumes"] == [f"{playbook_dir}:/src"]
+    assert data["target_image"]["name"] == "challet"
+    assert data["target_image"]["labels"] == {"x": "y"}
+    assert data["target_image"]["environment"] == {"asd": playbook_dir}
 
 
 def test_b_m_empty():
@@ -59,7 +59,7 @@ def test_set_all_params():
     assert b.build_volumes == ["/c:/d"]
     assert b.target_image == "funky-mona-lisa"
 
-    assert m.env_vars == {"z": "x"}
+    assert m.env_vars == {"z": "value"}
     assert m.volumes == ["/a"]
     assert m.working_dir == "/workshop"
     assert m.labels == {"x": "y"}
