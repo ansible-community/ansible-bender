@@ -1,3 +1,16 @@
+# 0.5.1
+
+## Bug fixes
+
+* When pushing a build using the `push` command, bender now picks the correct
+  image with metadata, instead of the last layer.
+* Variables are now expanded recursively. This means that when you define a variable in `vars` section, you can use it in other variables.
+
+## Minor
+
+* Documentation updates.
+
+
 # 0.5.0
 
 ## Breaking changes
