@@ -298,6 +298,7 @@ class PbVarsParser:
         with open(i_path, "w") as fd:
             fd.write("localhost ansible_connection=local")
 
+        # json is easier to parse than yaml
         tmp_pb_path = os.path.join(tmp, "p.json")
         with open(tmp_pb_path, "w") as fd:
             json.dump([pb], fd)
