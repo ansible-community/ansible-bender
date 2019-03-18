@@ -243,7 +243,7 @@ class Build:
         """
         if self.state not in [BuildState.DONE, BuildState.FAILED]:
             raise RuntimeError(f"Build have not finished yet, it is in state '{self.state.value}'.")
-        return self.get_top_layer_id()
+        return self.final_layer_id
 
     def was_last_layer_cached(self):
         if self.layers:

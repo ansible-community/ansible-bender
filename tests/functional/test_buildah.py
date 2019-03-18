@@ -195,6 +195,13 @@ def test_push_to_dockerd(target_image, tmpdir):
     try:
         cmd = ["docker", "run", "--rm", target, "cat", "/fun"]
         subprocess.check_call(cmd)
+
+        docker_inspect = json.loads(subprocess.check_output(["docker", "inspect", target]))[0]
+        p_inspect = json.loads(subprocess.check_output(
+            ["podman", "inspect", "-t", "image", target_image]))[0]
+        assert docker_inspect["RootFS"]["Layers"] == p_inspect["RootFS"]["Layers"]
+        assert docker_inspect["Created"] == p_inspect["Created"]
+        assert docker_inspect["Id"].endswith(p_inspect["Id"])
     finally:
         subprocess.check_call(["docker", "rmi", target])
 
