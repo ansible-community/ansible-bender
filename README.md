@@ -16,7 +16,7 @@ performing builds.
 
 tl;dr Ansible is the frontend, buildah is the backend.
 
-I described the concept in following blog posts:
+The concept is described in following blog posts:
 * [Building containers with buildah and ansible](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
 * [Ansible and Podman Can Play Together Now](https://blog.tomecek.net/post/ansible-and-podman-can-play-together-now/).
 
@@ -27,7 +27,9 @@ ansible-container covers the complete lifecycle of a containerized application
 while ab takes care of image builds only.
 
 
-**Status**: ready to use
+**Status**: ready to be used
+
+Ansible-bender was recently moved to the ansible-community organization. \o/
 
 
 ## Features:
@@ -96,8 +98,8 @@ binaries to be present on your host system:
   * Ansible needs to be built against python 3
 * Python 3
 
-I understand that the last two requirements are pretty tough: you can always
-run bender in a privileged container.
+Last two requirements can be pretty tough: you can always run bender in a
+privileged container.
 
 
 #### Setting up buildah and podman
@@ -158,8 +160,8 @@ $ ansible-bender --debug build --extra-ansible-args='-vvvvvv'
 
 ## Usage
 
-You may noticed that I refer to `ansible-bender` as ab. That was the initial
-name and I used to it. I recommend adding an alias into your shell rc file:
+Typing `ansible-bender` can take some time, consider adding an alias into your
+shell rc file:
 ```
 alias ab="ansible-bender"
 ```
