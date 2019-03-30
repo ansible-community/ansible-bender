@@ -1,6 +1,10 @@
 import json
 import logging
+import os
 import subprocess
+import tempfile
+from pathlib import Path
+from typing import Optional
 
 from ansible_bender.builders.base import Builder
 from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, \
@@ -193,22 +197,44 @@ class BuildahBuilder(Builder):
         self.clean()
         self.create()
 
-    def commit(self, image_name, print_output=True, final_image=False):
+    def commit(self, image_name: Optional[str] = None, print_output: bool = True, final_image: bool = False):
+        """
+        commit container into an image
+
+        :param image_name: name of the image
+        :param print_output: print to stdout if True
+        :param final_image: is this is the final layer?
+        :return:
+        """
         if final_image:
-            user=self.build.metadata.user
+            user = self.build.metadata.user
         else:
-            user=self.build.build_user
+            user = self.build.build_user
 
         if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:
             # change user if needed
             configure_buildah_container(
-                self.ansible_host, user=user,
+                self.ansible_host,
+                user=user,
                 cmd=self.build.metadata.cmd,
                 volumes=self.build.metadata.volumes,
             )
-        buildah("commit", [self.ansible_host, image_name], print_output=print_output,
-                debug=self.debug)
-        return self.get_image_id(image_name)
+
+        if image_name:
+            args = [self.ansible_host, image_name]
+            buildah("commit", args, print_output=print_output, debug=self.debug)
+            return self.get_image_id(image_name)
+        else:
+            fd, name = tempfile.mkstemp()
+            os.close(fd)
+            args = ["-q", "--iidfile", name, self.ansible_host]
+            try:
+                buildah("commit", args, print_output=print_output, debug=self.debug)
+                image_id = Path(name).read_text()
+                logger.debug("layer id = %s", image_id)
+                return image_id
+            finally:
+                os.unlink(name)
 
     def clean(self):
         """

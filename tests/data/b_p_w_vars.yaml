@@ -1,8 +1,8 @@
 - hosts: all
   vars:
     ansible_bender:
+      verbose_layer_names: true
       base_image: "docker.io/library/python:3-alpine"
-      ansible_extra_args: "-vvv"
 
       working_container:
         volumes:

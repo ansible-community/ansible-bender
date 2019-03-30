@@ -21,14 +21,15 @@ only from the first play. All the plays will end up in a single container image.
 
 #### Top-level keys
 
-| Key name             | type   | description                                             |
-|----------------------|--------|---------------------------------------------------------|
-| `base_image`         | string | name of the container image to use as a base            |
-| `ansible_extra_args` | string | extra CLI arguments to pass to ansible-playbook command |
-| `working_container`  | dict   | settings for the container where the build occurs       |
-| `target_image`       | dict   | metadata of the final image which we built              |
-| `cache_tasks`        | bool   | When true, enable caching mechanism                     |
-| `layering`           | bool   | When true, snapshot the image after a task is executed  |
+| Key name             | type   | description
+|----------------------|--------|---------------------------------------------------------
+| `base_image`         | string | name of the container image to use as a base
+| `ansible_extra_args` | string | extra CLI arguments to pass to ansible-playbook command
+| `working_container`  | dict   | settings for the container where the build occurs
+| `target_image`       | dict   | metadata of the final image which we built
+| `cache_tasks`        | bool   | When true, enable caching mechanism
+| `layering`           | bool   | When true, snapshot the image after a task is executed
+| `verbose_layer_names`| bool   | tag layers with a verbose name if true (image-name + timestamp), defaults to false
 
 
 #### `working_container`

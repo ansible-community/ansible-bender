@@ -138,6 +138,7 @@ class Build:
         self.pulled = False  # was the base image pulled?
         self.ansible_extra_args = None
         self.python_interpreter = None
+        self.verbose_layer_names = False
 
     def to_dict(self):
         """ serialize """
@@ -168,6 +169,7 @@ class Build:
             "pulled": self.pulled,
             "ansible_extra_args": self.ansible_extra_args,
             "python_interpreter": self.python_interpreter,
+            "verbose_layer_names": self.verbose_layer_names,
         }
 
     def update_from_configuration(self, data):
@@ -180,6 +182,7 @@ class Build:
         self.cache_tasks = graceful_get(data, "cache_tasks", default=self.cache_tasks)
         self.layering = graceful_get(data, "layering", default=self.layering)
         self.ansible_extra_args = graceful_get(data, "ansible_extra_args")
+        self.verbose_layer_names = graceful_get(data, "verbose_layer_names")
         # we should probably get this from the official Ansible variable
         # self.python_interpreter = None
 
@@ -217,6 +220,7 @@ class Build:
         b.pulled = j["pulled"]
         b.ansible_extra_args = j.get("ansible_extra_args", None)
         b.python_interpreter = j.get("python_interpreter", None)
+        b.verbose_layer_names = graceful_get(j, "verbose_layer_names", default=False)
         return b
 
     def record_layer(self, content, layer_id, base_image_id, cached=None):

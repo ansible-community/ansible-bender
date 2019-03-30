@@ -35,6 +35,14 @@ def test_basic(tmpdir):
         assert ab_inspect_data["pulled"] is False
         assert ab_inspect_data["target_image"] == "challet"
 
+        last_layer_id = ab_inspect_data["layers"][-1]["layer_id"]
+        cmd = ["podman", "inspect", "--type", "image", last_layer_id]
+        inspect_data = json.loads(subprocess.check_output(cmd))[0]
+        # "RepoTags": [
+        #     "docker.io/library/python:3-alpine"
+        # ],
+        assert inspect_data["RepoTags"][0]
+
         cmd = ["podman", "inspect", "--type", "image", "challet"]
         inspect_data = json.loads(subprocess.check_output(cmd))[0]
 
