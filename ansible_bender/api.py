@@ -90,9 +90,12 @@ class Application:
 
             builder.create()
         except Exception:
-            self.db.record_build(None, build_id=build.build_id,
-                                     build_state=BuildState.FAILED,
-                                     set_finish_time=True)
+            self.db.record_build(
+                None,
+                build_id=build.build_id,
+                build_state=BuildState.FAILED,
+                set_finish_time=True
+            )
             raise
 
         try:
