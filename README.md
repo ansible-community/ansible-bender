@@ -132,6 +132,7 @@ you are running into issues.
     inside the base image, it doesn't matter — Ansible is able to utilize
     python 2 even if it's invoked with python 3 on the control machine.
 
+
 ### Requirements (Ansible playbook)
 
 None.
@@ -146,6 +147,14 @@ content of the hosts variable.
 
 You can configure ansible-bender and set metadata on your final image, in order
 to do that, please check out [docs/configuration.md](docs/configuration.md).
+
+
+### Ansible roles
+
+If you are using roles in your playbook and they are in a non-standard place,
+you can utilize `ANSIBLE_ROLES_PATH` environment variable to tell ansible where
+your roles lives. Bender does not tamper with environment variables, all are
+passed to ansible-playbook.
 
 
 ## Debugging Bender

@@ -16,7 +16,7 @@ def test_expand_pb_vars():
     assert data["base_image"] == "docker.io/library/python:3-alpine"
     assert data["ansible_extra_args"] == "-vvv"
     playbook_dir = os.path.dirname(b_p_w_vars_path)
-    assert data["working_container"]["volumes"] == [f"{playbook_dir}:/src"]
+    assert data["working_container"]["volumes"] == [f"{playbook_dir}:/src:Z"]
     assert data["target_image"]["name"] == "challet"
     assert data["target_image"]["labels"] == {"x": "y"}
     assert data["target_image"]["environment"] == {"asd": playbook_dir}
