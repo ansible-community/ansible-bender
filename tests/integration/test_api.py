@@ -5,14 +5,14 @@ import os
 import shutil
 
 import yaml
-from ansible_bender.builders.buildah_builder import podman_run_cmd
 from flexmock import flexmock
 
 from ansible_bender.api import Application
+from ansible_bender.builders.buildah_builder import podman_run_cmd
 from ansible_bender.conf import Build
 from ansible_bender.utils import random_str, run_cmd
 from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
-                             dont_cache_playbook_path_pre, non_ex_pb, multiplay_path)
+                             dont_cache_playbook_path_pre, non_ex_pb, multiplay_path, role_pb_path, roles_dir)
 from ..spellbook import small_basic_playbook_path
 
 
@@ -241,5 +241,21 @@ def test_multiplay(build, application):
         build = application.db.get_build(build.build_id)
         podman_run_cmd(im, ["ls", "/queen"])  # the file has to be in there
         assert len(build.layers) == 3
+    finally:
+        run_cmd(["buildah", "rmi", im], ignore_status=True, print_output=True)
+
+
+def test_pb_with_role(build, application):
+    im = "image-built-with-role"
+    build.playbook_path = role_pb_path
+    build.target_image = im
+    os.environ["ANSIBLE_ROLES_PATH"] = roles_dir
+    application.build(build)
+    try:
+        build = application.db.get_build(build.build_id)
+        podman_run_cmd(im, ["ls", "/officer"])  # the file has to be in there
+        # base image + 2 from roles: [] + 2 from import_role
+        # + 3 from include_role (include_role is a task)
+        assert len(build.layers) == 8
     finally:
         run_cmd(["buildah", "rmi", im], ignore_status=True, print_output=True)

@@ -1,0 +1,11 @@
+---
+- hosts: all
+  roles:
+    - train
+  tasks:
+  - name: import the role
+    import_role:
+      name: train
+  - name: include the role
+    include_role:
+      name: train
