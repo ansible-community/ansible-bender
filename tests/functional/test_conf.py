@@ -26,7 +26,7 @@ def test_basic(tmpdir):
 
         assert ab_inspect_data["base_image"] == "docker.io/library/python:3-alpine"
         assert ab_inspect_data["build_id"] == "1"
-        assert ab_inspect_data['build_volumes'] == [f'{data_dir}:/src']
+        assert ab_inspect_data['build_volumes'] == [f'{data_dir}:/src:Z']
         assert ab_inspect_data['builder_name'] == "buildah"
         assert len(ab_inspect_data['layers']) == 3
         assert ab_inspect_data["metadata"]["labels"] == {"x": "y"}
