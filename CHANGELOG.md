@@ -1,3 +1,19 @@
+# 0.5.2
+
+## Bug fixes
+
+* Workaround an issue with Ansible when SELinux is being used and libselinux
+  python bindings are not present, ansible-playbook freezes for a couple of
+  minutes.
+  * https://bugzilla.redhat.com/show_bug.cgi?id=1696706
+  * https://github.com/ansible-community/ansible-bender/issues/101
+
+## Minor
+
+* Document how to make Ansible roles available during a build if they are on a
+  custom path.
+
+
 # 0.5.1
 
 ## Bug fixes
