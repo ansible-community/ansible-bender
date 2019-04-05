@@ -8,4 +8,3 @@ fedora: false
 labels:
   - bot
   - release-bot
-  - user-cont
