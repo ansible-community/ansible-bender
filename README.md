@@ -8,8 +8,8 @@ and turns them into container images. It has a pluggable builder selection —
 it is up to you to pick the tool which will be used to construct your container
 image. Right now the only supported builder is
 [buildah](https://github.com/containers/buildah).
-[More](http://github.com/TomasTomecek/ansible-bender/issues/25) [to
-come](http://github.com/TomasTomecek/ansible-bender/issues/26) in the future.
+[More](http://github.com/ansible-community/ansible-bender/issues/25) [to
+come](http://github.com/ansible-community/ansible-bender/issues/26) in the future.
 Ansible-bender (ab) relies on [Ansible connection
 plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for
 performing builds.
@@ -78,7 +78,7 @@ $ pip3 install ansible-bender
 
 If you are brave enough, please install bender directly from git master:
 ```
-$ pip3 install git+https://github.com/TomasTomecek/ansible-bender
+$ pip3 install git+https://github.com/ansible-community/ansible-bender
 ```
 
 If `pip3` command is not available on your system, you can run pip like this:
