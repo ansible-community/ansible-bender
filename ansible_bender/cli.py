@@ -144,7 +144,7 @@ class CLI:
         )
         self.build_parser.add_argument(
             "--runtime-volumes",
-            help="path a directory which has daata stored outside of the container",
+            help="path a directory which has data stored outside of the container",
             nargs="*"
         )
         self.build_parser.add_argument(

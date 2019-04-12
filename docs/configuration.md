@@ -128,7 +128,7 @@ optional arguments:
   -p [PORTS [PORTS ...]], --ports [PORTS [PORTS ...]]
                         ports to expose from container by default
   --runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]
-                        path a directory which has daata stored outside of the
+                        path a directory which has data stored outside of the
                         container
   --extra-ansible-args EXTRA_ANSIBLE_ARGS
                         arguments passed to ansible-playbook command (be
