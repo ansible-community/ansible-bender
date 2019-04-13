@@ -6,7 +6,7 @@ import sys
 
 from ansible_bender.builder import get_builder
 from ansible_bender.builders.base import BuildState
-from ansible_bender.constants import OUT_LOGGER, OUT_LOGGER_FORMAT
+from ansible_bender.constants import OUT_LOGGER, OUT_LOGGER_FORMAT, TIMESTAMP_FORMAT
 from ansible_bender.core import AnsibleRunner
 from ansible_bender.db import Database
 from ansible_bender.exceptions import AbBuildUnsuccesful
@@ -240,7 +240,7 @@ class Application:
 
     def create_new_layer(self, content, build):
         builder = self.get_builder(build)
-        timestamp = datetime.datetime.now().strftime("%Y%M%d-%H%M%S")
+        timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
         image_name = "%s-%s" % (build.target_image, timestamp)
         # buildah doesn't accept upper case
         image_name = image_name.lower()

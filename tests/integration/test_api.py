@@ -3,6 +3,7 @@ Test Application class
 """
 import os
 import shutil
+import subprocess
 
 import yaml
 from flexmock import flexmock
@@ -16,7 +17,7 @@ from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook,
 from ..spellbook import small_basic_playbook_path
 
 
-def test_build_db_metadata(target_image, application, build):
+def test_build_db_metadata(application, build):
     application.build(build)
     build = application.db.get_build(build.build_id)
     assert build.playbook_path is not None
@@ -29,7 +30,7 @@ def test_build_db_metadata(target_image, application, build):
     assert "failed=0" in logs
 
 
-def test_caching(target_image, application, build):
+def test_caching(application, build):
     b2 = Build.from_json(build.to_dict())
     application.build(build)
     b2.build_id = None
@@ -44,7 +45,7 @@ def test_caching(target_image, application, build):
     assert len(build.layers) == 5
 
 
-def test_disabled_caching(target_image, application, build):
+def test_disabled_caching(application, build):
     build.cache_tasks = False
     application.build(build)
     build = application.db.get_build(build.build_id)
@@ -56,7 +57,7 @@ def test_disabled_caching(target_image, application, build):
     assert not build.layers[4].cached
 
 
-def test_caching_mechanism(target_image, application, build):
+def test_caching_mechanism(application, build):
     """ check that previously executed tasks are being loaded from cache and new ones are computed from scratch """
     small_build = Build.from_json(build.to_dict())
     small_build.target_image += "2"
@@ -78,7 +79,7 @@ def test_caching_mechanism(target_image, application, build):
     assert not build.layers[4].cached
 
 
-def test_no_cache_tag(target_image, application, build):
+def test_no_cache_tag(application, build):
     """ utilize a playbook which halts caching """
     dont_cache_b = Build.from_json(build.to_dict())
     build.playbook_path = dont_cache_playbook_path_pre
@@ -106,7 +107,7 @@ def test_no_cache_tag(target_image, application, build):
     builder.run(dont_cache_b.target_image, ["ls", "-1", "/asd"])
 
 
-def test_stop_layering(target_image, application, build):
+def test_stop_layering(application, build):
     """ utilize a playbook which halts caching """
     build.playbook_path = change_layering_playbook
     application.build(build)
@@ -117,7 +118,7 @@ def test_stop_layering(target_image, application, build):
     builder.run(build.target_image, ["ls", "-1", "/etc/passwd-lol"])
 
 
-def test_file_caching_mechanism(tmpdir, target_image, application, build):
+def test_file_caching_mechanism(tmpdir, application, build):
     """ make sure that we don't load from cache when a file was changed """
     t = str(tmpdir)
     pb_name = "file_caching.yaml"
@@ -190,10 +191,6 @@ def test_caching_non_ex_image(tmpdir, application, build):
     application.build(build)
     build = application.db.get_build(build.build_id)
 
-    # for debugging
-    layers = build.layers
-    final_layer_id = build.final_layer_id
-    import subprocess
     subprocess.call(["podman", "images", "--all"])
     subprocess.call(["podman", "inspect", build.target_image])
 
