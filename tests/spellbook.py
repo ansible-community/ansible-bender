@@ -1,16 +1,6 @@
-import logging
 import os
 import random
 import string
-import subprocess
-
-import pytest
-
-from ansible_bender.builders.buildah_builder import buildah
-from ansible_bender.utils import set_logging
-
-
-set_logging(level=logging.DEBUG)
 
 
 tests_dir = os.path.dirname(os.path.abspath(__file__))

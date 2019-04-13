@@ -1,17 +1,17 @@
 import logging
 import subprocess
 
-from ansible_bender.api import Application
-from ansible_bender.builders.base import BuildState
-from ansible_bender.conf import ImageMetadata, Build
-from ansible_bender.builders.buildah_builder import buildah
-
-from .spellbook import random_word, basic_playbook_path, base_image, project_dir
-
 import pytest
 
+from ansible_bender.api import Application
+from ansible_bender.builders.base import BuildState
+from ansible_bender.builders.buildah_builder import buildah
+from ansible_bender.conf import ImageMetadata, Build
+from ansible_bender.utils import set_logging
+from .spellbook import random_word, basic_playbook_path, base_image, project_dir
 
-logger = logging.getLogger("ansible_bender")
+
+logger = set_logging(level=logging.DEBUG)
 
 
 @pytest.fixture()
@@ -36,6 +36,7 @@ def application(tmpdir):
 @pytest.fixture()
 def build(target_image):
     build = Build()
+    build.debug = True
     build.playbook_path = basic_playbook_path
     build.base_image = base_image
     build.target_image = target_image
