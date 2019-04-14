@@ -36,7 +36,10 @@ def pull_buildah_image(container_image):
 
 
 def does_image_exist(container_image):
-    cmd = ["podman", "image", "exists", container_image]
+    # cmd = ["podman", "image", "exists", container_image]
+    # https://github.com/containers/libpod/issues/2924
+    # https://github.com/ansible-community/ansible-bender/issues/114
+    cmd = ["buildah", "inspect", "-t", "image", container_image]
     run_cmd(cmd, print_output=True)
 
 
