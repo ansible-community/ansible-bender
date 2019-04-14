@@ -1,3 +1,22 @@
+# 0.5.3
+
+Thank you for contributions from @jamescassell and @alexgarel!
+
+## Bug fixes
+
+* Bender now correctly picks up all cached layers and does not display an error
+  message: `Error: could not get runtime: error creating runtime static files
+  directory /var/lib/containers/storage/libpod: mkdir
+  /var/lib/containers/storage/libpod: permission denied`. This was coming from
+  podman so we switched to buildah to perform checks for presence of layers.
+* A name of a working container now contains month digits instead of minutes as
+  one would expect. (How come that no one noticed?)
+
+## Minor
+
+* README now contains a bit of documentation for limitations of rootless mode.
+
+
 # 0.5.2
 
 ## Bug fixes
