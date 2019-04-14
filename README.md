@@ -104,8 +104,11 @@ privileged container.
 
 #### Setting up buildah and podman
 
-If you run ansible-bender as root, you don't need to do anything. Just install
-the packages and you are good to go.
+If you run ansible-bender as root, you don't need to set up anything. Just
+install the packages and you are good to go. This is the preferred way —
+buildah and podman are much more efficient when using the in-kernel overlay
+filesystem and you will encounter [less issues than with the rootless
+mode](https://github.com/containers/libpod/blob/master/rootless.md).
 
 On the other hand, if you want to utilize [the rootless
 mode](https://github.com/containers/libpod/blob/master/docs/podman-create.1.md#rootless-containers),
