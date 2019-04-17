@@ -68,7 +68,8 @@ def create_buildah_container(container_image, container_name, build_volumes=None
     """
     args = []
     if build_volumes:
-        args += ["-v"] + build_volumes
+        for volume in build_volumes:
+            args += ["-v", volume]
     args += ["--name", container_name, container_image]
     # will pull the image by default if it's not present in buildah's storage
     buildah("from", args, debug=debug, log_stderr=True)
