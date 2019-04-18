@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -267,3 +268,24 @@ def test_tback_in_callback(tmpdir):
             subprocess.call(["buildah", "rmi", im])
     finally:
         os.environ = good_env
+
+
+def test_two_build_vols(tmpdir, target_image):
+    vol1 = Path(tmpdir).joinpath("1")
+    vol1.mkdir()
+    vol2 = Path(tmpdir).joinpath("2")
+    vol2.mkdir()
+    container_mount1 = "/vol1"
+    container_mount2 = "/vol2"
+    vol_spec1 = f"{vol1}:{container_mount1}:Z"
+    vol_spec2 = f"{vol2}:{container_mount2}:Z"
+    cmd = ["build", "--build-volumes", vol_spec1, vol_spec2, "--",
+           basic_playbook_path_w_bv, base_image, target_image]
+    ab(cmd, str(tmpdir))
+
+    cmd = ["inspect", "--json"]
+    ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
+    build_volumes = ab_inspect_data["build_volumes"]
+
+    assert vol_spec1 in build_volumes
+    assert vol_spec2 in build_volumes
