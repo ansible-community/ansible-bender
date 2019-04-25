@@ -166,6 +166,7 @@ class BuildahBuilder(Builder):
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
             self.ansible_host, working_dir=self.build.metadata.working_dir,
+            user=self.build.build_user,
             env_vars=self.build.metadata.env_vars,
             ports=self.build.metadata.ports,
             labels=self.build.metadata.labels,  # labels are not applied when they are configured
@@ -192,11 +193,16 @@ class BuildahBuilder(Builder):
         self.clean()
         self.create()
 
-    def commit(self, image_name, print_output=True):
+    def commit(self, image_name, print_output=True, final_images=False):
+        if final_image:
+            user=self.build.metadata.user
+        else:
+            user=self.build.build_user
+
         if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:
             # change user if needed
             configure_buildah_container(
-                self.ansible_host, user=self.build.metadata.user,
+                self.ansible_host, user=user,
                 cmd=self.build.metadata.cmd,
                 volumes=self.build.metadata.volumes,
             )

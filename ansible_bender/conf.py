@@ -118,6 +118,7 @@ class Build:
         self.build_id = None  # PK, should be set by database
         self.playbook_path = None
         self.build_volumes = []  # volumes for the build container
+        self.build_user = None
         self.metadata = None  # Image metadata
         self.state = BuildState.NEW
         self.build_start_time = None
@@ -144,6 +145,7 @@ class Build:
             "build_id": self.build_id,
             "playbook_path": self.playbook_path,
             "build_volumes": self.build_volumes,
+            "build_user": self.build_user,
             "metadata": self.metadata.to_dict(),
             "state": self.state.value,
             "build_start_time": self.build_start_time.strftime(TIMESTAMP_FORMAT)
@@ -171,6 +173,7 @@ class Build:
     def update_from_configuration(self, data):
         """ update current object with data provided from Ansible vars """
         self.build_volumes += graceful_get(data, "working_container", "volumes", default=[])
+        self.build_user = graceful_get(data, "working_container", "user")
         self.base_image = graceful_get(data, "base_image")
         self.target_image = graceful_get(data, "target_image", "name")
         # self.builder_name = None
@@ -187,6 +190,7 @@ class Build:
         b.build_id = j["build_id"]
         b.playbook_path = j.get("playbook_path", None)
         b.build_volumes = j["build_volumes"]
+        b.build_user = j["build_user"]
         b.metadata = ImageMetadata.from_json(j["metadata"])
         b.state = BuildState(j["state"])
         b.build_start_time = None
