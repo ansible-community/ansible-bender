@@ -193,7 +193,7 @@ class BuildahBuilder(Builder):
         self.clean()
         self.create()
 
-    def commit(self, image_name, print_output=True, final_images=False):
+    def commit(self, image_name, print_output=True, final_image=False):
         if final_image:
             user=self.build.metadata.user
         else:
