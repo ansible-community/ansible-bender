@@ -106,6 +106,10 @@ class CLI:
             nargs="*"
         )
         self.build_parser.add_argument(
+            "--build-user",
+            help="the container gets invoked with this user during build"
+        )
+        self.build_parser.add_argument(
             "-w", "--workdir",
             help="path to an implicit working directory in the container"
         )

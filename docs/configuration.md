@@ -36,6 +36,7 @@ only from the first play. All the plays will end up in a single container image.
 | Key name             | type            | description                                                          |
 |----------------------|-----------------|----------------------------------------------------------------------|
 | `volumes`            | list of strings | volumes mappings for the working container (`HOST:CONTAINER:PARAMS`) |
+| `user`               | string          | UID or username to invoke the container during build (run ansible)   |
 
 #### `target_image`
 
@@ -113,6 +114,7 @@ optional arguments:
                         mount selected directory inside the container during
                         build, should be specified as
                         '/host/dir:/container/dir'
+  --build-user USER     the container gets invoked with this user during build
   -w WORKDIR, --workdir WORKDIR
                         path to an implicit working directory in the container
   -l [LABELS [LABELS ...]], --label [LABELS [LABELS ...]]

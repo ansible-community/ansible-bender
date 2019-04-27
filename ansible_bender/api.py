@@ -121,7 +121,7 @@ class Application:
                                      set_finish_time=True)
             b.log_lines = output
             # commit the final image and apply all metadata
-            b.final_layer_id = builder.commit(build.target_image)
+            b.final_layer_id = builder.commit(build.target_image, final_image=True)
 
             if not b.is_layering_on():
                 self.record_progress(b, None, b.final_layer_id)
