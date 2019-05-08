@@ -1,3 +1,14 @@
+# 0.6.0
+
+## Features
+
+* You can specify a user to be used during the build process (`--build-user`). (Thanks to @11mariom #122)
+
+## Bug fixes
+
+* Bender is able to correctly process multiple build volumes. (Thanks to @11mariom #118)
+
+
 # 0.5.3
 
 Thank you for contributions from @jamescassell and @alexgarel!
