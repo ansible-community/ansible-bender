@@ -36,7 +36,7 @@ class CallbackModule(CallbackBase):
 
         :param task_result: instance of TaskResult
         """
-        if task_result._task.action == "setup":
+        if task_result._task.action in ["setup", "gather_facts"]:
             # we ignore setup
             return
         if task_result.is_failed() or task_result._result.get("rc", 0) > 0:
