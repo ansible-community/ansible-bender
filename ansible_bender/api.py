@@ -188,6 +188,9 @@ class Application:
         return get_builder(build.builder_name)(build, debug=self.debug)
 
     def maybe_load_from_cache(self, content, build_id):
+        if not content:
+            return
+
         build = self.db.get_build(build_id)
         builder = self.get_builder(build)
 
@@ -250,6 +253,9 @@ class Application:
 
     def cache_task_result(self, content, build):
         """ snapshot the container after a task was executed """
+        if not content:
+            logger.info("no content provided, will not cache this layer")
+            return
         image_name, layer_id, base_image_id = self.create_new_layer(content, build)
         if not build.cache_tasks:  # actually we could still cache results
             return

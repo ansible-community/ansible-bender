@@ -4,11 +4,12 @@ import logging
 import os
 import traceback
 
-from ansible.plugins.callback import CallbackBase
 from ansible.executor.task_result import TaskResult
-from ansible_bender.builders.base import BuildState
+from ansible.playbook.task import Task
+from ansible.plugins.callback import CallbackBase
 
 from ansible_bender.api import Application
+from ansible_bender.builders.base import BuildState
 from ansible_bender.constants import NO_CACHE_TAG
 
 FILE_ACTIONS = ["file", "copy", "synchronize", "unarchive", "template"]
@@ -50,7 +51,7 @@ class CallbackModule(CallbackBase):
             return
         if not build.is_layering_on():
             return
-        content = self.get_task_content(task_result._task.get_ds())
+        content = self.get_task_content(task_result._task)
         if task_result.is_skipped() or getattr(task_result, "_result", {}).get("skip_reason", False):
             a.record_progress(None, content, None, build_id=build.build_id)
             return
@@ -67,8 +68,14 @@ class CallbackModule(CallbackBase):
             self._display.display("caching the task result in an image '%s'" % image_name)
 
     @staticmethod
-    def get_task_content(serialized_data):
-        assert serialized_data
+    def get_task_content(task: Task):
+        serialized_data = task.get_ds()
+        if not serialized_data:
+            # ansible 2.8
+            serialized_data = task.dump_attrs()
+        if not serialized_data:
+            logger.error("unable to obtain task content from ansible: caching will not work")
+            return
         c = json.dumps(serialized_data, sort_keys=True).encode("utf-8")
         logger.debug("content = %s", c)
         m = hashlib.sha512(c)
@@ -106,7 +113,7 @@ class CallbackModule(CallbackBase):
             return
         if not build.is_layering_on():
             return
-        content = self.get_task_content(task.get_ds())
+        content = self.get_task_content(task)
         logger.debug("hash = %s", content)
         status = a.maybe_load_from_cache(content, build_id=build.build_id)
         if status:
