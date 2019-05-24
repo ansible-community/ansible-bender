@@ -80,7 +80,7 @@ class CallbackModule(CallbackBase):
 
         :param task: instance of Task
         """
-        if task.action == "setup":
+        if task.action in ["setup", "gather_facts"]:
             # we ignore setup
             return
         a, build = self._get_app_and_build()
