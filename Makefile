@@ -11,6 +11,10 @@ build-ab-img: recipe.yml
 check:
 	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v $(TEST_TARGET)
 
+check-a-lot:
+	WITH_TESTS=yes vagrant up --provision
+	WITH_TESTS=yes vagrant halt
+
 check-in-container:
 	podman run -ti --rm \
 		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \

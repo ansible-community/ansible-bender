@@ -4,6 +4,7 @@
   vars:
     test_mode: no  # yes - test in CI, no - build an image
     project_dir: /src
+    with_tests: no  # yes - run test suite
     ansible_bender:
       target_image:
         workging_dir: /src
@@ -12,6 +13,11 @@
         volumes:
         - "{{ playbook_dir }}:/src"
   tasks:
+  - name: upgrade all packages
+    dnf:
+      name: "*"
+      state: latest
+    when: with_tests == "yes"
   - name: Install all packages needed to hack on ab.
     dnf:
       name:
@@ -33,6 +39,11 @@
       - python3-jsonschema
       - docker  # one test uses it
       state: present
+  - name: Start dockerd
+    systemd:
+      name: docker
+      state: started
+    when: with_tests == "yes"
   - name: Install latest twine for sake of check command
     pip:
       name:
@@ -49,6 +60,7 @@
       path: /etc/containers/storage.conf
       regexp: '^graphroot = '
       line: 'graphroot = "/tmp/containers"'
+    when: with_tests == "no"
   - name: stat /src
     stat:
       path: /src
@@ -69,15 +81,16 @@
       src: /usr/share/containers/libpod.conf
       dest: /etc/containers/libpod.conf
       remote_src: yes
+    when: with_tests == "no"
   - name: Change cgroup driver to cgroupfs.
     lineinfile:
       path: /etc/containers/libpod.conf
       regexp: '^cgroup_manager = '
       line: 'cgroup_manager = "cgroupfs"'
+    when: with_tests == "no"
   # this requires sources mounted inside at /src
   - name: Install ansible-bender from the current working directory
     pip:
       name: '{{ project_dir }}'
     tags:
     - no-cache
-
