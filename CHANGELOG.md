@@ -1,3 +1,14 @@
+# 0.6.1
+
+## Bug fixes
+
+* Make bender work with ansible 2.8.
+
+## Minor
+
+* Test bender in vagrant VMs against ansible 2.7 and 2.8.
+
+
 # 0.6.0
 
 ## Features
