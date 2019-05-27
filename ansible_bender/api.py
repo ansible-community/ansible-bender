@@ -1,11 +1,12 @@
+import datetime
 import logging
 import os
-import datetime
-
 import sys
+from typing import Tuple
 
 from ansible_bender.builder import get_builder
 from ansible_bender.builders.base import BuildState
+from ansible_bender.conf import Build
 from ansible_bender.constants import OUT_LOGGER, OUT_LOGGER_FORMAT, TIMESTAMP_FORMAT
 from ansible_bender.core import AnsibleRunner
 from ansible_bender.db import Database
@@ -241,12 +242,21 @@ class Application:
         self.db.record_build(build)
         return base_image_id, layer_id
 
-    def create_new_layer(self, content, build):
+    def create_new_layer(self, content: str, build: Build) -> Tuple[str, str, str]:
+        """
+        create new layer from the current state of the container of specified build
+
+        :param content: task as a str
+        :param build: Build instance
+        :return:
+        """
         builder = self.get_builder(build)
-        timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
-        image_name = "%s-%s" % (build.target_image, timestamp)
-        # buildah doesn't accept upper case
-        image_name = image_name.lower()
+        image_name = ""
+        if build.verbose_layer_names:
+            timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+            image_name = "%s-%s" % (build.target_image, timestamp)
+            # buildah doesn't accept upper case
+            image_name = image_name.lower()
         layer_id = builder.commit(image_name, print_output=False)
         base_image_id, _ = self.record_progress(build, content, layer_id)
         return image_name, layer_id, base_image_id
