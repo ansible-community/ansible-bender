@@ -193,7 +193,7 @@ class Build:
         b.build_id = j["build_id"]
         b.playbook_path = j.get("playbook_path", None)
         b.build_volumes = j["build_volumes"]
-        b.build_user = j["build_user"]
+        b.build_user = graceful_get(j, "build_user")
         b.metadata = ImageMetadata.from_json(j["metadata"])
         b.state = BuildState(j["state"])
         b.build_start_time = None
