@@ -1,3 +1,19 @@
+# 0.7.0
+
+## Changes
+
+* Intermediate image layers are no longer tagged with a name. This was required
+  by buildah, which is no longer the case since the 1.8 release. You can have
+  the old behavior by adding `verbose_layer_names: true` to the root of the
+  configuration.
+
+## Bug fixes
+
+* `list-builds` should no longer error out after an upgrade.
+* Bender incorrectly printed output of `buildah inspect $base_image` which
+  cluttered the output a lot - that's no longer the case.
+
+
 # 0.6.1
 
 ## Bug fixes
