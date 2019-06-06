@@ -136,6 +136,7 @@ class Build:
         self.debug = False
         self.verbose = False
         self.pulled = False  # was the base image pulled?
+        self.buildah_from_extra_args = None
         self.ansible_extra_args = None
         self.python_interpreter = None
         self.verbose_layer_names = False
@@ -167,6 +168,7 @@ class Build:
             "debug": self.debug,
             "verbose": self.verbose,
             "pulled": self.pulled,
+            "buildah_from_extra_args": self.buildah_from_extra_args,
             "ansible_extra_args": self.ansible_extra_args,
             "python_interpreter": self.python_interpreter,
             "verbose_layer_names": self.verbose_layer_names,
@@ -181,6 +183,7 @@ class Build:
         # self.builder_name = None
         self.cache_tasks = graceful_get(data, "cache_tasks", default=self.cache_tasks)
         self.layering = graceful_get(data, "layering", default=self.layering)
+        self.buildah_from_extra_args = graceful_get(data, "buildah_from_extra_args")
         self.ansible_extra_args = graceful_get(data, "ansible_extra_args")
         self.verbose_layer_names = graceful_get(data, "verbose_layer_names")
         # we should probably get this from the official Ansible variable
@@ -218,6 +221,7 @@ class Build:
         b.debug = j["debug"]
         b.verbose = j["verbose"]
         b.pulled = j["pulled"]
+        b.buildah_from_extra_args = j.get("buildah_from_extra_args", None)
         b.ansible_extra_args = j.get("ansible_extra_args", None)
         b.python_interpreter = j.get("python_interpreter", None)
         b.verbose_layer_names = graceful_get(j, "verbose_layer_names", default=False)

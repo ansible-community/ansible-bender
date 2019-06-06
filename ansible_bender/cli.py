@@ -152,6 +152,10 @@ class CLI:
             nargs="*"
         )
         self.build_parser.add_argument(
+            "--extra-buildah-from-args",
+            help="arguments passed to buildah from command (be careful!)"
+        )
+        self.build_parser.add_argument(
             "--extra-ansible-args",
             help="arguments passed to ansible-playbook command (be careful!)"
         )
@@ -276,6 +280,8 @@ class CLI:
             build.builder_name = self.args.builder
         if self.args.no_cache is not None:
             build.cache_tasks = not self.args.no_cache
+        if self.args.extra_buildah_from_args:
+            build.buildah_from_extra_args = self.args.extra_buildah_from_args
         if self.args.extra_ansible_args:
             build.ansible_extra_args = self.args.extra_ansible_args
         if self.args.python_interpreter:
