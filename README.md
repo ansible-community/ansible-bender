@@ -151,6 +151,15 @@ content of the hosts variable.
 You can configure ansible-bender and set metadata on your final image, in order
 to do that, please check out [docs/configuration.md](docs/configuration.md).
 
+If you want to configure Ansible itself, you can set any environment variable
+and ansible-bender will relay them to `ansible-playbook` command, an example:
+```
+ANSIBLE_STDOUT_CALLBACK=debug ansible-bender build simple-playbook.yaml
+```
+Bender creates ansible.cfg on the fly which is then used during an
+ansible-playbook run. If you define `ANSIBLE_CONFIG`, it will likely break the
+build process: you've been warned.
+
 
 ### Ansible roles
 
