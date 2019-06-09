@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shlex
 import subprocess
 import tempfile
 from pathlib import Path
@@ -61,7 +62,7 @@ def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
                    return_output=return_output, log_stderr=log_stderr)
 
 
-def create_buildah_container(container_image, container_name, build_volumes=None, debug=False):
+def create_buildah_container(container_image, container_name, build_volumes=None, extra_from_args=None, debug=False):
     """
     Create new buildah container according to spec.
 
@@ -74,6 +75,8 @@ def create_buildah_container(container_image, container_name, build_volumes=None
     if build_volumes:
         for volume in build_volumes:
             args += ["-v", volume]
+    if not extra_from_args is None:
+        args += shlex.split(extra_from_args)
     args += ["--name", container_name, container_image]
     # will pull the image by default if it's not present in buildah's storage
     buildah("from", args, debug=debug, log_stderr=True)
@@ -166,7 +169,9 @@ class BuildahBuilder(Builder):
         """
         create_buildah_container(
             self.build.get_top_layer_id(), self.ansible_host,
-            build_volumes=self.build.build_volumes, debug=self.debug)
+            build_volumes=self.build.build_volumes,
+            extra_from_args=self.build.buildah_from_extra_args,
+            debug=self.debug)
         # let's apply configuration before execing the playbook, except for user
         configure_buildah_container(
             self.ansible_host, working_dir=self.build.metadata.working_dir,

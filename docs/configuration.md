@@ -21,15 +21,16 @@ only from the first play. All the plays will end up in a single container image.
 
 #### Top-level keys
 
-| Key name             | type   | description
-|----------------------|--------|---------------------------------------------------------
-| `base_image`         | string | name of the container image to use as a base
-| `ansible_extra_args` | string | extra CLI arguments to pass to ansible-playbook command
-| `working_container`  | dict   | settings for the container where the build occurs
-| `target_image`       | dict   | metadata of the final image which we built
-| `cache_tasks`        | bool   | When true, enable caching mechanism
-| `layering`           | bool   | When true, snapshot the image after a task is executed
-| `verbose_layer_names`| bool   | tag layers with a verbose name if true (image-name + timestamp), defaults to false
+| Key name                  | type   | description
+|---------------------------|--------|---------------------------------------------------------
+| `base_image`              | string | name of the container image to use as a base
+| `buildah_from_extra_args` | string | extra CLI arguments to pass to buildah from command
+| `ansible_extra_args`      | string | extra CLI arguments to pass to ansible-playbook command
+| `working_container`       | dict   | settings for the container where the build occurs
+| `target_image`            | dict   | metadata of the final image which we built
+| `cache_tasks`             | bool   | When true, enable caching mechanism
+| `layering`                | bool   | When true, snapshot the image after a task is executed
+| `verbose_layer_names`     | bool   | tag layers with a verbose name if true (image-name + timestamp), defaults to false
 
 
 #### `working_container`
@@ -62,6 +63,7 @@ Example of a playbook with variables:
   vars:
     ansible_bender:
       base_image: "docker.io/library/python:3-alpine"
+      buildah_from_extra_args: "--dns 8.8.8.8"
       ansible_extra_args: "-vvv"
 
       working_container:
@@ -89,11 +91,13 @@ Please check out `ansible-bender build --help` for up to date options:
 $ ansible-bender build -h
 usage: ansible-bender build [-h] [--builder {docker,buildah}] [--no-cache]
                             [--build-volumes [BUILD_VOLUMES [BUILD_VOLUMES ...]]]
-                            [-w WORKDIR] [-l [LABELS [LABELS ...]]]
+                            [--build-user BUILD_USER] [-w WORKDIR]
+                            [-l [LABELS [LABELS ...]]]
                             [--annotation [ANNOTATIONS [ANNOTATIONS ...]]]
                             [-e [ENV_VARS [ENV_VARS ...]]] [--cmd CMD]
                             [-u USER] [-p [PORTS [PORTS ...]]]
                             [--runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]]
+                            [--extra-buildah-from-args EXTRA_BUILDAH_FROM_ARGS]
                             [--extra-ansible-args EXTRA_ANSIBLE_ARGS]
                             [--python-interpreter PYTHON_INTERPRETER]
                             PLAYBOOK_PATH [BASE_IMAGE] [TARGET_IMAGE]
@@ -115,7 +119,8 @@ optional arguments:
                         mount selected directory inside the container during
                         build, should be specified as
                         '/host/dir:/container/dir'
-  --build-user USER     the container gets invoked with this user during build
+  --build-user BUILD_USER
+                        the container gets invoked with this user during build
   -w WORKDIR, --workdir WORKDIR
                         path to an implicit working directory in the container
   -l [LABELS [LABELS ...]], --label [LABELS [LABELS ...]]
@@ -133,6 +138,8 @@ optional arguments:
   --runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]
                         path a directory which has data stored outside of the
                         container
+  --extra-buildah-from-args EXTRA_BUILDAH_FROM_ARGS
+                        arguments passed to buildah from command (be careful!)
   --extra-ansible-args EXTRA_ANSIBLE_ARGS
                         arguments passed to ansible-playbook command (be
                         careful!)
