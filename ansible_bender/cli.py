@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 
+import pkg_resources
 import yaml
 from tabulate import tabulate
 
@@ -46,6 +47,9 @@ class CLI:
                                  help="provide verbose output")
         self.parser.add_argument("--debug", action="store_true",
                                  help="provide all the output")
+        self.parser.add_argument("-V", "--version", action="store_true",
+                                 help="print version of ansible-bender")
+
         candidates_str = ", ".join(filter(lambda x: x, PATH_CANDIDATES))
         self.parser.add_argument(
             "--database-dir",
@@ -331,6 +335,14 @@ class CLI:
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
+            if self.args.version:
+                try:
+                    print(pkg_resources.get_distribution("ansible-bender").version)
+                except pkg_resources.DistributionNotFound:
+                    print("Ansible-bender is not installed, therefore we can't print the version.")
+                    print("Please run `python3 setup.py --version` instead.")
+                    return 18
+                return 0
             if subcommand == "build":
                 self._build()
                 return 0
