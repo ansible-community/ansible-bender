@@ -1,6 +1,7 @@
 # ansible-bender
 [![Build Status](https://dev.azure.com/nereone/ab/_apis/build/status/TomasTomecek.ansible-bender?branchName=master)](https://dev.azure.com/nereone/ab/_build/latest?definitionId=1&branchName=master)
 
+
 This is a tool which bends containers using
 [Ansible](https://github.com/ansible/ansible)
 [playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html)
