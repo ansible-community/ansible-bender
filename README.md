@@ -96,7 +96,8 @@ binaries to be present on your host system:
 * [Buildah](https://github.com/containers/buildah)
 * [Ansible](https://github.com/ansible/ansible)
   * Ansible needs to be built against python 3
-* Python 3
+* Python 3.6 or later (python 3.5 or earlier are not supported and known not
+  to be working)
 
 Last two requirements can be pretty tough: you can always run bender in a
 privileged container.
