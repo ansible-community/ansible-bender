@@ -7,7 +7,7 @@
 
       working_container:
         volumes:
-          - '{{ playbook_dir }}:/src'
+          - '{{ playbook_dir }}:/src:Z'
 
       target_image:
         name: a-very-nice-image
