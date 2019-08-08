@@ -104,6 +104,12 @@ class CLI:
                  "this option also implies the final image is composed of a base image and one additional layer"
         )
         self.build_parser.add_argument(
+            "--squash",
+            action="store_true",
+            default=False,
+            help="squash final image down to a single layer"
+        )
+        self.build_parser.add_argument(
             "--build-volumes",
             help="mount selected directory inside the container during build, "
                  "should be specified as '/host/dir:/container/dir'",
@@ -284,6 +290,8 @@ class CLI:
             build.builder_name = self.args.builder
         if self.args.no_cache is not None:
             build.cache_tasks = not self.args.no_cache
+        if self.args.squash:
+            build.squash = self.args.squash
         if self.args.extra_buildah_from_args:
             build.buildah_from_extra_args = self.args.extra_buildah_from_args
         if self.args.extra_ansible_args:

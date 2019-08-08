@@ -133,6 +133,7 @@ class Build:
         self.cache_tasks = True  # we cache by default, a user can opt out
         self.log_lines = []  # a list of strings
         self.layering = True
+        self.squash = False
         self.debug = False
         self.verbose = False
         self.pulled = False  # was the base image pulled?
@@ -165,6 +166,7 @@ class Build:
             # we could compress/base64 here, let's go for the easier solution first
             "log_lines": self.log_lines,
             "layering": self.layering,
+            "squash": self.squash,
             "debug": self.debug,
             "verbose": self.verbose,
             "pulled": self.pulled,
@@ -183,6 +185,7 @@ class Build:
         # self.builder_name = None
         self.cache_tasks = graceful_get(data, "cache_tasks", default=self.cache_tasks)
         self.layering = graceful_get(data, "layering", default=self.layering)
+        self.squash = graceful_get(data, "squash", default=self.squash)
         self.buildah_from_extra_args = graceful_get(data, "buildah_from_extra_args")
         self.ansible_extra_args = graceful_get(data, "ansible_extra_args")
         self.verbose_layer_names = graceful_get(data, "verbose_layer_names")
@@ -218,6 +221,7 @@ class Build:
         b.cache_tasks = j["cache_tasks"]
         b.log_lines = j["log_lines"]
         b.layering = j["layering"]
+        b.squash = j["squash"]
         b.debug = j["debug"]
         b.verbose = j["verbose"]
         b.pulled = j["pulled"]
