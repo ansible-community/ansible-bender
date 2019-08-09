@@ -65,6 +65,7 @@ def test_set_all_params():
     assert m.labels == {"x": "y"}
     assert m.annotations == {"bohemian": "rhapsody"}
     assert m.cmd == "command -x -y z"
+    assert m.entrypoint == "great-entry-point"
     assert m.user == "leonardo"
 
 

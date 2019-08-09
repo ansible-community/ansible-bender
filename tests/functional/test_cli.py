@@ -9,6 +9,7 @@ def test_inspect_cmd(tmpdir, target_image):
     e_a_b = "A=B"
     e_x_y = "X=Y"
     cmd, cmd_e = "ls -lha", ["ls", "-lha"]
+    entrypoint = "ls -lha"
     # FIXME
     # user = "1000"
     p_80, p_443 = "80", "443"
@@ -18,6 +19,7 @@ def test_inspect_cmd(tmpdir, target_image):
            "-l", l_a_b, l_x_y,
            "-e", e_a_b, e_x_y,
            "--cmd", cmd,
+           "--entrypoint", entrypoint,
            # "-u", user,
            "-p", p_80, p_443,
            "--runtime-volumes", runtime_volume,
@@ -43,6 +45,7 @@ def test_inspect_cmd(tmpdir, target_image):
 metadata:
   annotations: {}
   cmd: ls -lha
+  entrypoint: ls -lha
   env_vars:
     A: B
     X: Y
