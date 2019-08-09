@@ -21,6 +21,7 @@ BUILD_SCHEMA = {
         "cache_tasks",
         "log_lines",
         "layering",
+        "squash",
         "debug",
         "verbose",
         "pulled",
@@ -168,6 +169,15 @@ BUILD_SCHEMA = {
             "$id": "#/properties/layering",
             "type": "boolean",
             "title": "Should we layer after each task?",
+            "default": "",
+            "examples": [
+                False
+            ],
+        },
+        "squash": {
+            "$id": "#/properties/squash",
+            "type": "boolean",
+            "title": "Should we squash the final image to a single layer?",
             "default": "",
             "examples": [
                 False
