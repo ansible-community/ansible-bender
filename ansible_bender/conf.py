@@ -17,6 +17,7 @@ class ImageMetadata:
     labels: dict with labels
     env_vars: dict with env vars
     cmd: str, command to run by default in the container
+    entrypoint: str, entrypoint script to configure for the container
     user: str, username or uid; the container gets invoked with this user by default
     ports: list of str, ports to expose from container by default
     volumes: list of str; paths within the container which has data stored outside
@@ -28,6 +29,7 @@ class ImageMetadata:
         self.annotations = {}
         self.env_vars = {}
         self.cmd = None
+        self.entrypoint = None
         self.user = None
         self.ports = []
         self.volumes = []
@@ -39,6 +41,7 @@ class ImageMetadata:
             ANNOTATIONS_KEY: self.annotations,
             "env_vars": self.env_vars,
             "cmd": self.cmd,
+            "entrypoint": self.entrypoint,
             "user": self.user,
             "ports": self.ports,
             "volumes": self.volumes
@@ -51,6 +54,7 @@ class ImageMetadata:
         self.annotations.update(data.get(ANNOTATIONS_KEY, {}))
         self.env_vars.update(data.get("environment", {}))
         self.cmd = data.get("cmd", None)
+        self.entrypoint = data.get("entrypoint", None)
         self.user = data.get("user", None)
         self.ports += data.get("ports", [])
         self.volumes += data.get("volumes", [])
@@ -64,6 +68,7 @@ class ImageMetadata:
         m.annotations = graceful_get(j, ANNOTATIONS_KEY, default={})
         m.env_vars = j["env_vars"]
         m.cmd = j["cmd"]
+        m.entrypoint = j["entrypoint"]
         m.user = j["user"]
         m.ports = j["ports"]
         m.volumes = j["volumes"]

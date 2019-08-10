@@ -142,6 +142,10 @@ class CLI:
             help="command to run by default in the container"
         )
         self.build_parser.add_argument(
+            "--entrypoint",
+            help="entrypoint script to configure for the container"
+        )
+        self.build_parser.add_argument(
             "-u", "--user",
             help="the container gets invoked with this user by default"
         )
@@ -266,6 +270,8 @@ class CLI:
                 metadata.env_vars[k] = v
         if self.args.cmd:
             metadata.cmd = self.args.cmd
+        if self.args.entrypoint:
+            metadata.entrypoint = self.args.entrypoint
         if self.args.user:
             metadata.user = self.args.user
         if self.args.ports:

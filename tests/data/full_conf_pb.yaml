@@ -24,6 +24,7 @@
         environment:
           z: '{{ key }}'
         cmd: command -x -y z
+        entrypoint: great-entry-point
         user: leonardo
 
   tasks: []

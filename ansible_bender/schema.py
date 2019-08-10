@@ -229,6 +229,7 @@ IMAGE_META_SCHENA = {
         "annotations",
         "env_vars",
         "cmd",
+        "entrypoint",
         "user",
         "ports",
         "volumes"
@@ -269,6 +270,16 @@ IMAGE_META_SCHENA = {
             "default": "",
             "examples": [
                 "command -x -y z"
+            ],
+            "pattern": "^(.*)$"
+        },
+        "entrypoint": {
+            "$id": "#/properties/entrypoint",
+            "type": ["string", "null"],
+            "title": "An entrypoint script to configure for the container",
+            "default": "",
+            "examples": [
+                "entrypoint.sh"
             ],
             "pattern": "^(.*)$"
         },

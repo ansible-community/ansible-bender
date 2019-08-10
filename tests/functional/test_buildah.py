@@ -107,6 +107,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     e_x_y = "X=Y"
     ann = "bohemian=rhapsody"
     cmd, cmd_e = "ls -lha", ["ls", "-lha"]
+    entrypoint, entrypoint_e = "ls -lha", ["/bin/sh", "-c", "ls -lha"]
     # FIXME: this doesn't work with user namespaces
     # user = "1000"
     p_80, p_443 = "80", "443"
@@ -117,6 +118,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            "--annotation", ann,
            "-e", e_a_b, e_x_y,
            "--cmd", cmd,
+           "--entrypoint", entrypoint,
            # "-u", user,
            "-p", p_80, p_443,
            "--runtime-volumes", runtime_volume,
@@ -132,6 +134,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
     assert e_a_b in co["Env"]
     assert e_x_y in co["Env"]
     assert co["Cmd"] == cmd_e
+    assert co["Entrypoint"] == entrypoint_e
     # assert co["User"] == user
     assert p_80 in co["ExposedPorts"]
     assert p_443 in co["ExposedPorts"]

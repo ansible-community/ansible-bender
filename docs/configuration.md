@@ -50,6 +50,7 @@ only from the first play. All the plays will end up in a single container image.
 | `annotations`        | dict            | key/value data to apply to the final image (buildah/runc specific)   |
 | `environment`        | dict            | implicit environment variables to set in a container                 |
 | `cmd`                | string          | a default command to invoke the container                            |
+| `entrypoint`         | string          | entrypoint script to configure for the container                     |
 | `user`               | string          | UID or username used to invoke the container                         |
 | `ports`              | list of strings | a list of ports which are meant to be exposed on the host            |
 | `volumes`            | list of strings | a list of paths which are meant to be hosted outside of the container|
@@ -95,6 +96,7 @@ usage: ansible-bender build [-h] [--builder {docker,buildah}] [--no-cache]
                             [-l [LABELS [LABELS ...]]]
                             [--annotation [ANNOTATIONS [ANNOTATIONS ...]]]
                             [-e [ENV_VARS [ENV_VARS ...]]] [--cmd CMD]
+                            [--entrypoint ENTRYPOINT]
                             [-u USER] [-p [PORTS [PORTS ...]]]
                             [--runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]]
                             [--extra-buildah-from-args EXTRA_BUILDAH_FROM_ARGS]
@@ -132,6 +134,8 @@ optional arguments:
                         add an environment variable to the metadata of the
                         image, should be specified as 'KEY=VALUE'
   --cmd CMD             command to run by default in the container
+  --entrypoint ENTRYPOINT
+                        entrypoint script to configure for the container
   -u USER, --user USER  the container gets invoked with this user by default
   -p [PORTS [PORTS ...]], --ports [PORTS [PORTS ...]]
                         ports to expose from container by default

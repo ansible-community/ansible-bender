@@ -84,7 +84,8 @@ def create_buildah_container(container_image, container_name, build_volumes=None
 
 def configure_buildah_container(container_name, working_dir=None, env_vars=None,
                                 labels=None, annotations=None,
-                                user=None, cmd=None, ports=None, volumes=None,
+                                user=None, cmd=None, entrypoint=None,
+                                ports=None, volumes=None,
                                 debug=False):
     """
     apply metadata on the container so they get inherited in an image
@@ -95,6 +96,7 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
     :param annotations: dict with annotations
     :param env_vars: dict with env vars
     :param cmd: str, command to run by default in the container
+    :param entrypoint: str, entrypoint script to configure for the container
     :param user: str, username or uid; the container gets invoked with this user by default
     :param ports: list of str, ports to expose from container by default
     :param volumes: list of str; paths within the container which has data stored outside
@@ -117,6 +119,8 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
         config_args += ["--user", user]
     if cmd:
         config_args += ["--cmd", cmd]
+    if entrypoint:
+        config_args += ["--entrypoint", entrypoint]
     if ports:
         for p in ports:
             config_args += ["-p", p]
@@ -216,12 +220,14 @@ class BuildahBuilder(Builder):
         else:
             user = self.build.build_user
 
-        if self.build.metadata.user or self.build.metadata.cmd or self.build.metadata.volumes:
+        if (self.build.metadata.user or self.build.metadata.cmd or
+            self.build.metadata.entrypoint or self.build.metadata.volumes):
             # change user if needed
             configure_buildah_container(
                 self.ansible_host,
                 user=user,
                 cmd=self.build.metadata.cmd,
+                entrypoint=self.build.metadata.entrypoint,
                 volumes=self.build.metadata.volumes,
             )
 
