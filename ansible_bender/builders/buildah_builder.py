@@ -233,12 +233,16 @@ class BuildahBuilder(Builder):
 
         if image_name:
             args = [self.ansible_host, image_name]
+            if final_image and self.build.squash:
+                args.insert(0, "--squash")
             buildah("commit", args, print_output=print_output, debug=self.debug)
             return self.get_image_id(image_name)
         else:
             fd, name = tempfile.mkstemp()
             os.close(fd)
             args = ["-q", "--iidfile", name, self.ansible_host]
+            if final_image and self.build.squash:
+                args.insert(0, "--squash")
             try:
                 buildah("commit", args, print_output=print_output, debug=self.debug)
                 image_id = Path(name).read_text()

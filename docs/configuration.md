@@ -30,6 +30,7 @@ only from the first play. All the plays will end up in a single container image.
 | `target_image`            | dict   | metadata of the final image which we built
 | `cache_tasks`             | bool   | When true, enable caching mechanism
 | `layering`                | bool   | When true, snapshot the image after a task is executed
+| `squash`                  | bool   | When true, squash the final image down to a single layer
 | `verbose_layer_names`     | bool   | tag layers with a verbose name if true (image-name + timestamp), defaults to false
 
 
@@ -91,6 +92,7 @@ Please check out `ansible-bender build --help` for up to date options:
 ```
 $ ansible-bender build -h
 usage: ansible-bender build [-h] [--builder {docker,buildah}] [--no-cache]
+                            [--squash]
                             [--build-volumes [BUILD_VOLUMES [BUILD_VOLUMES ...]]]
                             [--build-user BUILD_USER] [-w WORKDIR]
                             [-l [LABELS [LABELS ...]]]
@@ -117,6 +119,7 @@ optional arguments:
                         them if a task is unchanged; this option also implies
                         the final image is composed of a base image and one
                         additional layer
+  --squash              squash final image down to a single layer
   --build-volumes [BUILD_VOLUMES [BUILD_VOLUMES ...]]
                         mount selected directory inside the container during
                         build, should be specified as
