@@ -17,7 +17,7 @@ check-a-lot:
 
 check-in-container:
 	podman run -ti --rm \
-		--tmpfs /tmp:rw,exec,nosuid,nodev,size=1000000k \
+		--tmpfs /tmp:rw,nosuid,nodev,size=1000000k \
 		--privileged \
 		-e CGROUP_MANAGER=cgroupfs \
 		-v $(CURDIR):/src \
