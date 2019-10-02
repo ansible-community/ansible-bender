@@ -1,3 +1,4 @@
+"""Ansible Bender CLI entry point."""
 from .cli import main
 
 
