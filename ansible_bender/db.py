@@ -83,7 +83,7 @@ class Database:
         """
         while True:
             try:
-                with os.fdopen(os.open(self._lock_path(), os.O_RDONLY|os.O_EXCL ),'r') as fd:
+                with os.fdopen(os.open(self._lock_path(), os.O_RDONLY ),'r') as fd:
                     # the file exists, ab changes the database
                     pid = fd.read()
                 logger.info("ab is running as PID %s", pid)
@@ -91,7 +91,7 @@ class Database:
                 time.sleep(0.1)
             except FileNotFoundError:
                 # cool, let's take the lock
-                with os.fdopen(os.open(self._lock_path(), os.O_WRONLY|os.O_EXCL ),'w') as fd:
+                with os.fdopen(os.open(self._lock_path(), os.O_WRONLY|os.O_EXCL|os.O_CREAT ),'w') as fd:
                     fd.write("%s" % os.getpid())
                 break
         # logger.debug("this stack has the lock: %s", traceback.extract_stack())
@@ -133,7 +133,7 @@ class Database:
     def _load(self):
         """ load data from disk, lock has to be acquired already! """
         try:
-            with os.fdopen(os.open(self._db_path(), os.O_RDONLY|os.O_EXCL ),'r') as fd:
+            with os.fdopen(os.open(self._db_path(), os.O_RDONLY ),'r') as fd:
                 return json.load(fd)
         except FileNotFoundError:
             # no problem, probably a first run
@@ -149,7 +149,7 @@ class Database:
 
     def _save(self, data):
         """ save data from memory to disk, lock has to be acquired already! """
-        with os.fdopen(os.open(self._db_path(), os.O_WRONLY|os.O_EXCL),'w') as fd:
+        with os.fdopen(os.open(self._db_path(), os.O_WRONLY),'w') as fd:
             json.dump(data, fd, indent=2)
 
     @staticmethod
