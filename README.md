@@ -92,9 +92,9 @@ $ python3 -m pip install ...
 Pip takes care of python dependencies, but ansible-bender also requires a few
 binaries to be present on your host system:
 
-* [Podman](https://github.com/containers/libpod)
-* [Buildah](https://github.com/containers/buildah)
-* [Ansible](https://github.com/ansible/ansible)
+* [Podman](https://podman.io/getting-started/installation)
+* [Buildah](https://github.com/containers/buildah/blob/master/install.md)
+* [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   * Ansible needs to be built against python 3
 * Python 3.6 or later (python 3.5 or earlier are not supported and known not
   to be working)
