@@ -158,7 +158,7 @@ class Database:
         """ return id for next build id and increment the one in DB """
         next_build_id = data["next_build_id"]
         data["next_build_id"] += 1
-        if data["builds"].get[next_build_id]:
+        if not data["builds"].get[next_build_id]:
             return str(next_build_id)
         else:
             raise Exception('Build ID already exists')
