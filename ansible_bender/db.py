@@ -158,8 +158,11 @@ class Database:
         """ return id for next build id and increment the one in DB """
         next_build_id = data["next_build_id"]
         data["next_build_id"] += 1
-        # TODO: verify such build is not in DB, we don't want to overwrite, just in case
-        return str(next_build_id)
+        if data["builds"].get[next_build_id]:
+            return str(next_build_id)
+        else:
+            raise Exception('Build ID already exists')
+
 
     def record_build(self, build_i, build_id=None, build_state=None, set_finish_time=False):
         """
