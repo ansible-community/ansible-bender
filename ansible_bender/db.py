@@ -161,7 +161,7 @@ class Database:
         if not data["builds"].get[next_build_id]:
             return str(next_build_id)
         else:
-            raise Exception('Build ID already exists')
+            raise Exception(f'Database seems to be corrupted. Build {next_build_id_str} already exists.')
 
 
     def record_build(self, build_i, build_id=None, build_state=None, set_finish_time=False):
