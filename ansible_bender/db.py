@@ -158,10 +158,10 @@ class Database:
         """ return id for next build id and increment the one in DB """
         next_build_id = data["next_build_id"]
         data["next_build_id"] += 1
-        if not data["builds"].get[next_build_id]:
+        if not data["builds"].get(str(next_build_id)):
             return str(next_build_id)
         else:
-            raise Exception(f'Database seems to be corrupted. Build {next_build_id_str} already exists.')
+            raise Exception(f'Database seems to be corrupted. Build {next_build_id} already exists.')
 
 
     def record_build(self, build_i, build_id=None, build_state=None, set_finish_time=False):
