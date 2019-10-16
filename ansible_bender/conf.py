@@ -68,7 +68,7 @@ class ImageMetadata:
         m.annotations = graceful_get(j, ANNOTATIONS_KEY, default={})
         m.env_vars = j["env_vars"]
         m.cmd = j["cmd"]
-        m.entrypoint = j["entrypoint"]
+        m.entrypoint = j.get("entrypoint", "")
         m.user = j["user"]
         m.ports = j["ports"]
         m.volumes = j["volumes"]
@@ -226,7 +226,7 @@ class Build:
         b.cache_tasks = j["cache_tasks"]
         b.log_lines = j["log_lines"]
         b.layering = j["layering"]
-        b.squash = j["squash"]
+        b.squash = j.get("squash", False)
         b.debug = j["debug"]
         b.verbose = j["verbose"]
         b.pulled = j["pulled"]

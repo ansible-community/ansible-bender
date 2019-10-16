@@ -1,12 +1,14 @@
+import json
 import os
+from pathlib import Path
 
 import jsonschema
 import pytest
-from ansible_bender.utils import set_logging
 
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.core import PbVarsParser
-
+from ansible_bender.db import Database
+from ansible_bender.utils import set_logging
 from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_path, multiplay_path
 
 
@@ -91,3 +93,95 @@ def test_multiplay(caplog):
     assert b.target_image != "nope"
     assert "Variables are loaded only from the first play." == caplog.records[0].msg
     assert "no bender data found in the playbook" == caplog.records[1].msg
+
+
+def test_backwards_compat(tmpdir):
+    """
+    we keep adding new fields in DB: this test makes sure that none of them are required
+    so that old config is forward compat with new versions of ab
+    """
+    db_dir_path = str(tmpdir)
+    db = Database(db_path=db_dir_path)
+    db_path = db._db_path()
+    db_content = {
+        "next_build_id": 2,
+        "builds": {
+            "1": {
+                "build_id": "1",
+                "playbook_path": "playbook.yaml",
+                "build_volumes": [],
+                "build_user": None,
+                "metadata": {
+                    "working_dir": "/src",
+                    "labels": {},
+                    "annotations": {},
+                    "env_vars": {},
+                    "cmd": None,
+                    "user": None,
+                    "ports": [],
+                    "volumes": []
+                },
+                "state": "done",
+                "build_start_time": "20190923-153518169396",
+                "build_finished_time": "20190923-153531854630",
+                "base_image": "fedora:30",
+                "target_image": "ansiblefest-image",
+                "builder_name": "buildah",
+                "layers": [
+                    {
+                        "content": None,
+                        "layer_id": "e9ed59d2baf72308f3a811ebc49ff3f4e0175abf40bf636bea0160759c637999",
+                        "base_image_id": None,
+                        "cached": True
+                    },
+                    {
+                        "content": "730ecc32518d080377233c10f42ec832f3834cc933ff42a32cbb",
+                        "layer_id": "6e96477fc1760c4b325af2411b0b3eeb7329ad498e1f12d3f45407b468370c87",
+                        "base_image_id": "e9ed59d2baf72308f3a811ebc49ff3f4e0175abf40bf636bea0160759c637999",
+                        "cached": False
+                    },
+                    {
+                        "content": "ffdc7f85f0fe7a9b72fe172d2e54c7d39daf81d7779dcf560d729",
+                        "layer_id": "ccaa5ef34c2d6afacf8017f00d0ae3ce325ac9e282a49acedcbb166c8a3e23b9",
+                        "base_image_id": "6e96477fc1760c4b325af2411b0b3eeb7329ad498e1f12d3f45407b468370c87",
+                        "cached": False
+                    }
+                ],
+                "final_layer_id": "55187e2caf8e5f0c8b5e6c863779701328dc9de17a3cd07525894a6e2e41339f",
+                "layer_index": {
+                    "e9ed59d2baf72308f3a811ebc49ff3f4e0175abf40bf636bea0160759c637999": {
+                        "content": None,
+                        "layer_id": "e9ed59d2baf72308f3a811ebc49ff3f4e0175abf40bf636bea0160759c637999",
+                        "base_image_id": None,
+                        "cached": True
+                    },
+                    "6e96477fc1760c4b325af2411b0b3eeb7329ad498e1f12d3f45407b468370c87": {
+                        "content": "730ecc32518d080377233c10f42ec832f3834cc933ff42a32cbb54bb4",
+                        "layer_id": "6e96477fc1760c4b325af2411b0b3eeb7329ad498e1f12d3f45407b468370c87",
+                        "base_image_id": "e9ed59d2baf72308f3a811ebc49ff3f4e0175abf40bf636bea0160759c637999",
+                        "cached": False
+                    },
+                    "ccaa5ef34c2d6afacf8017f00d0ae3ce325ac9e282a49acedcbb166c8a3e23b9": {
+                        "content": "ffdc7f85f0fe7a9b72fe172d2e54c7d39daf81d7779dcf560d729e99",
+                        "layer_id": "ccaa5ef34c2d6afacf8017f00d0ae3ce325ac9e282a49acedcbb166c8a3e23b9",
+                        "base_image_id": "6e96477fc1760c4b325af2411b0b3eeb7329ad498e1f12d3f45407b468370c87",
+                        "cached": False
+                    }
+                },
+                "build_container": "ansiblefest-image-20190923-153517420660-cont",
+                "cache_tasks": True,
+                "log_lines": [""],
+                "layering": True,
+                "debug": True,
+                "verbose": True,
+                "pulled": True,
+                "buildah_from_extra_args": None,
+                "ansible_extra_args": "",
+                "python_interpreter": "",
+                "verbose_layer_names": ""
+            },
+
+        }
+    }
+    Path(db_path).write_text(json.dumps(db_content))
+    assert db.load_builds()
