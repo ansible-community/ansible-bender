@@ -16,6 +16,7 @@ from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
 
+from ansible_bender.utils import fancy_time
 
 def split_once_or_fail_with(strink, pattern, error_message):
     """
@@ -317,13 +318,13 @@ class CLI:
         for b in builds:
             build_time = ""
             if b.build_finished_time and b.build_start_time:
-                build_time = b.build_finished_time - b.build_start_time
+                build_time = fancy_time(b.build_finished_time - b.build_start_time)
             builds_data.append((
                 b.build_id,
                 b.target_image,
                 b.state.value,
                 b.build_finished_time if b.build_finished_time else "",
-                build_time  # TODO: make it fancy
+                build_time
             ))
         print(tabulate(builds_data, headers=header))
 
