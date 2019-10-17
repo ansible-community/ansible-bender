@@ -5,9 +5,10 @@ from flexmock import flexmock
 
 from ansible_bender import utils
 from ansible_bender.db import generate_working_cont_name
-from ansible_bender.utils import run_cmd, graceful_get, ap_command_exists, is_ansibles_python_2
+from ansible_bender.utils import run_cmd, graceful_get, ap_command_exists, is_ansibles_python_2, fancy_time
 from tests.spellbook import C7_AP_VER_OUT
 
+from datetime import timedelta
 
 def test_run_cmd():
     assert "etc" in run_cmd(["ls", "-1", "/"], return_all_output=True)
@@ -59,3 +60,18 @@ def test_ansibles_python(m, is_py2):
     m()
     cmd = ap_command_exists()
     assert is_ansibles_python_2(cmd) == is_py2
+
+fancy_time_testdata = [
+    (timedelta(1), "1 day"),
+    (timedelta(2), "2 days"),
+    (timedelta(0, 1), "1 second"),
+    (timedelta(0, 2), "2 seconds"),
+    (timedelta(0, 60), "1 minute"),
+    (timedelta(0, 120), "2 minutes"),
+    (timedelta(0, 3600), "1 hour"),
+    (timedelta(0, 7200), "2 hours")
+]
+
+@pytest.mark.parametrize("build_time, expected", fancy_time_testdata)
+def test_fancy_time(build_time, expected):
+    assert fancy_time(build_time) == expected
