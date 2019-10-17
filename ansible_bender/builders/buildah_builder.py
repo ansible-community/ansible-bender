@@ -1,6 +1,8 @@
+import datetime
 import json
 import logging
 import os
+import re
 import shlex
 import subprocess
 import tempfile
@@ -8,6 +10,8 @@ from pathlib import Path
 from typing import Optional
 
 from ansible_bender.builders.base import Builder
+from ansible_bender.constants import TIMESTAMP_FORMAT_TOGETHER
+from ansible_bender import utils
 from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, \
     podman_command_exists
 
@@ -241,6 +245,13 @@ class BuildahBuilder(Builder):
             fd, name = tempfile.mkstemp()
             os.close(fd)
             args = ["-q", "--iidfile", name, self.ansible_host]
+            # buildah 1.7.3 dropped the requirement for image name, let's support both
+            # https://github.com/ansible-community/ansible-bender/issues/166
+            if self.get_buildah_version() < (1, 7, 3):
+                args += ["{}-{}".format(
+                    self.ansible_host,
+                    datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER)
+                )]
             if final_image and self.build.squash:
                 args.insert(0, "--squash")
             try:
@@ -336,6 +347,17 @@ class BuildahBuilder(Builder):
         run_cmd(["podman", "version"], log_stderr=True, log_output=True)
         logger.debug("checking that buildah command works")
         run_cmd(["buildah", "version"], log_stderr=True, log_output=True)
+
+    def get_buildah_version(self):
+        out = run_cmd(["buildah", "version"], log_stderr=True, return_output=True, log_output=False)
+        version = re.findall(r"Version:\s+(\d+)\.(\d+)\.(\d+)", out)
+        logger.debug("buildah version = %s", version)
+        # buildah version = [('1', '11', '3')]
+        try:
+            return int(version[0][0]), int(version[0][1]), int(version[0][2])
+        except (IndexError, ValueError) as ex:
+            logger.error("Unable to parse buildah's version: %s", ex)
+            return 0, 0, 0
 
     def check_container_creation(self):
         """

@@ -1,7 +1,7 @@
 import pytest
 
-from ansible_bender.conf import Build
 from ansible_bender.builders.buildah_builder import BuildahBuilder
+from ansible_bender.conf import Build
 
 
 @pytest.mark.parametrize("image_name,found", [
@@ -20,3 +20,9 @@ def test_find_py_intrprtr_in_fedora_image(image_name, found):
         if found:
             # interpreter should have been found
             raise
+
+
+def test_get_version():
+    b = BuildahBuilder(Build(), debug=True)
+    version = b.get_buildah_version()
+    assert [x for x in version if isinstance(x, int)]
