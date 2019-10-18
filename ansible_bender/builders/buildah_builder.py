@@ -350,11 +350,11 @@ class BuildahBuilder(Builder):
 
     def get_buildah_version(self):
         out = run_cmd(["buildah", "version"], log_stderr=True, return_output=True, log_output=False)
-        version = re.findall(r"Version:\s+(\d+)\.(\d+)\.(\d+)", out)
+        version = re.findall(r"Version:\s*([\d\.]+)", out)[0].split(".")
         logger.debug("buildah version = %s", version)
-        # buildah version = [('1', '11', '3')]
+        # buildah version = ['1', '11', '3']
         try:
-            return int(version[0][0]), int(version[0][1]), int(version[0][2])
+            return tuple(map(int, version))
         except (IndexError, ValueError) as ex:
             logger.error("Unable to parse buildah's version: %s", ex)
             return 0, 0, 0
