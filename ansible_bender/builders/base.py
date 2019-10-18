@@ -34,6 +34,7 @@ class Builder:
             "/usr/local/bin/python2",
             "/usr/bin/python",
             "/usr/local/bin/python",
+            "/usr/libexec/platform-python",
         )
 
     def create(self):
