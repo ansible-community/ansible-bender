@@ -4,12 +4,13 @@ PY_PACKAGE := ansible-bender
 # container image with ab inside
 CONT_IMG := $(PY_PACKAGE)
 ANSIBLE_BENDER := python3 -m ansible_bender.cli
+PYTEST_EXEC := pytest-3
 
 build-ab-img: recipe.yml
 	$(ANSIBLE_BENDER) build -- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
-	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v $(TEST_TARGET)
+	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes $(PYTEST_EXEC) --cov=ansible_bender -l -v $(TEST_TARGET)
 
 check-a-lot:
 	WITH_TESTS=yes vagrant up --provision
