@@ -260,3 +260,32 @@ def is_ansibles_python_2(ap_exe: str) -> bool:
         return True
     logger.debug("it seems that %s is not using python 2", ap_exe)
     return False
+
+def fancy_time(build_time):
+    """ 
+    returns build time in human readable form 
+
+    :param build_time: total time taken for the build
+    """
+    seconds = build_time.seconds
+    minutes = round(seconds / 60)
+    hours = round(seconds / 60 / 60)
+    days = build_time.days
+    f_time = ""
+
+    if days > 0:
+        f_time = str(days)
+        f_time = f_time + (" day" if days == 1 else " days")
+    elif hours > 0:
+        f_time = str(hours)
+        f_time = f_time + (" hour" if hours == 1 else " hours")
+    elif minutes > 0:
+        f_time = str(minutes)
+        f_time = f_time + (" minute" if minutes == 1 else " minutes")
+    elif seconds > 0:
+        f_time = str(seconds)
+        f_time = f_time + (" second" if seconds == 1 else " seconds")
+    else:
+        f_time = "zero time"
+    
+    return f_time
