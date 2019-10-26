@@ -91,10 +91,12 @@ class Database:
                 time.sleep(0.1)
             except FileNotFoundError:
                 # cool, let's take the lock
-                # FIXME: but this is not atomic, we should use open() for that
-                with open(self._lock_path(), "w") as fd:
-                    fd.write("%s" % os.getpid())
-                break
+                try:
+                    with os.fdopen(os.open(self._lock_path(), os.O_WRONLY|os.O_EXCL|os.O_CREAT ),'w') as fd:
+                        fd.write("%s" % os.getpid())
+                    break
+                except FileExistsError:
+                    continue
         # logger.debug("this stack has the lock: %s", traceback.extract_stack())
         yield True
         self.release()
