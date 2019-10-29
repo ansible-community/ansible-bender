@@ -65,6 +65,27 @@ def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
     return run_cmd(["podman", "run", "--rm", container_image] + cmd,
                    return_output=return_output, log_stderr=log_stderr)
 
+def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True, return_output=False):
+    """
+    run provided command in selected container image using buildah; raise exc when command fails
+
+    :param container_image: str
+    :param host_name: str
+    :param cmd: list of str
+    :param log_stderr: bool, log errors to stdout as ERROR level
+    :param return_output: bool, if True, return output of the command
+    """
+    container_name="{}-{}".format(host_name, datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER))
+    try:
+        create_buildah_container(container_image, container_name, None, None, False)
+        run_cmd(["buildah", "run", container_name] + cmd,
+                return_output=return_output, log_stderr=log_stderr)
+    except:
+        print(f"Unable to create container {container_image} using buildah")
+    finally:
+        run_cmd(["buildah", "rm", container_name],
+                return_output=return_output, log_stderr=log_stderr)
+
 
 def create_buildah_container(container_image, container_name, build_volumes=None, extra_from_args=None, debug=False):
     """
@@ -347,6 +368,8 @@ class BuildahBuilder(Builder):
         run_cmd(["podman", "version"], log_stderr=True, log_output=True)
         logger.debug("checking that buildah command works")
         run_cmd(["buildah", "version"], log_stderr=True, log_output=True)
+        logger.debug("Checking container creation using buildah")
+        buildah_run_cmd(self.build.base_image, self.ansible_host, ["true"], log_stderr=True)
 
     def get_buildah_version(self):
         out = run_cmd(["buildah", "version"], log_stderr=True, return_output=True, log_output=False)
