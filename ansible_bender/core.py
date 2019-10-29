@@ -1,5 +1,5 @@
 """
-Module to interact with Ansible, perform ansible-pleybook and extract metadata from Ansible vars
+Module to interact with Ansible, perform ansible-playbook and extract metadata from Ansible vars
 
 A sample configuration:
 

@@ -1,5 +1,19 @@
+# test artifacts
 tests/data/basic_playbook.retry
 tests/data/basic_playbook_with_volume.retry
 contrib/ab-pod.yml
 .coverage.*
 .coverage*
+
+# python artifacts
+__pycache__/
+*.pyc
+*$py.class
+pip-log.txt
+pip-delete-this-directory.txt
+.python-version
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
