@@ -112,6 +112,8 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
 
     env = os.environ.copy()
     env["ANSIBLE_RETRY_FILES_ENABLED"] = "0"
+    if debug:
+        env["ANSIBLE_STDOUT_CALLBACK"] = "debug"
     if environment:
         env.update(environment)
     if a_cfg_path:
