@@ -65,7 +65,8 @@ def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
     return run_cmd(["podman", "run", "--rm", container_image] + cmd,
                    return_output=return_output, log_stderr=log_stderr)
 
-def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True, return_output=False):
+
+def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True):
     """
     run provided command in selected container image using buildah; raise exc when command fails
 
@@ -73,18 +74,20 @@ def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True, return_out
     :param host_name: str
     :param cmd: list of str
     :param log_stderr: bool, log errors to stdout as ERROR level
-    :param return_output: bool, if True, return output of the command
     """
-    container_name="{}-{}".format(host_name, datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER))
+    container_name = "{}-{}".format(host_name, datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER))
+    # was the temporary container created? if so, remove it
+    created = False
     try:
         create_buildah_container(container_image, container_name, None, None, False)
-        run_cmd(["buildah", "run", container_name] + cmd,
-                return_output=return_output, log_stderr=log_stderr)
-    except:
-        print(f"Unable to create container {container_image} using buildah")
+        created = True
+        run_cmd(["buildah", "run", container_name] + cmd, log_stderr=log_stderr)
+    except subprocess.CalledProcessError:
+        logger.error(f"Unable to create or run a container using {container_image} with buildah")
+        raise
     finally:
-        run_cmd(["buildah", "rm", container_name],
-                return_output=return_output, log_stderr=log_stderr)
+        if created:
+            run_cmd(["buildah", "rm", container_name], log_stderr=log_stderr)
 
 
 def create_buildah_container(container_image, container_name, build_volumes=None, extra_from_args=None, debug=False):
