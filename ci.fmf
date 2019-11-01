@@ -1,4 +1,3 @@
----
 /test/bender/smoke:
   execute:
     how: shell
