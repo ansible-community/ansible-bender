@@ -5,6 +5,7 @@
     test_mode: no  # yes - test in CI, no - build an image
     project_dir: /src
     with_tests: no  # yes - run test suite
+    with_bender_install: yes
     ansible_bender:
       target_image:
         workging_dir: /src
@@ -94,3 +95,4 @@
       name: '{{ project_dir }}'
     tags:
     - no-cache
+    when: with_bender_install == "yes"

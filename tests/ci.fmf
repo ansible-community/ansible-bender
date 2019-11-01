@@ -1,14 +1,16 @@
-/test/bender/smoke:
-  execute:
-    how: shell
-    commands:
-    - /usr/bin/ansible-bender --help
-/test/bender/test-suite:
+/bender:
   prepare:
     how: ansible
     playbooks:
-    - recipe.yml
-  execute:
-    how: shell
-    commands:
-    - make check
+    - ci.yaml
+  /smoke:
+    execute:
+      how: shell
+      script:
+      - /usr/bin/ansible-bender --help
+      - /usr/bin/ansible-bender -V
+  /full:
+    execute:
+      how: shell
+      script:
+      - pwd; cd ~/git-source && pwd && make --debug=v check

@@ -18,6 +18,9 @@ jobs:
   trigger: pull_request
   metadata:
     targets:
+    # tests pass here
     - fedora-30-x86_64
+    # https://github.com/ansible-community/ansible-bender/issues/181
     - fedora-31-x86_64
+    # we can't even the provision test env here: twine fails to install
     - fedora-rawhide-x86_64
