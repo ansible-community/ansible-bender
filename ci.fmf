@@ -1,0 +1,15 @@
+---
+/test/bender/smoke:
+  execute:
+    how: shell
+    commands:
+    - /usr/bin/ansible-bender --help
+/test/bender/test-suite:
+  prepare:
+    how: ansible
+    playbooks:
+    - recipe.yml
+  execute:
+    how: shell
+    commands:
+    - make check

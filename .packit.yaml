@@ -14,3 +14,10 @@ jobs:
     - fedora-31-x86_64
     - fedora-rawhide-x86_64
   trigger: pull_request
+- job: tests
+  trigger: pull_request
+  metadata:
+    targets:
+    - fedora-30-x86_64
+    - fedora-31-x86_64
+    - fedora-rawhide-x86_64
