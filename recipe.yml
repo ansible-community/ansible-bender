@@ -45,12 +45,6 @@
       name: docker
       state: started
     when: with_tests == "yes"
-  - name: Install latest twine for sake of check command
-    pip:
-      name:
-      - twine  # we need newest twine, b/c of the check command
-      - readme_renderer[md]
-      state: latest
   # - name: Change storage driver to vfs (ovl on ovl doesn't work)
   #   lineinfile:
   #     path: /etc/containers/storage.conf
