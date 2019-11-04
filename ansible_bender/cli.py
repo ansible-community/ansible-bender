@@ -366,8 +366,7 @@ class CLI:
                 self.app.remove_build(b.build_id)
                 print(f"Build entry with ID {b.build_id} has been removed from DB as it no longer has it's corresponding image")
                 continue
-            finally:
-                print("Done!")
+        print("Done!")
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
