@@ -1,15 +1,26 @@
 downstream_package_name: ansible-bender
-jobs:
-- job: copr_build
-  metadata:
-    targets:
-    - fedora-29-x86_64
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    - fedora-rawhide-x86_64
-  trigger: pull_request
 specfile_path: ansible-bender.spec
 synced_files:
 - ansible-bender.spec
 - .packit.yaml
 upstream_package_name: ansible-bender
+current_version_command: ["python3", "setup.py", "--version"]
+create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
+jobs:
+- job: copr_build
+  metadata:
+    targets:
+    - fedora-30-x86_64
+    - fedora-31-x86_64
+    - fedora-rawhide-x86_64
+  trigger: pull_request
+- job: tests
+  trigger: pull_request
+  metadata:
+    targets:
+    # tests pass here
+    - fedora-30-x86_64
+    # https://github.com/ansible-community/ansible-bender/issues/181
+    - fedora-31-x86_64
+    # we can't even the provision test env here: twine fails to install
+    - fedora-rawhide-x86_64

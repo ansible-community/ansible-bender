@@ -44,6 +44,17 @@ $ make build-ab-img && make check-in-container
 ```
 
 
+### CI
+
+Bender is using [packit project](https://packit.dev/) for continuous integration.
+
+Related files:
+* .packit.yaml — root config file for packit
+* .fmf/ — packit utilies [fmf]() project under the hood and this dir is required for fmf to function
+* tests/ci.fmf — definition of tests to run in Packit's CI System - Testing Farm
+* ci.yaml — Ansible playbook to set up the testing environment so bender's test suite can run
+
+
 ## Install the development version
 
 You can install your development checkout like this:

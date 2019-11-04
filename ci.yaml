@@ -1,0 +1,7 @@
+---
+- name: Provision environment with dependncies to run Bender's test suite
+  vars:
+    project_dir: "."
+    with_bender_install: no
+    with_tests: no
+  import_playbook: recipe.yml
