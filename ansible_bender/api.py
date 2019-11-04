@@ -274,3 +274,6 @@ class Application:
 
     def clean(self):
         self.db.release()
+
+    def remove_build(self, build_id):
+        self.db.delete_build(build_id)

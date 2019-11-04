@@ -65,6 +65,7 @@ class CLI:
         self._do_get_logs_interface()
         self._do_inspect_interface()
         self._do_push_interface()
+        self._do_clean_interface()
 
         self.args = self.parser.parse_args()
         debug = False
@@ -251,6 +252,13 @@ class CLI:
         # )
         self.push_parser.set_defaults(subcommand="push")
 
+    def _do_clean_interface(self):
+        self.lb_parser = self.subparsers.add_parser(
+            name="clean",
+            description="Clean images from database which are no longer present on the disk",
+        )
+        self.lb_parser.set_defaults(subcommand="clean")
+
     def _build(self):
         pb_vars_p = PbVarsParser(self.args.playbook_path)
         build, metadata = pb_vars_p.get_build_and_metadata()
@@ -347,6 +355,20 @@ class CLI:
         # force = self.args.force
         self.app.push(target, build_id=build_id, force=False)
 
+    def _clean(self):
+        builds = self.app.list_builds()
+        print("Cleaning images from database which are no longer present on the disk...")
+        for b in builds:
+            try:
+                run_cmd(["podman", "inspect", b.target_image],
+                        return_output=False, log_output=False)
+            except subprocess.CalledProcessError:
+                self.app.remove_build(b.build_id)
+                print(f"Build entry with ID {b.build_id} has been removed from DB as it no longer has it's corresponding image")
+                continue
+            finally:
+                print("Done!")
+
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
@@ -376,6 +398,10 @@ class CLI:
             elif subcommand == "bio":
                 self._build_inside_openshift()
                 return 0
+            elif subcommand == "clean":
+                self._clean()
+                return 0
+
         except KeyboardInterrupt:
             return 133
         except Exception as ex:
