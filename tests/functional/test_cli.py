@@ -1,5 +1,6 @@
 from .test_buildah import ab
 from ..spellbook import basic_playbook_path, base_image
+from ansible_bender.constants import playbook_template
 
 
 def test_inspect_cmd(tmpdir, target_image):
@@ -78,3 +79,11 @@ def test_clean(tmpdir):
     assert out.startswith("Cleaning images from database which are no longer present on the disk...")
     assert out.endswith("Done!\n")
     
+def test_init(tmpdir):
+    cmd = ["init"]
+    ab(cmd, str(tmpdir))
+    out = ab(["init"], str(tmpdir), return_output=True)
+    assert out.startswith("Created an Ansible playbook template as playbook.yml")
+    with open('playbook.yml', 'r') as fd:
+      pb = fd.read()
+    assert pb == playbook_template
