@@ -8,7 +8,7 @@ NO_CACHE_TAG = "no-cache"
 ANNOTATIONS_KEY = "annotations"
 
 # ansible playbook template in yaml
-playbook_template = """---
+PLAYBOOK_TEMPLATE = """---
 - name: Containerized version of $project
   hosts: all
   vars:

@@ -1,6 +1,6 @@
 from .test_buildah import ab
 from ..spellbook import basic_playbook_path, base_image
-from ansible_bender.constants import playbook_template
+from ansible_bender.constants import PLAYBOOK_TEMPLATE
 
 
 def test_inspect_cmd(tmpdir, target_image):
@@ -86,4 +86,4 @@ def test_init(tmpdir):
     assert out.startswith("Created an Ansible playbook template as playbook.yml")
     with open('playbook.yml', 'r') as fd:
       pb = fd.read()
-    assert pb == playbook_template
+    assert pb == PLAYBOOK_TEMPLATE

@@ -11,7 +11,7 @@ import yaml
 from tabulate import tabulate
 
 from ansible_bender.api import Application
-from ansible_bender.constants import ANNOTATIONS_KEY, playbook_template
+from ansible_bender.constants import ANNOTATIONS_KEY, PLAYBOOK_TEMPLATE
 from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
@@ -378,8 +378,8 @@ class CLI:
 
     def _init(self):
         with open('playbook.yml', 'w') as fd:
-            fd.write(playbook_template)
-        print("Created a playbook template as template_playbook.yml")
+            fd.write(PLAYBOOK_TEMPLATE)
+        print("Created an Ansible playbook template as playbook.yml")
         print("Edit the playbook accordingly and run the build subcommand:\n\nansible-bender build playbook.yaml")
 
     def run(self):
