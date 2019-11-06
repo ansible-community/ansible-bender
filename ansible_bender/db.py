@@ -239,3 +239,18 @@ class Database:
         with self.acquire():
             data = self._load()
             return [Build.from_json(b) for b in data["builds"].values()]
+
+    def delete_build(self, build_id):
+        """
+        delete a build from database
+
+        :param build_id: str, id of the build to be deleted from DB
+        """
+        with self.acquire():
+            data = self._load()
+            try:
+                del data["builds"][build_id]
+            except KeyError:
+                raise RuntimeError("There is no such build with ID %s" % build_id)
+            finally:
+                self._save(data)
