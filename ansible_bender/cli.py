@@ -380,7 +380,7 @@ class CLI:
         with open('playbook.yml', 'w') as fd:
             fd.write(playbook_template)
         print("Created a playbook template as template_playbook.yml")
-        print("Edit the playbook accordingly and run the build subcommand")
+        print("Edit the playbook accordingly and run the build subcommand:\n\nansible-bender build playbook.yaml")
 
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
