@@ -69,6 +69,7 @@ Command | Description
 `inspect` | provide detailed metadata about the selected build
 `push` | Push images you built to remote locations.
 `clean` | Clean images from database which are no longer present on the disk.
+`init` | Adds a template playbook with all the vars.
 
 
 ## Installation
