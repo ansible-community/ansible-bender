@@ -11,7 +11,7 @@ import yaml
 from tabulate import tabulate
 
 from ansible_bender.api import Application
-from ansible_bender.constants import ANNOTATIONS_KEY
+from ansible_bender.constants import ANNOTATIONS_KEY, PLAYBOOK_TEMPLATE
 from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
@@ -66,6 +66,7 @@ class CLI:
         self._do_inspect_interface()
         self._do_push_interface()
         self._do_clean_interface()
+        self._do_init_interface()
 
         self.args = self.parser.parse_args()
         debug = False
@@ -252,6 +253,13 @@ class CLI:
         # )
         self.push_parser.set_defaults(subcommand="push")
 
+    def _do_init_interface(self):
+        self.lb_parser = self.subparsers.add_parser(
+            name="init",
+            description="Add a template playbook with all the vars.",
+        )
+        self.lb_parser.set_defaults(subcommand="init")
+
     def _do_clean_interface(self):
         self.lb_parser = self.subparsers.add_parser(
             name="clean",
@@ -368,6 +376,12 @@ class CLI:
                 continue
         print("Done!")
 
+    def _init(self):
+        with open('playbook.yml', 'w') as fd:
+            fd.write(PLAYBOOK_TEMPLATE)
+        print("Created an Ansible playbook template as playbook.yml")
+        print("Edit the playbook accordingly and run the build subcommand:\n\nansible-bender build playbook.yaml")
+
     def run(self):
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
@@ -400,7 +414,9 @@ class CLI:
             elif subcommand == "clean":
                 self._clean()
                 return 0
-
+            elif subcommand == "init":
+                self._init()
+                return 0
         except KeyboardInterrupt:
             return 133
         except Exception as ex:
