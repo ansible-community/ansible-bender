@@ -493,22 +493,22 @@ PLAYBOOK_SCHEMA = {
         },
         "cache_tasks": {
             "$id": "#/properties/cache_tasks",
-            "type": "bool",
+            "type": "boolean",
             "title": "When true, enable caching mechanism"
         },
         "layering": {
             "$id": "#/properties/layering",
-            "type": "bool",
+            "type": "boolean",
             "title": "When true, snapshot the image after a task is executed",
         },
         "squash": {
             "$id": "#/properties/squash",
-            "type": "bool",
+            "type": "boolean",
             "title": "When true, squash the final image down to a single layer",
         },
         "verbose_layer_names": {
             "$id": "#/properties/verbose_layer_names",
-            "type": "bool",
+            "type": "boolean",
             "title": "tag layers with a verbose name if true (image-name + timestamp), defaults to false",
         },
 

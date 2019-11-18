@@ -5,7 +5,7 @@ import datetime
 
 from ansible_bender.builders.base import BuildState
 from ansible_bender.constants import TIMESTAMP_FORMAT, ANNOTATIONS_KEY
-from ansible_bender.schema import IMAGE_META_SCHENA, BUILD_SCHEMA
+from ansible_bender.schema import IMAGE_META_SCHEMA, BUILD_SCHEMA 
 from ansible_bender.utils import graceful_get
 
 import jsonschema
@@ -75,7 +75,7 @@ class ImageMetadata:
         return m
 
     def validate(self):
-        jsonschema.validate(self.to_dict(), IMAGE_META_SCHENA)
+        jsonschema.validate(self.to_dict(), IMAGE_META_SCHEMA)
 
 
 class Layer:
