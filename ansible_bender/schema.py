@@ -348,7 +348,6 @@ PLAYBOOK_SCHEMA = {
             "$id": "#/properties/working_container",
             "type": ["object", "null"],
             "title": "settings for the container where the build occurs",
-            "default": "",
             "additionalProperties": False,
             "properties": {
                 "volumes": {
@@ -359,22 +358,18 @@ PLAYBOOK_SCHEMA = {
                         "$id": "#/properties/working_container/properties/volumes/items",
                         "type": "string",
                         "title": "The Items Schema",
-                        "default": "",
                         "examples": [
                             "/path/to/a/directory"
                         ],
-                        "pattern": "^(.*)$"
-                    } 
+                    }
                 },
                 "user": {
                     "$id": "#/properties/working_container/properties/user",
                     "type": ["string", "null"],
                     "title": "UID or username used to invoke the container",
-                    "default": "",
                     "examples": [
                         "leonardo"
                     ],
-                    "pattern": "^(.*)$"
                 }
             }
         },
@@ -388,7 +383,6 @@ PLAYBOOK_SCHEMA = {
                     "$id": "#/properties/target_image/properties/name",
                     "type": ["string", "null"],
                     "title": "Path to a working directory within a container image",
-                    "default": "",
                 },
                 "ports": {
                     "$id": "#/properties/target_image/properties/ports",
@@ -399,11 +393,9 @@ PLAYBOOK_SCHEMA = {
                         "$id": "#/properties/target_image/properties/ports/items",
                         "type": "string",
                         "title": "The Items Schema",
-                        "default": "",
                         "examples": [
                             "80", "443"
                         ],
-                        "pattern": "^(.*)$"
                     }
                 },
                 "volumes": {
@@ -414,22 +406,18 @@ PLAYBOOK_SCHEMA = {
                         "$id": "#/properties/target_image/properties/volumes/items",
                         "type": "string",
                         "title": "The Items Schema",
-                        "default": "",
                         "examples": [
                             "/path/to/a/directory"
                         ],
-                        "pattern": "^(.*)$"
-                    } 
+                    }
                 },
                 "working_dir": {
                     "$id": "#/properties/target_image/properties/working_dir",
                     "type": ["string", "null"],
                     "title": "Path to a working directory within a container image",
-                    "default": "",
                     "examples": [
                         "/workshop"
                     ],
-                    "pattern": "^(.*)$"
                 },
                 "labels": {
                     "$id": "#/properties/target_image/properties/labels",
@@ -457,27 +445,22 @@ PLAYBOOK_SCHEMA = {
                     "examples": [
                         "command -x -y z"
                     ],
-                    "pattern": "^(.*)$"
                 },
                 "entrypoint": {
                     "$id": "#/properties/target_image/properties/entrypoint",
                     "type": ["string", "null"],
                     "title": "An entrypoint script to configure for the container",
-                    "default": "",
                     "examples": [
                         "entrypoint.sh"
                     ],
-                    "pattern": "^(.*)$"
                 },
                 "user": {
                     "$id": "#/properties/target_image/properties/user",
                     "type": ["string", "null"],
                     "title": "UID or username used to invoke the container",
-                    "default": "",
                     "examples": [
                         "leonardo"
                     ],
-                    "pattern": "^(.*)$"
                 },
             },
         },
@@ -488,7 +471,6 @@ PLAYBOOK_SCHEMA = {
             "examples": [
                 "fedora:29"
             ],
-            "pattern": "^(.*)$",
         },
         "cache_tasks": {
             "$id": "#/properties/cache_tasks",
