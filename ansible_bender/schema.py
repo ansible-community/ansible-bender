@@ -343,6 +343,7 @@ PLAYBOOK_SCHEMA = {
     "$id": "3",
     "type": "object",
     "title": "Playbook Schema",
+    "additionalProperties": False,
     "properties": {
         "working_container": {
             "$id": "#/properties/working_container",
@@ -492,7 +493,15 @@ PLAYBOOK_SCHEMA = {
             "type": "boolean",
             "title": "tag layers with a verbose name if true (image-name + timestamp), defaults to false",
         },
-
+        "ansible_extra_args": {
+            "$id": "#/properties/ansible_extra_args",
+            "type": "string",
+            "title": "provide extra arguments for ansible-playbook run",
+        },
+        "buildah_from_extra_args": {
+            "$id": "#/properties/buildah_from_extra_args",
+            "type": "string",
+            "title": "provide extra arguments for `buildah from` command"
+        },
     },
-    "additionalProperties": False
 }
