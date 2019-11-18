@@ -355,7 +355,7 @@ PLAYBOOK_SCHEMA = {
                     "$id": "#/properties/working_container/properties/volumes",
                     "type": "array",
                     "title": "A list of paths which are meant to be hosted outside of the container",
-                     "items": {
+                    "items": {
                         "$id": "#/properties/working_container/properties/volumes/items",
                         "type": "string",
                         "title": "The Items Schema",
@@ -403,14 +403,14 @@ PLAYBOOK_SCHEMA = {
                         "examples": [
                             "80", "443"
                         ],
-                    "pattern": "^(.*)$"
+                        "pattern": "^(.*)$"
                     }
                 },
                 "volumes": {
                     "$id": "#/properties/target_image/properties/volumes",
                     "type": "array",
                     "title": "A list of paths which are meant to be hosted outside of the container",
-                     "items": {
+                    "items": {
                         "$id": "#/properties/target_image/properties/volumes/items",
                         "type": "string",
                         "title": "The Items Schema",
@@ -453,7 +453,6 @@ PLAYBOOK_SCHEMA = {
                     "$id": "#/properties/target_image/properties/cmd",
                     "type": ["string", "null"],
                     "title": "A default command to invoke the container",
-                            "$id": "#/properties/cmd",
                     "default": "",
                     "examples": [
                         "command -x -y z"

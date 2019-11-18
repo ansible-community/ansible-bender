@@ -88,6 +88,7 @@ def test_basic_build_errr(tmpdir):
     assert "Failed validating 'type' in schema['properties']['base_image']:" in e
     assert "There was an error during execution: None is not of type 'string'" in e
 
+
 def test_unknown_key_error(tmpdir):
     cmd = ["build", playbook_with_unknown_keys]
     try:
