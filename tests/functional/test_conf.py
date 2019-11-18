@@ -91,9 +91,7 @@ def test_basic_build_errr(tmpdir):
 
 def test_unknown_key_error(tmpdir):
     cmd = ["build", playbook_with_unknown_keys]
-    try:
+    with pytest.raises(subprocess.CalledProcessError) as ex:
         ab(cmd, str(tmpdir), return_output=True)
-    except subprocess.CalledProcessError as ex:
-        print(ex)
-        assert "Additional properties are not allowed" in ex
+    assert "Additional properties are not allowed" in ex.value.stdout
 
