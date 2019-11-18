@@ -346,7 +346,7 @@ PLAYBOOK_SCHEMA = {
     "properties": {
         "working_container": {
             "$id": "#/properties/working_container",
-            "type": ["string", "null"],
+            "type": ["object", "null"],
             "title": "settings for the container where the build occurs",
             "default": "",
             "additionalProperties": False,
@@ -380,7 +380,7 @@ PLAYBOOK_SCHEMA = {
         },
         "target_image": {
             "$id": "#/properties/target_image",
-            "type": ["string", "null"],
+            "type": ["object", "null"],
             "title": "metadata of the final image which we built",
             "additionalProperties": False,
             "properties": {
