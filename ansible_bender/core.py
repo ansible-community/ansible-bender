@@ -42,6 +42,7 @@ import tempfile
 from pathlib import Path
 
 import yaml
+import jsonschema
 
 import ansible_bender
 from ansible_bender import callback_plugins
@@ -50,6 +51,7 @@ from ansible_bender.constants import TIMESTAMP_FORMAT, TIMESTAMP_FORMAT_TOGETHER
 from ansible_bender.exceptions import AbBuildUnsuccesful
 from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get, \
     is_ansibles_python_2
+from ansible_bender.schema import PLAYBOOK_SCHEMA
 
 logger = logging.getLogger(__name__)
 A_CFG_TEMPLATE = """\
@@ -363,6 +365,8 @@ class PbVarsParser:
             return
         self.metadata.update_from_configuration(bender_data.get("target_image", {}))
         self.build.update_from_configuration(bender_data)
+        # validation to error out unknown keys in /vars/ansible_bender
+        jsonschema.validate(bender_data, PLAYBOOK_SCHEMA)
 
     def get_build_and_metadata(self):
         """
