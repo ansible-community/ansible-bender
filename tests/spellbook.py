@@ -22,6 +22,8 @@ change_layering_playbook = os.path.join(data_dir, "change_layering.yaml")
 bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 role_pb_path = os.path.join(data_dir, "role.yaml")
 base_image = "docker.io/library/python:3-alpine"
+playbook_with_unknown_keys = os.path.join(data_dir, "playbook_with_unknown_keys.yaml")
+
 
 C7_AP_VER_OUT = """\
 ansible-playbook 2.4.2.0

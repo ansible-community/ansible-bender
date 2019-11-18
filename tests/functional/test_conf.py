@@ -9,7 +9,7 @@ import pytest
 
 from ansible_bender.builders.buildah_builder import buildah
 
-from tests.spellbook import b_p_w_vars_path, p_w_vars_files_path, data_dir, basic_playbook_path
+from tests.spellbook import b_p_w_vars_path, p_w_vars_files_path, data_dir, basic_playbook_path, playbook_with_unknown_keys
 from ..conftest import ab
 
 
@@ -87,4 +87,12 @@ def test_basic_build_errr(tmpdir):
     e = ex.value.stdout
     assert "Failed validating 'type' in schema['properties']['base_image']:" in e
     assert "There was an error during execution: None is not of type 'string'" in e
+
+def test_unknown_key_error(tmpdir):
+    cmd = ["build", playbook_with_unknown_keys]
+    try:
+        ab(cmd, str(tmpdir), return_output=True)
+    except subprocess.CalledProcessError as ex:
+        print(ex)
+        assert "Additional properties are not allowed" in ex
 

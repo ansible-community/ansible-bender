@@ -1,0 +1,28 @@
+- hosts: all
+  vars:
+    ansible_bender:
+
+      unknown_key:
+        name: unknown_key
+
+      verbose_layer_names: true
+      base_image: "docker.io/library/python:3-alpine"
+
+      working_container:
+        volumes:
+          - "{{ playbook_dir }}:/src:Z"
+
+      target_image:
+        name: challet
+        labels:
+          x: y
+        environment:
+          asd: '{{ playbook_dir }}'
+        working_dir: /src
+
+  tasks:
+  - copy:
+      src: /src/a_bag_of_fun
+      dest: /tmp
+      remote_src: yes
+  - command: ls /tmp
