@@ -227,7 +227,7 @@ BUILD_SCHEMA = {
     }
 }
 
-IMAGE_META_SCHENA = {
+IMAGE_META_SCHEMA = {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "1",
@@ -333,5 +333,175 @@ IMAGE_META_SCHENA = {
                 "pattern": "^(.*)$"
             }
         }
-    }
+    },
+    "additionalProperties": False
+}
+
+PLAYBOOK_SCHEMA = {
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "3",
+    "type": "object",
+    "title": "Playbook Schema",
+    "additionalProperties": False,
+    "properties": {
+        "working_container": {
+            "$id": "#/properties/working_container",
+            "type": ["object", "null"],
+            "title": "settings for the container where the build occurs",
+            "additionalProperties": False,
+            "properties": {
+                "volumes": {
+                    "$id": "#/properties/working_container/properties/volumes",
+                    "type": "array",
+                    "title": "A list of paths which are meant to be hosted outside of the container",
+                    "items": {
+                        "$id": "#/properties/working_container/properties/volumes/items",
+                        "type": "string",
+                        "title": "The Items Schema",
+                        "examples": [
+                            "/path/to/a/directory"
+                        ],
+                    }
+                },
+                "user": {
+                    "$id": "#/properties/working_container/properties/user",
+                    "type": ["string", "null"],
+                    "title": "UID or username used to invoke the container",
+                    "examples": [
+                        "leonardo"
+                    ],
+                }
+            }
+        },
+        "target_image": {
+            "$id": "#/properties/target_image",
+            "type": ["object", "null"],
+            "title": "metadata of the final image which we built",
+            "additionalProperties": False,
+            "properties": {
+                "name": {
+                    "$id": "#/properties/target_image/properties/name",
+                    "type": ["string", "null"],
+                    "title": "Path to a working directory within a container image",
+                },
+                "ports": {
+                    "$id": "#/properties/target_image/properties/ports",
+                    "type": "array",
+                    "title": "A list of ports which are meant to be exposed on the host",
+                    "default": "",
+                    "items": {
+                        "$id": "#/properties/target_image/properties/ports/items",
+                        "type": "string",
+                        "title": "The Items Schema",
+                        "examples": [
+                            "80", "443"
+                        ],
+                    }
+                },
+                "volumes": {
+                    "$id": "#/properties/target_image/properties/volumes",
+                    "type": "array",
+                    "title": "A list of paths which are meant to be hosted outside of the container",
+                    "items": {
+                        "$id": "#/properties/target_image/properties/volumes/items",
+                        "type": "string",
+                        "title": "The Items Schema",
+                        "examples": [
+                            "/path/to/a/directory"
+                        ],
+                    }
+                },
+                "working_dir": {
+                    "$id": "#/properties/target_image/properties/working_dir",
+                    "type": ["string", "null"],
+                    "title": "Path to a working directory within a container image",
+                    "examples": [
+                        "/workshop"
+                    ],
+                },
+                "labels": {
+                    "$id": "#/properties/target_image/properties/labels",
+                    "type": "object",
+                    "title": "Key/value data to apply to the final image",
+                    "additionalProperties": {"type": "string"}
+                },
+                "annotations": {
+                    "$id": "#/properties/target_image/properties/annotations",
+                    "type": "object",
+                    "title": "Key/value data to apply to the final image",
+                    "additionalProperties": {"type": "string"}
+                },
+                "environment": {
+                    "$id": "#/properties/target_image/properties/environment",
+                    "type": "object",
+                    "title": "implicit environment variables to set in a container",
+                    "additionalProperties": {"type": "string"}
+                },
+                "cmd": {
+                    "$id": "#/properties/target_image/properties/cmd",
+                    "type": ["string", "null"],
+                    "title": "A default command to invoke the container",
+                    "default": "",
+                    "examples": [
+                        "command -x -y z"
+                    ],
+                },
+                "entrypoint": {
+                    "$id": "#/properties/target_image/properties/entrypoint",
+                    "type": ["string", "null"],
+                    "title": "An entrypoint script to configure for the container",
+                    "examples": [
+                        "entrypoint.sh"
+                    ],
+                },
+                "user": {
+                    "$id": "#/properties/target_image/properties/user",
+                    "type": ["string", "null"],
+                    "title": "UID or username used to invoke the container",
+                    "examples": [
+                        "leonardo"
+                    ],
+                },
+            },
+        },
+        "base_image": {
+            "$id": "#/properties/base_image",
+            "type": "string",
+            "title": "name of the container image to use as a base",
+            "examples": [
+                "fedora:29"
+            ],
+        },
+        "cache_tasks": {
+            "$id": "#/properties/cache_tasks",
+            "type": "boolean",
+            "title": "When true, enable caching mechanism"
+        },
+        "layering": {
+            "$id": "#/properties/layering",
+            "type": "boolean",
+            "title": "When true, snapshot the image after a task is executed",
+        },
+        "squash": {
+            "$id": "#/properties/squash",
+            "type": "boolean",
+            "title": "When true, squash the final image down to a single layer",
+        },
+        "verbose_layer_names": {
+            "$id": "#/properties/verbose_layer_names",
+            "type": "boolean",
+            "title": "tag layers with a verbose name if true (image-name + timestamp), defaults to false",
+        },
+        "ansible_extra_args": {
+            "$id": "#/properties/ansible_extra_args",
+            "type": "string",
+            "title": "provide extra arguments for ansible-playbook run",
+        },
+        "buildah_from_extra_args": {
+            "$id": "#/properties/buildah_from_extra_args",
+            "type": "string",
+            "title": "provide extra arguments for `buildah from` command"
+        },
+    },
 }

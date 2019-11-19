@@ -72,13 +72,15 @@ def test_get_logs(target_image, tmpdir):
     assert "failed=0" in out
     assert "TASK [print local env vars]" in out
 
+
 def test_clean(tmpdir):
     cmd = ["clean"]
     ab(cmd, str(tmpdir))
     out = ab(["clean"], str(tmpdir), return_output=True)
     assert out.startswith("Cleaning images from database which are no longer present on the disk...")
     assert out.endswith("Done!\n")
-    
+
+
 def test_init(tmpdir):
     cmd = ["init"]
     ab(cmd, str(tmpdir))
