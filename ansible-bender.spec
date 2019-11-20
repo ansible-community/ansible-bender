@@ -6,8 +6,8 @@
 %bcond_with     privileged_tests
 
 Name:           ansible-bender
-Version:        0.7.0
-Release:        4%{?dist}
+Version:        0.8.0
+Release:        1%{?dist}
 Summary:        Build container images using Ansible playbooks
 
 License:        MIT
@@ -84,6 +84,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 
 %changelog
+* Tue Nov 19 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.8.0-1
+- new upstream release: 0.8.0
+
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.7.0-4
 - Rebuilt for Python 3.8.0rc1 (#1748018)
 

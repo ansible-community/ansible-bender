@@ -1,3 +1,66 @@
+# 0.8.0
+
+Thank you to all the contributors! You are awesome!
+
+And special thanks to @kmehant, our [Red Hat Open Source Contest 2019](https://research.redhat.com/red-hat-open-source-contest/) student.
+
+## Features
+
+* You can now pass extra arguments to `buildah from` call when bender creates
+  new build container. This can be done from CLI using
+  `--extra-buildah-from-args` option of build command or in the playbook:
+  `vars → ansible-bender → buildah_from_extra_args`. Thanks to @jordemort #140
+* One can print bender's version using `-V/--version` options.
+* The final image build by bender can now be squashed — all layers merged into
+  one. This can be done with the `--squash` option or in the playbook: `vars →
+  ansible-bender → squash`. @jordemort #154
+* Entrypoints now can be set! Aside from default container commands. Similar
+  drill: `--entrypoint` or `vars → ansible-bender → target_image → entrypoint`,
+  thanks you, @slopedog #155
+* Build times in `list-builds` are now more readable, enjoy! Thanks to @kmehant
+  #161
+* Bender can now locate platform-python of RHEL 8 and CentOS 8, thanks to
+  @hhenkel #171
+* When running bender in debug mode (--debug), ansible stdout callback plugin
+  is set to debug (`ANSIBLE_STDOUT_CALLBACK=debug`). @kmehant #175
+* Ansible executes a playbook in the buildah container using `buildah run`
+  command. Before bender gets to that point, it tries to create a no-op
+  container (`buildah from --name $container $base_image && buildah run
+  $container true`) first to verify that the container runtime is correctly set
+  up. @kmehant #174
+* We have two new subcommands:
+  * `init` — create a template playbook in the current working directory so you
+    can get on-board bender's train more easily. @kmehant #184
+  * `clean` — clean images from database which are no longer present on disk
+    @kmehant #180
+
+## Bug fixes
+
+* Buildah 1.7.3 introduced a backwards-incompatible change to `commit` command
+  which required changes in bender's code. Bender is now able to work with
+  both: buildah `< 1.7.3` and `>= 1.7.3`. CentOS 8.0 and RHEL 8.0 have buildah
+  `< 1.7.3`.
+* Bender is using file locking when using its database (`~/.cache/ab/db.json`),
+  the locks are now atomic thanks to @kmehant #176
+* When you set bender-specific variables in your playbook (`vars →
+  ansible-bender`) and there is a typo in any of the variables or the variable
+  is not recognized, bender exits and informs you about this problem — we have
+  implemented this to prevent typos in the configuration so that you would not
+  be able to build invalid images. @kmehant #189
+* Bender no longer prints output from buildah pull as errors. @kmehant #195
+
+## Minor
+
+* [Contribution guide](/CONTRIBUTING.md) is now placed in the upstream repo.
+* You can now invoke ansible-bender directly from the upstream git repo using
+  the common python way:
+  ```
+  $ python3 -m ansible_bender --help
+  ```
+  @kmehant #160
+* Bender is now using [Packit project](https://packit.dev/) for continuous integration.
+
+
 # 0.7.0
 
 ## Changes
