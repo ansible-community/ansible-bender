@@ -5,7 +5,7 @@ CLI for ansible builder
 import argparse
 import json
 import sys
-
+import subprocess
 import pkg_resources
 import yaml
 from tabulate import tabulate
