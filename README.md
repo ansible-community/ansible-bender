@@ -330,8 +330,8 @@ We can list builds we have done:
 $ ansible-bender list-builds
   BUILD ID  IMAGE NAME         STATUS    DATE                        BUILD TIME
 ----------  -----------------  --------  --------------------------  --------------
-         1  a-very-nice-image  done      2019-03-02 16:07:47.471912  0:00:12.347721
-         2  a-very-nice-image  done      2019-03-02 16:07:58.858699  0:00:06.242378
+         1  a-very-nice-image  done      2019-03-02 16:07:47.471912  13 minutes
+         2  a-very-nice-image  done      2019-03-02 16:07:58.858699  7 minutes
 ```
 
 
