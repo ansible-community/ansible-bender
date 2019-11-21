@@ -1,10 +1,12 @@
+import subprocess
+
 import pytest
 from flexmock import flexmock
 
 from ansible_bender.builders import buildah_builder
-from ansible_bender.builders.buildah_builder import BuildahBuilder
+from ansible_bender.builders.buildah_builder import BuildahBuilder, buildah_run_cmd
 from ansible_bender.conf import Build
-
+from tests.spellbook import base_image
 
 BUILDAH_15_VERSION = """ \
 Version:         1.5
@@ -21,7 +23,7 @@ OS/Arch:         linux/amd64
 
 @pytest.mark.parametrize("image_name,found", [
     ("registry.fedoraproject.org/fedora:29", True),
-    ("docker.io/library/python:3-alpine", True),
+    (base_image, True),
     ("docker.io/library/busybox", False),
     ])
 def test_find_py_intrprtr_in_fedora_image(image_name, found):
@@ -49,3 +51,19 @@ def test_get_version_rhel_8():
     version = b.get_buildah_version()
     assert [x for x in version if isinstance(x, int)]
     assert version < (1, 7, 3)
+
+
+@pytest.mark.parametrize("command,err_message,exit_code", [
+    # sometimes it's "No", sometimes it's "no"
+    (["/I-dont-exist"], "o such file or directory", None),
+    # the message is inconsistent, let's use the return code instead
+    (["false"], None, 1),
+])
+def test_buildah_run_cmd(command, err_message, exit_code):
+    try:
+        buildah_run_cmd(base_image, "autumn", command)
+    except subprocess.CalledProcessError as e:
+        if err_message is not None:
+            assert err_message in e.stderr
+        elif exit_code is not None:
+            assert exit_code == e.returncode
