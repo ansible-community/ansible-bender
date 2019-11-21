@@ -15,6 +15,9 @@ from ansible_bender.builders.buildah_builder import buildah, inspect_resource, \
 from ..spellbook import basic_playbook_path, base_image, bad_playbook_path, random_word, basic_playbook_path_w_bv
 from ..conftest import ab
 
+import datetime
+from ansible_bender.constants import TIMESTAMP_FORMAT
+
 logger = logging.getLogger("ansible_bender")
 
 
@@ -145,7 +148,8 @@ def test_build_failure(tmpdir):
     target_image_name = "registry.example.com/ab-test-" + random_word(12)
     target_image_tag = "oldest"
     target_image = f"{target_image_name}:{target_image_tag}"
-    target_failed_image = target_image + "-failed"
+    timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+    target_failed_image = timestamp + "-" + target_image + "-failed"
     cmd = ["build", bad_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError):
         ab(cmd, str(tmpdir))
@@ -257,7 +261,8 @@ def test_tback_in_callback(tmpdir):
         with pytest.raises(subprocess.CalledProcessError):
             ab(cmd, str(tmpdir), env=new_env)
 
-        im += "-failed"
+        timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+        im = timestamp + "-" + im + "-failed"
         try:
             cmd = ["inspect", "--json"]
             ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
