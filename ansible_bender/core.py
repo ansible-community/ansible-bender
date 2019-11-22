@@ -365,8 +365,20 @@ class PbVarsParser:
             return
         self.metadata.update_from_configuration(bender_data.get("target_image", {}))
         self.build.update_from_configuration(bender_data)
-        # validation to error out unknown keys in /vars/ansible_bender
-        jsonschema.validate(bender_data, PLAYBOOK_SCHEMA)
+
+        try: 
+            # validation to error out unknown keys in /vars/ansible_bender
+            jsonschema.validate(bender_data, PLAYBOOK_SCHEMA)
+        except jsonschema.ValidationError as validation_error:
+            if validation_error.validator is "type":
+                # error is due to invalid value datatype
+                properties = "/"
+                for property in list(validation_error.schema_path)[1::2]:
+                    properties += (property+"/")
+                raise Exception(validation_error.message + " in " + properties + " property. ") from validation_error 
+            else:
+                # error is due to absence of a required key, unknown keys playbook or any other kind
+                raise Exception(validation_error.message) from validation_error
 
     def get_build_and_metadata(self):
         """
