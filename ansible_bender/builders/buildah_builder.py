@@ -7,13 +7,13 @@ import shlex
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from ansible_bender.builders.base import Builder
 from ansible_bender.constants import TIMESTAMP_FORMAT_TOGETHER
-from ansible_bender import utils
 from ansible_bender.utils import graceful_get, run_cmd, buildah_command_exists, \
     podman_command_exists
+
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,12 @@ def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
                    return_output=return_output, log_stderr=log_stderr)
 
 
-def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True):
+def buildah_run_cmd(
+        container_image: str,
+        host_name: str,
+        cmd: List[str],
+        log_stderr: bool = True,
+        log_output: bool = False):
     """
     run provided command in selected container image using buildah; raise exc when command fails
 
@@ -74,6 +79,7 @@ def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True):
     :param host_name: str
     :param cmd: list of str
     :param log_stderr: bool, log errors to stdout as ERROR level
+    :param log_output: bool, print output of the command to logs
     """
     container_name = "{}-{}".format(host_name, datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER))
     # was the temporary container created? if so, remove it
@@ -81,7 +87,7 @@ def buildah_run_cmd(container_image, host_name, cmd, log_stderr=True):
     try:
         create_buildah_container(container_image, container_name, None, None, False)
         created = True
-        run_cmd(["buildah", "run", container_name] + cmd, log_stderr=log_stderr)
+        run_cmd(["buildah", "run", container_name] + cmd, log_stderr=log_stderr, log_output=log_output)
     except subprocess.CalledProcessError:
         logger.error(f"Unable to create or run a container using {container_image} with buildah")
         raise
