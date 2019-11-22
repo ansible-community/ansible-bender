@@ -109,7 +109,7 @@ class Application:
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
                 timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
-                image_name = timestamp + "-" + build.target_image + "-failed"
+                image_name = build.target_image + "-" + timestamp + "-failed"
                 b.target_image = image_name
                 image_id = builder.commit(image_name)
                 b.final_layer_id = image_id
