@@ -10,7 +10,7 @@ from ansible_bender.conf import Build
 from ansible_bender.constants import OUT_LOGGER, OUT_LOGGER_FORMAT, TIMESTAMP_FORMAT
 from ansible_bender.core import AnsibleRunner
 from ansible_bender.db import Database
-from ansible_bender.exceptions import AbBuildUnsuccesful
+from ansible_bender.exceptions import ABBuildUnsuccesful
 from ansible_bender.utils import set_logging
 
 
@@ -102,7 +102,7 @@ class Application:
         try:
             try:
                 output = a_runner.build(self.db_path)
-            except AbBuildUnsuccesful as ex:
+            except ABBuildUnsuccesful as ex:
                 b = self.db.record_build(None, build_id=build.build_id,
                                          build_state=BuildState.FAILED,
                                          set_finish_time=True)

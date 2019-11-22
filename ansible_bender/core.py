@@ -48,7 +48,7 @@ import ansible_bender
 from ansible_bender import callback_plugins
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.constants import TIMESTAMP_FORMAT, TIMESTAMP_FORMAT_TOGETHER
-from ansible_bender.exceptions import AbBuildUnsuccesful
+from ansible_bender.exceptions import ABBuildUnsuccesful, ABValidationError
 from ansible_bender.utils import run_cmd, ap_command_exists, random_str, graceful_get, \
     is_ansibles_python_2
 from ansible_bender.schema import PLAYBOOK_SCHEMA
@@ -139,7 +139,7 @@ def run_playbook(playbook_path, inventory_path, a_cfg_path, connection, extra_va
             log_stderr=log_stderr,
         )
     except subprocess.CalledProcessError as ex:
-        raise AbBuildUnsuccesful("ansible-playbook execution failed: %s" % ex, ex.output)
+        raise ABBuildUnsuccesful("ansible-playbook execution failed: %s" % ex, ex.output)
 
 
 class AnsibleRunner:

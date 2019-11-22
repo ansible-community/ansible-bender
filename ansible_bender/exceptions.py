@@ -1,4 +1,12 @@
-class AbBuildUnsuccesful(Exception):
+class ABError(Exception):
+    pass
+
+
+class ABValidationError(ABError):
+    pass
+
+
+class ABBuildUnsuccesful(ABError):
     """ Build was not successful """
     def __init__(self, msg, output):
         self.msg = msg
