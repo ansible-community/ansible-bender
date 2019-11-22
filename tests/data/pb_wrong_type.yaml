@@ -1,0 +1,11 @@
+- hosts: all
+  vars:
+    ansible_bender:
+      base_image: "docker.io/library/python:3-alpine"
+      target_image: my-image-name
+  tasks:
+  - copy:
+      src: /src/a_bag_of_fun
+      dest: /tmp
+      remote_src: yes
+  - command: ls /tmp

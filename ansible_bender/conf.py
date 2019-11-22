@@ -5,6 +5,7 @@ import datetime
 
 from ansible_bender.builders.base import BuildState
 from ansible_bender.constants import TIMESTAMP_FORMAT, ANNOTATIONS_KEY
+from ansible_bender.exceptions import ABValidationError
 from ansible_bender.schema import IMAGE_META_SCHEMA, BUILD_SCHEMA 
 from ansible_bender.utils import graceful_get
 
@@ -49,6 +50,8 @@ class ImageMetadata:
 
     def update_from_configuration(self, data):
         """ update current object with data provided from Ansible vars """
+        if not isinstance(data, dict):
+            raise ABValidationError(f"\"target_image\" should be dict, not {data.__class__.__name__}")
         self.working_dir = data.get("working_dir", None)
         self.labels.update(data.get("labels", {}))
         self.annotations.update(data.get(ANNOTATIONS_KEY, {}))

@@ -6,6 +6,7 @@ import pytest
 from flexmock import flexmock
 
 from ansible_bender.core import PbVarsParser
+from ansible_bender.exceptions import ABValidationError
 
 
 def mock_read_text(return_val=None, raise_exc=False):
@@ -63,3 +64,28 @@ def test_ansible_selinux_workaround(mock_r_t, mock_i_m, should_raise):
         assert "libselinux" in str(ex.value)
     else:
         p._check_selinux_iz_gud()
+
+
+@pytest.mark.parametrize("di, error_message", (
+    (
+        {"target_image": {"user": {}}},
+        "variable /target_image/user is set to {}, which is not of type string, null"
+    ),
+    (
+        {"target_image": {"volumes": {"A": "B"}}},
+        "variable /target_image/volumes is set to {'A': 'B'}, which is not of type array"
+    ),
+    (
+        {"target_image": {"environment": ["A=B"]}},
+        "variable /target_image/environment is set to ['A=B'], which is not of type object"
+    ),
+    (
+        {"target_image": {"environment": "A=B"}},
+        "variable /target_image/environment is set to A=B, which is not of type object"
+    ),
+))
+def test_validation(di, error_message):
+    p = PbVarsParser("")
+    with pytest.raises(ABValidationError) as ex:
+        p.process_pb_vars(di)
+    assert error_message in str(ex)

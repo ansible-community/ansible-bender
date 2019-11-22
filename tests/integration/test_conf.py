@@ -8,8 +8,10 @@ import pytest
 from ansible_bender.conf import ImageMetadata, Build
 from ansible_bender.core import PbVarsParser
 from ansible_bender.db import Database
+from ansible_bender.exceptions import ABValidationError
 from ansible_bender.utils import set_logging
-from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_path, multiplay_path
+from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_path, multiplay_path, \
+    playbook_with_unknown_keys, playbook_wrong_type
 
 
 def test_expand_pb_vars():
@@ -83,6 +85,25 @@ def test_validation_err_ux():
 
     assert "is not of type" in s
     assert "Failed validating 'type' in schema" in s
+
+
+@pytest.mark.parametrize(
+    "path,message",
+    (
+        (
+            playbook_with_unknown_keys,
+            "Additional properties are not allowed ('unknown_key' was unexpected)"
+        ),
+        (playbook_wrong_type, "variable /target_image is set to my-image-name, which is not of type object, null")
+    )
+)
+def test_validation_err_ux2(path, message):
+    """ Test that validation errors are useful """
+    p = PbVarsParser(path)
+    with pytest.raises(ABValidationError) as ex:
+        p.get_build_and_metadata()
+    s = str(ex.value)
+    assert message in s
 
 
 def test_multiplay(caplog):
