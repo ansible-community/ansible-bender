@@ -49,7 +49,7 @@ Ansible-bender was recently moved to the ansible-community organization. \o/
   * You can turn this off with `--no-cache`.
   * You can disable caching from a certain point by adding a tag `no-cache` to a task.
 * You can stop creating new image layers by adding tag `stop-layering` to a task.
-* If an image build fails, it's committed and named with a suffix `[TIMESTAMP]-failed` (so
+* If an image build fails, it's committed and named with a suffix `-[TIMESTAMP]-failed` (so
   you can take a look inside and resolve the issue).
 * The tool tries to find python interpreter inside the base image.
 * You can push images you built to remote locations such as:
