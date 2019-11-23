@@ -16,7 +16,8 @@ from ansible_bender.core import PbVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
 
-from ansible_bender.utils import fancy_time
+from ansible_bender.utils import fancy_time, run_cmd
+
 
 def split_once_or_fail_with(strink, pattern, error_message):
     """
