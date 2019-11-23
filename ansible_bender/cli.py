@@ -59,7 +59,7 @@ class CLI:
             help="a path to directory where ab will store runtime data, defaults to: \"%s\""
                  % candidates_str
         )
-        self.subparsers = self.parser.add_subparsers(help='commands')
+        self.subparsers = self.parser.add_subparsers()
 
         self._do_build_interface()
         self._do_list_builds_interface()
@@ -81,7 +81,8 @@ class CLI:
     def _do_build_interface(self):
         self.build_parser = self.subparsers.add_parser(
             name="build",
-            epilog="Please use '--' to separate options and arguments."
+            epilog="Please use '--' to separate options and arguments.",
+            help="Build container images using the given Ansible playbook"
         )
         self.build_parser.add_argument(
             "playbook_path", metavar="PLAYBOOK_PATH",
@@ -186,6 +187,7 @@ class CLI:
         self.bio_parser = self.subparsers.add_parser(
             name="build-inside-openshift",
             description="Build image within an openshift environment.",
+            help="Build image within an openshift environment."
         )
         self.bio_parser.set_defaults(subcommand="bio")
 
@@ -193,6 +195,7 @@ class CLI:
         self.gl_parser = self.subparsers.add_parser(
             name="get-logs",
             description="show logs of a specific build (default to latest build)",
+            help="show logs of a specific build (default to latest build)"
         )
         self.gl_parser.add_argument(
             "BUILD_ID",
@@ -206,6 +209,7 @@ class CLI:
         self.lb_parser = self.subparsers.add_parser(
             name="list-builds",
             description="print a list of past and present builds",
+            help="print a list of past and present builds"
         )
         self.lb_parser.set_defaults(subcommand="list-builds")
 
@@ -213,6 +217,7 @@ class CLI:
         self.inspect_parser = self.subparsers.add_parser(
             name="inspect",
             description="provide detailed information for a selected build (default to latest build)",
+            help="provide detailed information for a selected build (default to latest build)"
         )
         self.inspect_parser.add_argument(
             "BUILD_ID",
@@ -233,7 +238,8 @@ class CLI:
             description="push built image to a different location (default to latest build)",
             epilog="This command is thin wrapper on top of `podman push` command. "
                    "The target is passed directly to podman, for more information, please consult "
-                   " podman-push(1) manpage or skopeo(1)."
+                   " podman-push(1) manpage or skopeo(1).",
+            help="push built image to a different location (default to latest build)",
         )
         self.push_parser.add_argument(
             "TARGET",
@@ -258,6 +264,7 @@ class CLI:
         self.lb_parser = self.subparsers.add_parser(
             name="init",
             description="Add a template playbook with all the vars.",
+            help="Add a template playbook with all the vars."
         )
         self.lb_parser.set_defaults(subcommand="init")
 
@@ -265,6 +272,7 @@ class CLI:
         self.lb_parser = self.subparsers.add_parser(
             name="clean",
             description="Clean images from database which are no longer present on the disk",
+            help="Clean images from database which are no longer present on the disk"
         )
         self.lb_parser.set_defaults(subcommand="clean")
 
