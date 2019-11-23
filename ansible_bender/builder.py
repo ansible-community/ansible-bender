@@ -18,4 +18,4 @@ def get_builder(builder_name):
     try:
         return BUILDERS[builder_name]
     except KeyError:
-        raise RuntimeError("No such builder %s", builder_name)
+        raise RuntimeError("No such builder %s" % builder_name)

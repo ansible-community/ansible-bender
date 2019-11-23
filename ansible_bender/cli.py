@@ -347,7 +347,10 @@ class CLI:
     def _get_logs(self):
         build_id = self.args.BUILD_ID
         log_lines = self.app.get_logs(build_id=build_id)
-        print("\n".join(log_lines))
+        if log_lines:
+            print("\n".join(log_lines))
+        else:
+            print("Sorry, the latest build has not got any log lines")
 
     def _inspect(self):
         build_id = self.args.BUILD_ID
