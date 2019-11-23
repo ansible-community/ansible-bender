@@ -15,6 +15,9 @@ from ansible_bender.builders.buildah_builder import buildah, inspect_resource, \
 from ..spellbook import basic_playbook_path, base_image, bad_playbook_path, random_word, basic_playbook_path_w_bv
 from ..conftest import ab
 
+import datetime
+from ansible_bender.constants import TIMESTAMP_FORMAT
+
 logger = logging.getLogger("ansible_bender")
 
 
@@ -145,25 +148,29 @@ def test_build_failure(tmpdir):
     target_image_name = "registry.example.com/ab-test-" + random_word(12)
     target_image_tag = "oldest"
     target_image = f"{target_image_name}:{target_image_tag}"
-    target_failed_image = target_image + "-failed"
     cmd = ["build", bad_playbook_path, base_image, target_image]
     with pytest.raises(subprocess.CalledProcessError):
         ab(cmd, str(tmpdir))
     out = ab(["get-logs"], str(tmpdir), return_output=True).lstrip()
     assert out.startswith("PLAY [registry")
 
-    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_failed_image]))[0]
-    image_id = p_inspect_data["Id"]
+    # regex string for target image
+    image_name_regex = "%s+[-]+[0-9]+[-]+[0-9]+-failed" %(target_image)
 
     cmd = ["inspect", "--json"]
     ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
     top_layer_id = ab_inspect_data["layers"][-1]["layer_id"]
     final_image_id = ab_inspect_data["final_layer_id"]
+    final_image_name = ab_inspect_data["target_image"]
+
+    assert re.match(image_name_regex, final_image_name)
+
+    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", final_image_name]))[0]
+    image_id = p_inspect_data["Id"]
 
     assert image_id == top_layer_id
     assert image_id == final_image_id
-    assert ab_inspect_data["target_image"] == target_failed_image
-    buildah("rmi", [target_failed_image])
+    buildah("rmi", [final_image_name])
 
 
 def test_two_runs(tmpdir, target_image):
@@ -257,18 +264,18 @@ def test_tback_in_callback(tmpdir):
         with pytest.raises(subprocess.CalledProcessError):
             ab(cmd, str(tmpdir), env=new_env)
 
-        im += "-failed"
+        image_name_regex = "%s+[-]+[0-9]+[-]+[0-9]+-failed" %(im)
         try:
             cmd = ["inspect", "--json"]
             ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
             assert ab_inspect_data["state"] == "failed"
-            assert ab_inspect_data["target_image"] == im
+            assert re.match(image_name_regex, ab_inspect_data["target_image"])
             assert len(ab_inspect_data["layers"]) == 2
             with pytest.raises(subprocess.CalledProcessError) as ex:
-                podman_run_cmd(im, ["ls", "/fun"], return_output=True)
+                podman_run_cmd(ab_inspect_data["target_image"], ["ls", "/fun"], return_output=True)
             assert "No such file or directory" in ex.value.output
         finally:
-            subprocess.call(["buildah", "rmi", im])
+            subprocess.call(["buildah", "rmi", ab_inspect_data["target_image"]])
     finally:
         os.environ = good_env
 

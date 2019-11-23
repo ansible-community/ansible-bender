@@ -108,8 +108,8 @@ class Application:
                                          set_finish_time=True)
                 b.log_lines = ex.output.split("\n")
                 self.db.record_build(b)
-                # TODO: since this overwrites previous runs, we should likely add timestamp here
-                image_name = build.target_image + "-failed"
+                timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+                image_name = build.target_image + "-" + timestamp + "-failed"
                 b.target_image = image_name
                 image_id = builder.commit(image_name)
                 b.final_layer_id = image_id
