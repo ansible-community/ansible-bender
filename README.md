@@ -1,5 +1,10 @@
 # ansible-bender
+[![PyPI version](https://badge.fury.io/py/ansible-bender.svg)](https://badge.fury.io/py/ansible-bender)
+![GitHub Release Date](https://img.shields.io/github/release-date/ansible-community/ansible-bender?label=Latest%20release)
+![PyPI - Status](https://img.shields.io/pypi/status/ansible-bender)
 [![Build Status](https://dev.azure.com/nereone/ab/_apis/build/status/TomasTomecek.ansible-bender?branchName=master)](https://dev.azure.com/nereone/ab/_build/latest?definitionId=1&branchName=master)
+![GitHub](https://img.shields.io/github/license/ansible-community/ansible-bender)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/ansible-bender)
 
 This is a tool which bends containers using
 [Ansible](https://github.com/ansible/ansible)
