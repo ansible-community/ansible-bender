@@ -1,7 +1,7 @@
 from .test_buildah import ab
 from ..spellbook import basic_playbook_path, base_image
 from ansible_bender.constants import PLAYBOOK_TEMPLATE
-
+from ansible_bender.utils import run_cmd
 
 def test_inspect_cmd(tmpdir, target_image):
     workdir_path = "/etc"
@@ -73,7 +73,10 @@ def test_get_logs(target_image, tmpdir):
     assert "TASK [print local env vars]" in out
 
 
-def test_clean(tmpdir):
+def test_clean(target_image, tmpdir):
+    cmd = ["build", basic_playbook_path, base_image, target_image]
+    ab(cmd, str(tmpdir))
+    run_cmd(["podman", "rmi", target_image], print_output=True)
     cmd = ["clean"]
     ab(cmd, str(tmpdir))
     out = ab(["clean"], str(tmpdir), return_output=True)
