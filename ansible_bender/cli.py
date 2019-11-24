@@ -350,7 +350,7 @@ class CLI:
         if log_lines:
             print("\n".join(log_lines))
         else:
-            print("Sorry, the latest build has not got any log lines")
+            print(f"There are no logs for build {build_id}")
 
     def _inspect(self):
         build_id = self.args.BUILD_ID
