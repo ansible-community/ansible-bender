@@ -1,3 +1,9 @@
+"""
+pytest fixtures and pre-testing set up for ansible-bender
+
+TODO:
+* introduce a new fixture which verifies that a container runtime is working properly: if not, skip tests which require the functional container runtime
+"""
 import logging
 import subprocess
 
