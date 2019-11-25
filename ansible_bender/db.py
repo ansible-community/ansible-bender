@@ -144,11 +144,21 @@ class Database:
             return copy.deepcopy(DEFAULT_DATA)
 
     @staticmethod
-    def _load_build(data, build_id):
+    def _load_build(data, build_id, is_latest=False):
+        """
+        load selected build from database
+        :param data: dict
+        :param build_id: str or None
+        :param is_latest: bool
+        :return: build
+        """
         try:
             return Build.from_json(data["builds"][build_id])
         except KeyError:
-            raise RuntimeError("There is no such build with ID %s" % build_id)
+            if is_latest:
+                raise RuntimeError("Latest build with ID %s is no longer available, probably got cleaned." % build_id)
+            else:
+                raise RuntimeError("There is no such build with ID %s" % build_id)
 
     def _save(self, data):
         """ save data from memory to disk, lock has to be acquired already! """
@@ -199,7 +209,7 @@ class Database:
         with self.acquire():
             data = self._load()
             build_id = str(data["next_build_id"] - 1)
-            return self._load_build(data, build_id)
+            return self._load_build(data, build_id, is_latest=True)
 
     def get_build(self, build_id):
         """
