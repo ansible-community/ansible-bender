@@ -150,6 +150,12 @@ def configure_buildah_container(container_name, working_dir=None, env_vars=None,
         for k, v in annotations.items():
             config_args += ["--annotation", "%s=%s" % (k, v)]
     if user:
+        if os.getuid() != 0:
+            logger.warning(
+                "CHANGING USER IN ROOTLESS MODE IS DISCOURAGED, "
+                "USE IT ONLY WHEN YOU KNOW WHAT YOU'RE DOING, "
+                "YOU'VE BEEN WARNED"
+            )
         config_args += ["--user", user]
     if cmd:
         config_args += ["--cmd", cmd]
