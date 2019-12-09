@@ -274,6 +274,8 @@ This is how the playbook looks:
 
 As you can see, the whole build processed is configured by the variable
 `ansible_bender`.
+The list of known variables by ansible-bender is detailed in the document
+[configuration.md](docs/configuration.md).
 
 If we rerun the build again, we can see that ab loads every task from cache:
 ```bash
