@@ -1,3 +1,24 @@
+# 0.8.1
+
+## Fixes
+
+* `clean` command now works properly.
+* If bender can't create a container, a useful error message is now being
+  printed.
+
+## Features
+
+* Warn when you request a change to UID while running in rootless mode (user
+  namespaces are tricky).
+* If an image build failed, bender tagged the image with a `-failed` suffix so
+  it could be inspected further. Now bender also prepends timestamp so one
+  image is not being overwritten over and over.
+
+## Minor
+
+* Improvements to documentation in README and `--help` output.
+
+
 # 0.8.0
 
 Thank you to all the contributors! You are awesome!
