@@ -4,4 +4,10 @@
     project_dir: "."
     with_bender_install: no
     with_tests: no
-  import_playbook: recipe.yml
+  import_playbook: contrib/pre-setup.yml
+- name: Provision environment with dependncies to run Bender's test suite
+  vars:
+    project_dir: "."
+    with_bender_install: no
+    with_tests: no
+  import_playbook: contrib/post-setup.yml

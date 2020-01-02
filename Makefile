@@ -6,8 +6,8 @@ CONT_IMG := $(PY_PACKAGE)
 ANSIBLE_BENDER := python3 -m ansible_bender.cli
 PYTEST_EXEC := pytest-3
 
-build-ab-img: recipe.yml
-	$(ANSIBLE_BENDER) build -- ./recipe.yml $(BASE_IMAGE) $(CONT_IMG)
+build-ab-img: contrib/pre-setup.yml
+	$(ANSIBLE_BENDER) build -- ./contrib/pre-setup.yml $(BASE_IMAGE) $(CONT_IMG)
 
 check:
 	PYTHONPATH=$(CURDIR) PYTHONDONTWRITEBYTECODE=yes $(PYTEST_EXEC) --cov=ansible_bender -l -v $(TEST_TARGET)
@@ -65,7 +65,8 @@ check-in-docker:
 		bash -c " \
 			set -x \
 			&& dnf install -y ansible make \
-			&& ansible-playbook -i 'localhost,' -e ansible_python_interpreter=/usr/bin/python3 -e test_mode=yes -c local ./recipe.yml \
+			&& ansible-playbook -i 'localhost,' -e ansible_python_interpreter=/usr/bin/python3 -e test_mode=yes -c local ./contrib/pre-setup.yml \
+			&& ansible-playbook -i 'localhost,' -e ansible_python_interpreter=/usr/bin/python3 -e test_mode=yes -c local ./contrib/post-setup.yml \
 			&& id \
 			&& pwd \
 			&& podman info \
