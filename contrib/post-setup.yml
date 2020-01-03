@@ -1,0 +1,45 @@
+---
+- name: Set up environment for ansible-bender (after reboot)
+  hosts: all
+  vars:
+    test_mode: no  # yes - test in CI, no - build an image
+    project_dir: /src
+    with_tests: no  # yes - run test suite
+    with_bender_install: yes
+    docker_package_name: docker
+    ansible_bender:
+      target_image:
+        workging_dir: /src
+        cmd: /entry.sh
+      working_container:
+        volumes:
+        - "{{ playbook_dir }}:/src"
+  tasks:
+  - name: Start dockerd
+    systemd:
+      name: docker
+      state: started
+    when: with_tests == "yes"
+  - name: stat /src
+    stat:
+      path: /src
+    register: src_path
+    when: test_mode == "no"
+  - name: Let's make sure /src is present
+    assert:
+      that:
+      - 'src_path.stat.isdir'
+    when: test_mode == "no"
+  - name: copy entrypoint script
+    copy:
+      src: contrib/entry.sh
+      dest: /entry.sh
+    when: test_mode == "no"
+  # this requires sources mounted inside at /src
+  - name: Install ansible-bender from the current working directory
+    pip:
+      name: '{{ project_dir }}'
+    tags:
+    - no-cache
+    when: with_bender_install == "yes"
+

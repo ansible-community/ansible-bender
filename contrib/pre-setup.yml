@@ -1,11 +1,12 @@
 ---
-- name: Containerized ansible-bender
+- name: Set up environment for ansible-bender (before reboot)
   hosts: all
   vars:
     test_mode: no  # yes - test in CI, no - build an image
     project_dir: /src
     with_tests: no  # yes - run test suite
     with_bender_install: yes
+    docker_package_name: docker
     ansible_bender:
       target_image:
         workging_dir: /src
@@ -19,6 +20,22 @@
       name: "*"
       state: latest
     when: with_tests == "yes"
+  - name: "figure out docker package name: F31+ has moby, not docker"
+    set_fact:
+      docker_package_name: moby-engine
+    when: ansible_distribution_major_version >= '31'
+  - name: use cgroups v1
+    lineinfile:
+      state: present
+      path: /etc/default/grub
+      regexp: "^(GRUB_CMDLINE_LINUX=\")^(?!systemd.unified)(.+)"
+      # double escape is yaml's fault
+      line: "\\1systemd.unified_cgroup_hierarchy=0 \\2"
+      backrefs: yes
+    become: true
+  - name: regen grub config
+    command: grub2-mkconfig -o /boot/grub2/grub.cfg
+    become: true
   - name: Install all packages needed to hack on ab.
     dnf:
       name:
@@ -38,13 +55,9 @@
       - python3-flexmock
       - python3-ipdb
       - python3-jsonschema
-      - docker  # one test uses it
+      - python3-tabulate
+      - '{{ docker_package_name }}'  # one test uses it
       state: present
-  - name: Start dockerd
-    systemd:
-      name: docker
-      state: started
-    when: with_tests == "yes"
   # - name: Change storage driver to vfs (ovl on ovl doesn't work)
   #   lineinfile:
   #     path: /etc/containers/storage.conf
@@ -56,21 +69,6 @@
       regexp: '^graphroot = '
       line: 'graphroot = "/tmp/containers"'
     when: with_tests == "no"
-  - name: stat /src
-    stat:
-      path: /src
-    register: src_path
-    when: test_mode == "no"
-  - name: Let's make sure /src is present
-    assert:
-      that:
-      - 'src_path.stat.isdir'
-    when: test_mode == "no"
-  - name: copy entrypoint script
-    copy:
-      src: contrib/entry.sh
-      dest: /entry.sh
-    when: test_mode == "no"
   - name: copy libpod.conf
     copy:
       src: /usr/share/containers/libpod.conf
@@ -83,10 +81,4 @@
       regexp: '^cgroup_manager = '
       line: 'cgroup_manager = "cgroupfs"'
     when: with_tests == "no"
-  # this requires sources mounted inside at /src
-  - name: Install ansible-bender from the current working directory
-    pip:
-      name: '{{ project_dir }}'
-    tags:
-    - no-cache
-    when: with_bender_install == "yes"
+

@@ -46,7 +46,8 @@ def test_basic(tmpdir):
         cmd = ["podman", "inspect", "--type", "image", "challet"]
         inspect_data = json.loads(subprocess.check_output(cmd))[0]
 
-        assert inspect_data["Config"]["Labels"] == {"x": "y"}
+        # buildah 1.12 adds this: `{'io.buildah.version': '1.12.0'}`
+        assert inspect_data["Config"]["Labels"]["x"] == "y"
         assert f"asd={data_dir}" in inspect_data["Config"]["Env"]
         assert inspect_data["Config"]["WorkingDir"] == "/src"
     finally:
