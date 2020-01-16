@@ -1,4 +1,6 @@
+import logging
 import subprocess
+from subprocess import CalledProcessError
 
 import pytest
 from flexmock import flexmock
@@ -6,6 +8,7 @@ from flexmock import flexmock
 from ansible_bender.builders import buildah_builder
 from ansible_bender.builders.buildah_builder import BuildahBuilder, buildah_run_cmd
 from ansible_bender.conf import Build
+from ansible_bender.utils import set_logging
 from tests.spellbook import base_image
 
 BUILDAH_15_VERSION = """ \
@@ -67,3 +70,20 @@ def test_buildah_run_cmd(command, err_message, exit_code):
             assert err_message in e.stderr
         elif exit_code is not None:
             assert exit_code == e.returncode
+
+
+def test_buildah_sanity_check_extra_args(caplog):
+    set_logging(level=logging.DEBUG)
+    build = Build()
+    build.base_image = base_image
+    build.buildah_from_extra_args = "--help"
+    b = BuildahBuilder(build, debug=True)
+    b.ansible_host = "cacao"
+    with pytest.raises(CalledProcessError):
+        b.sanity_check()
+    for r in caplog.records:
+        if "-h, --help" in r.message:
+            break
+    else:
+        assert 1/0, "it seems that buildah_from_extra_args were not passed to sanity check"
+
