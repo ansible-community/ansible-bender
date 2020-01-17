@@ -71,7 +71,9 @@ def buildah_run_cmd(
         host_name: str,
         cmd: List[str],
         log_stderr: bool = True,
-        log_output: bool = False):
+        log_output: bool = False,
+        extra_from_args: Optional[List[str]] = None,
+    ):
     """
     run provided command in selected container image using buildah; raise exc when command fails
 
@@ -80,12 +82,14 @@ def buildah_run_cmd(
     :param cmd: list of str
     :param log_stderr: bool, log errors to stdout as ERROR level
     :param log_output: bool, print output of the command to logs
+    :param extra_from_args: a list of extra arguments for `buildah from`
     """
     container_name = "{}-{}".format(host_name, datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER))
     # was the temporary container created? if so, remove it
     created = False
     try:
-        create_buildah_container(container_image, container_name, None, None, False)
+        create_buildah_container(
+            container_image, container_name, build_volumes=None, extra_from_args=extra_from_args, debug=False)
         created = True
         run_cmd(["buildah", "run", container_name] + cmd, log_stderr=log_stderr, log_output=log_output)
     except subprocess.CalledProcessError:
@@ -102,6 +106,7 @@ def create_buildah_container(container_image, container_name, build_volumes=None
 
     :param container_image: name of the image
     :param container_name: name of the container to work in
+    :param extra_from_args: a list of extra arguments for `buildah from`
     :param build_volumes: list of str, bind-mount specification: ["/host:/cont", ...]
     :param debug: bool, make buildah print debug info
     """
@@ -384,7 +389,9 @@ class BuildahBuilder(Builder):
         logger.debug("checking that buildah command works")
         run_cmd(["buildah", "version"], log_stderr=True, log_output=True)
         logger.debug("Checking container creation using buildah")
-        buildah_run_cmd(self.build.base_image, self.ansible_host, ["true"], log_stderr=True)
+        buildah_run_cmd(
+            self.build.base_image, self.ansible_host, ["true"],
+            log_stderr=True, extra_from_args=self.build.buildah_from_extra_args)
 
     def get_buildah_version(self):
         out = run_cmd(["buildah", "version"], log_stderr=True, return_output=True, log_output=False)
