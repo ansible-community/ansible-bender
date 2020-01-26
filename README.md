@@ -67,15 +67,4 @@ Ansible-bender was recently moved to the ansible-community organization. \o/
 * [Usage](https://github.com/ansible-community/ansible-bender/docs/md_docs/usage.md)
 * [Caching and Layering mechanism](https://github.com/ansible-community/ansible-bender/docs/md_docs/cacheandlayer.md)
 * [Contribution guide](https://github.com/ansible-community/ansible-bender/docs/md_docs/contributing.md)
-
-
-### Ansible-bender in OKD
-
-Recently I started experimenting with running ab inside [OpenShift
-origin](https://github.com/openshift/origin) — imagine that you'd be able to
-build images in your cluster, using Ansible playbooks as definitions.
-
-Openshift by default runs its pods in a
-[restrictive](https://blog.openshift.com/understanding-service-accounts-sccs/)
-environment. In the proof of concept I was forced to run ab in a privileged
-pod. In the end, the whole test suite is passing in that privileged pod.
+* [Ansible-bender in OKD](https://github.com/ansible-community/ansible-bender/docs/md_docs/okd.md)

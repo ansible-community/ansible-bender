@@ -47,6 +47,7 @@ Features
    usage.rst
    cacheandlayer.rst
    contributing.rst
+   okd.rst
 
 
 
