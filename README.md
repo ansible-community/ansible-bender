@@ -63,11 +63,11 @@ Ansible-bender was recently moved to the ansible-community organization. \o/
 ## Documentation
 
 You can read more about this project in the documentation:
-* [Documentation home](/ansible-bender/docs/build/html)
-* [Interface](/ansible-bender/docs/build/html/interface.html)
-* [Installation](/ansible-bender/docs/build/html/installation.html)
-* [Configuration](/ansible-bender/docs/build/html/configuration.html)
-* [Usage](/ansible-bender/docs/build/html/usage.html)
-* [Caching and Layering mechanism](/ansible-bender/docs/build/html/cacheandlayer.html)
-* [Contribution guide](/ansible-bender/docs/build/html/contributing.html)
-* [Ansible-bender in OKD](/ansible-bender/docs/build/html/okd.html)
+* [Documentation home](https://ansible-community.github.io/ansible-bender/build/html/index.html)
+* [Interface](https://ansible-community.github.io/ansible-bender/build/html/interface.html)
+* [Installation](https://ansible-community.github.io/ansible-bender/build/html/installation.html)
+* [Configuration](https://ansible-community.github.io/ansible-bender/build/html/configuration.html)
+* [Usage](https://ansible-community.github.io/ansible-bender/build/html/usage.html)
+* [Caching and Layering mechanism](https://ansible-community.github.io/ansible-bender/build/html/cacheandlayer.html)
+* [Contribution guide](https://ansible-community.github.io/ansible-bender/build/html/contributing.html)
+* [Ansible-bender in OKD](https://ansible-community.github.io/ansible-bender/build/html/okd.html)
