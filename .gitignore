@@ -5,6 +5,9 @@ contrib/ab-pod.yml
 .coverage.*
 .coverage*
 
+docs/build/doctrees
+docs/build/html/_sources
+
 # python artifacts
 __pycache__/
 *.pyc

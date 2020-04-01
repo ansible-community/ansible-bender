@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Contributing to ansible-bender &mdash; ansible-bender 0.8.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Ansible-bender in OKD" href="okd.html" />
+    <link rel="prev" title="Caching and Layering mechanism" href="cacheandlayer.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ansible-bender
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="interface.html">Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cacheandlayer.html">Caching and Layering mechanism</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to ansible-bender</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-your-local-development-environment">Setting up your local development environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ci">CI</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-the-development-version">Install the development version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-bender-directly-from-git">Run bender directly from git</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="okd.html">Ansible-bender in OKD</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ansible-bender</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Contributing to ansible-bender</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="contributing-to-ansible-bender">
+<h1>Contributing to ansible-bender<a class="headerlink" href="#contributing-to-ansible-bender" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="setting-up-your-local-development-environment">
+<h2>Setting up your local development environment<a class="headerlink" href="#setting-up-your-local-development-environment" title="Permalink to this headline">¶</a></h2>
+<p>Please make sure to follow bender’s installation process:
+<a class="reference external" href="https://github.com/ansible-community/ansible-bender#installation">https://github.com/ansible-community/ansible-bender#installation</a></p>
+<p>For local development, you’ll need a few more packages. All of them are
+listed in
+<a class="reference external" href="https://github.com/ansible-community/ansible-bender/blob/master/setup.cfg">setup.cfg</a>:</p>
+<ol class="arabic simple">
+<li><p>To run bender from git, you need <code class="docutils literal notranslate"><span class="pre">setuptools_scm</span></code></p></li>
+<li><p>Test suite is using <code class="docutils literal notranslate"><span class="pre">pytest</span></code> and <code class="docutils literal notranslate"><span class="pre">flexmock</span></code></p></li>
+</ol>
+<p>A lot of development automation is done in the
+<a class="reference external" href="https://github.com/ansible-community/ansible-bender/blob/master/Makefile">Makefile</a>
+so make sure that you have GNU make installed.</p>
+<p>Since bender is so closely tight to podman and buildah, it works only on linux.</p>
+</div>
+<div class="section" id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
+<p>A good way to verify that everything works fine is to run the test suite in your local environment:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ make check
+PYTHONPATH=/home/me/path/to/ansible-bender PYTHONDONTWRITEBYTECODE=yes pytest-3 --cov=ansible_bender -l -v ./tests/
+=============================== test session starts =====================================
+platform linux -- Python 3.7.4, pytest-3.9.3, py-1.7.0, pluggy-0.8.1 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/me/path/to/ansible-bender, inifile:
+plugins: celery-4.3.0, cov-2.6.0
+collected 61 items
+
+tests/functional/test_buildah.py::test_output PASSED                       [  1%]
+tests/functional/test_buildah.py::test_build_basic_image PASSED            [  3%]
+tests/functional/test_buildah.py::test_build_basic_image_with_env_vars     [....]
+...
+</pre></div>
+</div>
+<p>You can also run the test suite in a container:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ make build-ab-img &amp;&amp; make check-in-container
+</pre></div>
+</div>
+<div class="section" id="ci">
+<h3>CI<a class="headerlink" href="#ci" title="Permalink to this headline">¶</a></h3>
+<p>Bender is using <a class="reference external" href="https://packit.dev/">packit project</a> for continuous integration.</p>
+<p>Related files:</p>
+<ul class="simple">
+<li><p>.packit.yaml — root config file for packit</p></li>
+<li><p>.fmf/ — packit utilies <a href="#id1"><span class="problematic" id="id2">`fmf &lt;&gt;`_</span></a> project under the hood and this dir is required for fmf to function</p></li>
+<li><p>tests/ci.fmf — definition of tests to run in Packit’s CI System - Testing Farm</p></li>
+<li><p>ci.yaml — Ansible playbook to set up the testing environment so bender’s test suite can run</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="install-the-development-version">
+<h2>Install the development version<a class="headerlink" href="#install-the-development-version" title="Permalink to this headline">¶</a></h2>
+<p>You can install your development checkout like this:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ cd local/git/checkout/of/bender/
+$ pip3 install --user -e .
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-bender-directly-from-git">
+<h2>Run bender directly from git<a class="headerlink" href="#run-bender-directly-from-git" title="Permalink to this headline">¶</a></h2>
+<p>It’s really easy:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ PAYTHONPATH=/home/me/local/git/checkout/of/bender/ python3 -m ansible_bender.cli --help
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="okd.html" class="btn btn-neutral float-right" title="Ansible-bender in OKD" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cacheandlayer.html" class="btn btn-neutral float-left" title="Caching and Layering mechanism" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Tomas Tomecek
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

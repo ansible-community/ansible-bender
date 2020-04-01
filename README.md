@@ -60,11 +60,14 @@ Ansible-bender was recently moved to the ansible-community organization. \o/
   * [podman push](https://github.com/containers/libpod/blob/master/docs/podman-push.1.md) is used to perform the push.
 
 
-## Contents
-* [Interface](https://github.com/ansible-community/ansible-bender/docs/md_docs/interface.md)
-* [Installation](https://github.com/ansible-community/ansible-bender/docs/md_docs/installation.md)
-* [Configuration](https://github.com/ansible-community/ansible-bender/docs/md_docs/configuration.md)
-* [Usage](https://github.com/ansible-community/ansible-bender/docs/md_docs/usage.md)
-* [Caching and Layering mechanism](https://github.com/ansible-community/ansible-bender/docs/md_docs/cacheandlayer.md)
-* [Contribution guide](https://github.com/ansible-community/ansible-bender/docs/md_docs/contributing.md)
-* [Ansible-bender in OKD](https://github.com/ansible-community/ansible-bender/docs/md_docs/okd.md)
+## Documentation
+
+You can read more about this project in the documentation:
+* [Documentation home](/ansible-bender/docs/build/html)
+* [Interface](/ansible-bender/docs/build/html/interface.html)
+* [Installation](/ansible-bender/docs/build/html/installation.html)
+* [Configuration](/ansible-bender/docs/build/html/configuration.html)
+* [Usage](/ansible-bender/docs/build/html/usage.html)
+* [Caching and Layering mechanism](/ansible-bender/docs/build/html/cacheandlayer.html)
+* [Contribution guide](/ansible-bender/docs/build/html/contributing.html)
+* [Ansible-bender in OKD](/ansible-bender/docs/build/html/okd.html)

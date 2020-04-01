@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; ansible-bender 0.8.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Interface" href="interface.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ansible-bender
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="interface.html">Interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements-host">Requirements (host)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-buildah-and-podman">Setting up buildah and podman</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements-base-image">Requirements (base image)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements-ansible-playbook">Requirements (Ansible playbook)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cacheandlayer.html">Caching and Layering mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ansible-bender</a></li>
+<li class="toctree-l1"><a class="reference internal" href="okd.html">Ansible-bender in OKD</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ansible-bender</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ pip3 install ansible-bender
+</pre></div>
+</div>
+<p>If you are brave enough, please install bender directly from git master:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ pip3 install git+https://github.com/ansible-community/ansible-bender
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">pip3</span></code> command is not available on your system, you can run pip like this:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install ...
+</pre></div>
+</div>
+<div class="section" id="requirements-host">
+<h2>Requirements (host)<a class="headerlink" href="#requirements-host" title="Permalink to this headline">¶</a></h2>
+<p>Pip takes care of python dependencies, but ansible-bender also requires a few
+binaries to be present on your host system:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://podman.io/getting-started/installation">Podman</a></p></li>
+<li><p><a class="reference external" href="https://github.com/containers/buildah/blob/master/install.md">Buildah</a></p></li>
+<li><p><a class="reference external" href="https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html">Ansible</a></p>
+<ul>
+<li><p>Ansible needs to be built against python 3</p></li>
+</ul>
+</li>
+<li><p>Python 3.6 or later (python 3.5 or earlier are not supported and known not
+to be working)</p></li>
+</ul>
+<p>Last two requirements can be pretty tough: you can always run bender in a
+privileged container.</p>
+<div class="section" id="setting-up-buildah-and-podman">
+<h3>Setting up buildah and podman<a class="headerlink" href="#setting-up-buildah-and-podman" title="Permalink to this headline">¶</a></h3>
+<p>If you run ansible-bender as root, you don’t need to set up anything. Just
+install the packages and you are good to go. This is the preferred way —
+buildah and podman are much more efficient when using the in-kernel overlay
+filesystem and you will encounter <a class="reference external" href="https://github.com/containers/libpod/blob/master/rootless.md">less issues than with the rootless
+mode</a>.</p>
+<p>On the other hand, if you want to utilize <a class="reference external" href="https://github.com/containers/libpod/blob/master/docs/podman-create.1.md#rootless-containers">the rootless
+mode</a>,
+you need to set up the UID mapping. It is documented in
+<a class="reference external" href="https://github.com/containers/libpod/blob/master/troubleshooting.md#10-podman-fails-to-run-in-user-namespace-because-etcsubuid-is-not-properly-populated">podman’s</a>
+documentation. All you need to do is to add an entry into /etc/subuid and
+/etc/subgid:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo sh -c <span class="s2">&quot;printf \&quot;\n</span><span class="k">$(</span>whoami<span class="k">)</span><span class="s2">:100000:65536\n\&quot; &gt;&gt;/etc/subuid&quot;</span>
+$ sudo sh -c <span class="s2">&quot;printf \&quot;\n</span><span class="k">$(</span>whoami<span class="k">)</span><span class="s2">:100000:65536\n\&quot; &gt;&gt;/etc/subgid&quot;</span>
+</pre></div>
+</div>
+<p>You should consult <a class="reference external" href="https://github.com/containers/libpod/blob/master/troubleshooting.md">podman’s troubleshooting
+guide</a> if
+you are running into issues.</p>
+</div>
+</div>
+<div class="section" id="requirements-base-image">
+<h2>Requirements (base image)<a class="headerlink" href="#requirements-base-image" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>python interpreter — ansible-bender will try to find it (alternatively you
+can specify it via <code class="docutils literal notranslate"><span class="pre">--python-interpreter</span></code>).</p>
+<ul>
+<li><p>It can be python 2 or python 3 — on host, you have to have python 3 but
+inside the base image, it doesn’t matter — Ansible is able to utilize
+python 2 even if it’s invoked with python 3 on the control machine.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="requirements-ansible-playbook">
+<h2>Requirements (Ansible playbook)<a class="headerlink" href="#requirements-ansible-playbook" title="Permalink to this headline">¶</a></h2>
+<p>None.</p>
+<p>Bender copies the playbook you provide so that it can be processed. <code class="docutils literal notranslate"><span class="pre">hosts</span></code>
+variable is being overwritten in the copy and changed to the name of the
+working container — where the build happens.  So it doesn’t matter what’s the
+content of the hosts variable.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="interface.html" class="btn btn-neutral float-left" title="Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Tomas Tomecek
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

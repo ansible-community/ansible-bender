@@ -1,0 +1,501 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration &mdash; ansible-bender 0.8.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ansible-bender
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="interface.html">Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#target-image-metadata">Target image metadata</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#via-playbook-vars">Via playbook vars</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#top-level-keys">Top-level keys</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#working-container"><code class="docutils literal notranslate"><span class="pre">working_container</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#target-image"><code class="docutils literal notranslate"><span class="pre">target_image</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#via-cli">Via CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ansible">Ansible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ansible-roles">Ansible roles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#buildah">Buildah</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cacheandlayer.html">Caching and Layering mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ansible-bender</a></li>
+<li class="toctree-l1"><a class="reference internal" href="okd.html">Ansible-bender in OKD</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ansible-bender</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="target-image-metadata">
+<h2>Target image metadata<a class="headerlink" href="#target-image-metadata" title="Permalink to this headline">¶</a></h2>
+<p>With dockerfiles, this is being usually done with instructions such as <code class="docutils literal notranslate"><span class="pre">LABEL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ENV</span></code> or <code class="docutils literal notranslate"><span class="pre">EXPOSE</span></code>. Bender supports two ways of configuring the metadata:</p>
+<ul class="simple">
+<li><p>Setting specific Ansible variables inside your playbook.</p></li>
+<li><p>CLI options of <code class="docutils literal notranslate"><span class="pre">ansible-bender</span> <span class="pre">build</span></code>.</p></li>
+</ul>
+<div class="section" id="via-playbook-vars">
+<h3>Via playbook vars<a class="headerlink" href="#via-playbook-vars" title="Permalink to this headline">¶</a></h3>
+<p>Configuration is done using a top-level Ansible variable <code class="docutils literal notranslate"><span class="pre">ansible_bender</span></code>. All
+the values are nested under it. The values are processed before a build starts.
+The changes to values are not reflected during a playbook run.</p>
+<p>If your playbook has multiple plays, the <code class="docutils literal notranslate"><span class="pre">ansible_bender</span></code> variable is processed
+only from the first play. All the plays will end up in a single container image.</p>
+<div class="section" id="top-level-keys">
+<h4>Top-level keys<a class="headerlink" href="#top-level-keys" title="Permalink to this headline">¶</a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key name</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">base_image</span></code></p></td>
+<td><p>string</p></td>
+<td><p>name of the container image to use as a base</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">buildah_from_extra_args</span></code></p></td>
+<td><p>string</p></td>
+<td><p>extra CLI arguments to pass to buildah from command</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ansible_extra_args</span></code></p></td>
+<td><p>string</p></td>
+<td><p>extra CLI arguments to pass to ansible-playbook command</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">working_container</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>settings for the container where the build occurs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">target_image</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>metadata of the final image which we built</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cache_tasks</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>When true, enable caching mechanism</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">layering</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>When true, snapshot the image after a task is executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">squash</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>When true, squash the final image down to a single layer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verbose_layer_names</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>tag layers with a verbose name if true (image-name + timestamp), defaults to false</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="working-container">
+<h4><code class="docutils literal notranslate"><span class="pre">working_container</span></code><a class="headerlink" href="#working-container" title="Permalink to this headline">¶</a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key name</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">volumes</span></code></p></td>
+<td><p>list of strings</p></td>
+<td><p>volumes mappings for the working container (<code class="docutils literal notranslate"><span class="pre">HOST:CONTAINER:PARAMS</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">user</span></code></p></td>
+<td><p>string</p></td>
+<td><p>UID or username to invoke the container during build (run ansible)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="target-image">
+<h4><code class="docutils literal notranslate"><span class="pre">target_image</span></code><a class="headerlink" href="#target-image" title="Permalink to this headline">¶</a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key name</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>string</p></td>
+<td><p>name of the image</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">labels</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>key/value data to apply to the final image</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">annotations</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>key/value data to apply to the final image (buildah/runc specific)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">environment</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>implicit environment variables to set in a container</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cmd</span></code></p></td>
+<td><p>string</p></td>
+<td><p>a default command to invoke the container</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">entrypoint</span></code></p></td>
+<td><p>string</p></td>
+<td><p>entrypoint script to configure for the container</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">user</span></code></p></td>
+<td><p>string</p></td>
+<td><p>UID or username used to invoke the container</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ports</span></code></p></td>
+<td><p>list of strings</p></td>
+<td><p>a list of ports which are meant to be exposed on the host</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">volumes</span></code></p></td>
+<td><p>list of strings</p></td>
+<td><p>a list of paths which are meant to be hosted outside of the container</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">working_dir</span></code></p></td>
+<td><p>string</p></td>
+<td><p>path to a working directory within a container image</p></td>
+</tr>
+</tbody>
+</table>
+<p>Example of a playbook with variables:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">hosts</span><span class="p">:</span> <span class="k">all</span>
+  <span class="n">vars</span><span class="p">:</span>
+    <span class="n">ansible_bender</span><span class="p">:</span>
+      <span class="n">base_image</span><span class="p">:</span> <span class="ss">&quot;docker.io/library/python:3-alpine&quot;</span>
+      <span class="n">buildah_from_extra_args</span><span class="p">:</span> <span class="ss">&quot;--dns 8.8.8.8&quot;</span>
+      <span class="n">ansible_extra_args</span><span class="p">:</span> <span class="ss">&quot;-vvv&quot;</span>
+
+      <span class="n">working_container</span><span class="p">:</span>
+        <span class="n">volumes</span><span class="p">:</span>
+          <span class="o">-</span> <span class="ss">&quot;{{ playbook_dir }}:/src&quot;</span>
+
+      <span class="n">target_image</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">challet</span>
+        <span class="n">labels</span><span class="p">:</span>
+          <span class="n">x</span><span class="p">:</span> <span class="n">y</span>
+        <span class="n">environment</span><span class="p">:</span>
+          <span class="n">asd</span><span class="p">:</span> <span class="s1">&#39;{{ playbook_dir }}&#39;</span>
+</pre></div>
+</div>
+<p>Before bender processes the variables, it runs a no-op playbook so that Ansible
+expand them. Therefore you can utilize some of the Ansible’s native variables.
+Please bear in mind that most of the facts won’t be available.</p>
+</div>
+</div>
+<div class="section" id="via-cli">
+<h3>Via CLI<a class="headerlink" href="#via-cli" title="Permalink to this headline">¶</a></h3>
+<p>Please check out <code class="docutils literal notranslate"><span class="pre">ansible-bender</span> <span class="pre">build</span> <span class="pre">--help</span></code> for up to date options:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>$ ansible-bender build -h
+usage: ansible-bender build [-h] [--builder {docker,buildah}] [--no-cache]
+                            [--squash]
+                            [--build-volumes [BUILD_VOLUMES [BUILD_VOLUMES ...]]]
+                            [--build-user BUILD_USER] [-w WORKDIR]
+                            [-l [LABELS [LABELS ...]]]
+                            [--annotation [ANNOTATIONS [ANNOTATIONS ...]]]
+                            [-e [ENV_VARS [ENV_VARS ...]]] [--cmd CMD]
+                            [--entrypoint ENTRYPOINT]
+                            [-u USER] [-p [PORTS [PORTS ...]]]
+                            [--runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]]
+                            [--extra-buildah-from-args EXTRA_BUILDAH_FROM_ARGS]
+                            [--extra-ansible-args EXTRA_ANSIBLE_ARGS]
+                            [--python-interpreter PYTHON_INTERPRETER]
+                            PLAYBOOK_PATH [BASE_IMAGE] [TARGET_IMAGE]
+
+positional arguments:
+  PLAYBOOK_PATH         path to Ansible playbook
+  BASE_IMAGE            name of a container image to use as a base
+  TARGET_IMAGE          name of the built container image
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --builder {docker,buildah}
+                        pick preferred builder backend
+  --no-cache            disable caching mechanism: storing layers and loading
+                        them if a task is unchanged; this option also implies
+                        the final image is composed of a base image and one
+                        additional layer
+  --squash              squash final image down to a single layer
+  --build-volumes [BUILD_VOLUMES [BUILD_VOLUMES ...]]
+                        mount selected directory inside the container during
+                        build, should be specified as
+                        &#39;/host/dir:/container/dir&#39;
+  --build-user BUILD_USER
+                        the container gets invoked with this user during build
+  -w WORKDIR, --workdir WORKDIR
+                        path to an implicit working directory in the container
+  -l [LABELS [LABELS ...]], --label [LABELS [LABELS ...]]
+                        add a label to the metadata of the image, should be
+                        specified as &#39;key=value&#39;
+  --annotation [ANNOTATIONS [ANNOTATIONS ...]]
+                        Add key=value annotation for the target image
+  -e [ENV_VARS [ENV_VARS ...]], --env-vars [ENV_VARS [ENV_VARS ...]]
+                        add an environment variable to the metadata of the
+                        image, should be specified as &#39;KEY=VALUE&#39;
+  --cmd CMD             command to run by default in the container
+  --entrypoint ENTRYPOINT
+                        entrypoint script to configure for the container
+  -u USER, --user USER  the container gets invoked with this user by default
+  -p [PORTS [PORTS ...]], --ports [PORTS [PORTS ...]]
+                        ports to expose from container by default
+  --runtime-volumes [RUNTIME_VOLUMES [RUNTIME_VOLUMES ...]]
+                        path a directory which has data stored outside of the
+                        container
+  --extra-buildah-from-args EXTRA_BUILDAH_FROM_ARGS
+                        arguments passed to buildah from command (be careful!)
+  --extra-ansible-args EXTRA_ANSIBLE_ARGS
+                        arguments passed to ansible-playbook command (be
+                        careful!)
+  --python-interpreter PYTHON_INTERPRETER
+                        Path to a python interpreter inside the base image
+
+Please use &#39;--&#39; to separate options and arguments.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="ansible">
+<h2>Ansible<a class="headerlink" href="#ansible" title="Permalink to this headline">¶</a></h2>
+<p>If you want to configure Ansible itself, you can set any environment variable
+and ansible-bender will relay them to <code class="docutils literal notranslate"><span class="pre">ansible-playbook</span></code> command, an example:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="n">ANSIBLE_STDOUT_CALLBACK</span><span class="o">=</span><span class="n">debug</span> <span class="n">ansible</span><span class="o">-</span><span class="n">bender</span> <span class="n">build</span> <span class="k">simple</span><span class="o">-</span><span class="n">playbook</span><span class="p">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
+<p>Bender creates ansible.cfg on the fly which is then used during an
+ansible-playbook run. If you define <code class="docutils literal notranslate"><span class="pre">ANSIBLE_CONFIG</span></code>, it will likely break the
+build process: you’ve been warned.</p>
+</div>
+<div class="section" id="ansible-roles">
+<h2>Ansible roles<a class="headerlink" href="#ansible-roles" title="Permalink to this headline">¶</a></h2>
+<p>If you are using roles in your playbook and they are in a non-standard place,
+you can utilize <code class="docutils literal notranslate"><span class="pre">ANSIBLE_ROLES_PATH</span></code> environment variable to tell ansible where
+your roles lives. Bender does not tamper with environment variables, all are
+passed to ansible-playbook.</p>
+</div>
+<div class="section" id="buildah">
+<h2>Buildah<a class="headerlink" href="#buildah" title="Permalink to this headline">¶</a></h2>
+<p>If you are familiar with podman and buildah, you know that you can
+<a class="reference external" href="https://github.com/containers/buildah/blob/master/docs/buildah.md#files">configure</a>
+these tools. Ansible-bender doesn’t change this configuration in any way so
+it’s up to you how you set up buildah and podman. The same applies for running
+ansible-bender as root or not: buildah allows you to utilize rootless
+containers.</p>
+<p>My suggestion is to use the overlay storage backend. Vfs backend is slow and
+inefficient.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Tomas Tomecek
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

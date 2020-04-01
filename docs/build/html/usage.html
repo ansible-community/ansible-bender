@@ -1,0 +1,394 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Usage &mdash; ansible-bender 0.8.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Caching and Layering mechanism" href="cacheandlayer.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ansible-bender
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="interface.html">Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-images">Building images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#listing-builds">Listing builds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-logs-of-a-build">Getting logs of a build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#locating-built-images-with-podman">Locating built images with podman</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cacheandlayer.html">Caching and Layering mechanism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to ansible-bender</a></li>
+<li class="toctree-l1"><a class="reference internal" href="okd.html">Ansible-bender in OKD</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ansible-bender</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Usage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>Typing <code class="docutils literal notranslate"><span class="pre">ansible-bender</span></code> can take some time, consider adding an alias into your
+shell rc file:</p>
+<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span><span class="k">alias</span> <span class="n">ab</span><span class="o">=</span><span class="ss">&quot;ansible-bender&quot;</span>
+</pre></div>
+</div>
+<div class="section" id="building-images">
+<h2>Building images<a class="headerlink" href="#building-images" title="Permalink to this headline">¶</a></h2>
+<p>There is a simple playbook present in the root of this repository to showcase the functionality:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ansible-bender build ./simple-playbook.yaml
+
+PLAY <span class="o">[</span>Demonstration of ansible-bender functionality<span class="o">]</span> ****************************************
+
+TASK <span class="o">[</span>Gathering Facts<span class="o">]</span> **********************************************************************
+ok: <span class="o">[</span>a-very-nice-image-20190302-153257279579-cont<span class="o">]</span>
+
+TASK <span class="o">[</span>Run a sample command<span class="o">]</span> *****************************************************************
+changed: <span class="o">[</span>a-very-nice-image-20190302-153257279579-cont<span class="o">]</span>
+caching the task result in an image <span class="s1">&#39;a-very-nice-image-20193302-153306&#39;</span>
+
+TASK <span class="o">[</span>Stat a file<span class="o">]</span> **************************************************************************
+ok: <span class="o">[</span>a-very-nice-image-20190302-153257279579-cont<span class="o">]</span>
+caching the task result in an image <span class="s1">&#39;a-very-nice-image-20193302-153310&#39;</span>
+
+PLAY RECAP **********************************************************************************
+a-very-nice-image-20190302-153257279579-cont : <span class="nv">ok</span><span class="o">=</span><span class="m">3</span>    <span class="nv">changed</span><span class="o">=</span><span class="m">1</span>    <span class="nv">unreachable</span><span class="o">=</span><span class="m">0</span>    <span class="nv">failed</span><span class="o">=</span><span class="m">0</span>
+
+Getting image <span class="nb">source</span> signatures
+
+Skipping blob 767f936afb51 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.46 MiB / <span class="m">4</span>.46 MiB <span class="o">[=========]</span> 0s
+
+Skipping blob b211a7fc6e85 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">819</span>.00 KiB / <span class="m">819</span>.00 KiB <span class="o">[=====]</span> 0s
+
+Skipping blob 8d092d3e44bb <span class="o">(</span>already present<span class="o">)</span>: <span class="m">67</span>.20 MiB / <span class="m">67</span>.20 MiB <span class="o">[=======]</span> 0s
+
+Skipping blob 767f936afb51 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.46 MiB / <span class="m">4</span>.46 MiB <span class="o">[=========]</span> 0s
+
+Skipping blob b211a7fc6e85 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">819</span>.00 KiB / <span class="m">819</span>.00 KiB <span class="o">[=====]</span> 0s
+
+Skipping blob 8d092d3e44bb <span class="o">(</span>already present<span class="o">)</span>: <span class="m">67</span>.20 MiB / <span class="m">67</span>.20 MiB <span class="o">[=======]</span> 0s
+
+Skipping blob 492c5c55da84 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.50 KiB / <span class="m">4</span>.50 KiB <span class="o">[=========]</span> 0s
+
+Skipping blob 6f55b6e55d8a <span class="o">(</span>already present<span class="o">)</span>: <span class="m">6</span>.15 MiB / <span class="m">6</span>.15 MiB <span class="o">[=========]</span> 0s
+
+Skipping blob 80ea48511c5d <span class="o">(</span>already present<span class="o">)</span>: <span class="m">1021</span>.00 KiB / <span class="m">1021</span>.00 KiB <span class="o">[===]</span> 0s
+
+Copying config 6b6dc5878fb2: <span class="m">0</span> B / <span class="m">5</span>.15 KiB <span class="o">[</span>----------------------------------<span class="o">]</span>
+Copying config 6b6dc5878fb2: <span class="m">5</span>.15 KiB / <span class="m">5</span>.15 KiB <span class="o">[==========================]</span> 0s
+Writing manifest to image destination
+Storing signatures
+6b6dc5878fb2c2c10099adbb4458c2fc78cd894134df6e4dee0bf8656e93825a
+Image <span class="s1">&#39;a-very-nice-image&#39;</span> was built successfully <span class="se">\o</span>/
+</pre></div>
+</div>
+<p>This is how the playbook looks:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Demonstration of ansible-bender functionality</span>
+  <span class="nt">hosts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">all</span>
+  <span class="nt">vars</span><span class="p">:</span>
+    <span class="nt">ansible_bender</span><span class="p">:</span>
+      <span class="nt">base_image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python:3-alpine</span>
+
+      <span class="nt">working_container</span><span class="p">:</span>
+        <span class="nt">volumes</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">playbook_dir</span><span class="nv"> </span><span class="s">}}:/src&#39;</span>
+
+      <span class="nt">target_image</span><span class="p">:</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">a-very-nice-image</span>
+        <span class="nt">working_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/src</span>
+        <span class="nt">labels</span><span class="p">:</span>
+          <span class="nt">built-by</span><span class="p">:</span> <span class="s">&#39;{{</span><span class="nv"> </span><span class="s">ansible_user</span><span class="nv"> </span><span class="s">}}&#39;</span>
+        <span class="nt">environment</span><span class="p">:</span>
+          <span class="nt">FILE_TO_PROCESS</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">README.md</span>
+  <span class="nt">tasks</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Run a sample command</span>
+    <span class="nt">command</span><span class="p">:</span> <span class="s">&#39;ls</span><span class="nv"> </span><span class="s">-lha</span><span class="nv"> </span><span class="s">/src&#39;</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Stat a file</span>
+    <span class="nt">stat</span><span class="p">:</span>
+      <span class="nt">path</span><span class="p">:</span> <span class="s">&quot;{{</span><span class="nv"> </span><span class="s">lookup(&#39;env&#39;,&#39;FILE_TO_PROCESS&#39;)</span><span class="nv"> </span><span class="s">}}&quot;</span>
+</pre></div>
+</div>
+<p>As you can see, the whole build processed is configured by the variable
+<code class="docutils literal notranslate"><span class="pre">ansible_bender</span></code>.
+The list of known variables by ansible-bender is detailed in the document
+<a class="reference external" href="docs/configuration.md">configuration.md</a>.</p>
+<p>If we rerun the build again, we can see that ab loads every task from cache:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ansible-bender build ./simple-playbook.yaml
+
+PLAY <span class="o">[</span>Demonstration of ansible-bender functionality<span class="o">]</span> ****************************************
+
+TASK <span class="o">[</span>Gathering Facts<span class="o">]</span> **********************************************************************
+ok: <span class="o">[</span>a-very-nice-image-20190302-153526013757-cont<span class="o">]</span>
+
+TASK <span class="o">[</span>Run a sample command<span class="o">]</span> *****************************************************************
+loaded from cache: <span class="s1">&#39;7c69668c42987446cc78adbf6620fc2faf90ad10c3497662fe38940dd6de998f&#39;</span>
+skipping: <span class="o">[</span>a-very-nice-image-20190302-153526013757-cont<span class="o">]</span>
+
+TASK <span class="o">[</span>Stat a file<span class="o">]</span> **************************************************************************
+loaded from cache: <span class="s1">&#39;4a4f54285928c03eea65745ee9feead88026c780a40126d94e79d5842bcdbe62&#39;</span>
+skipping: <span class="o">[</span>a-very-nice-image-20190302-153526013757-cont<span class="o">]</span>
+
+PLAY RECAP **********************************************************************************
+a-very-nice-image-20190302-153526013757-cont : <span class="nv">ok</span><span class="o">=</span><span class="m">1</span>    <span class="nv">changed</span><span class="o">=</span><span class="m">0</span>    <span class="nv">unreachable</span><span class="o">=</span><span class="m">0</span>    <span class="nv">failed</span><span class="o">=</span><span class="m">0</span>
+
+Getting image <span class="nb">source</span> signatures
+
+Skipping blob 767f936afb51 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.46 MiB / <span class="m">4</span>.46 MiB <span class="o">[=========]</span> 0s
+
+Skipping blob b211a7fc6e85 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">819</span>.00 KiB / <span class="m">819</span>.00 KiB <span class="o">[=====]</span> 0s
+
+Skipping blob 8d092d3e44bb <span class="o">(</span>already present<span class="o">)</span>: <span class="m">67</span>.20 MiB / <span class="m">67</span>.20 MiB <span class="o">[=======]</span> 0s
+
+Skipping blob 492c5c55da84 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.50 KiB / <span class="m">4</span>.50 KiB <span class="o">[=========]</span> 0s
+Skipping blob 767f936afb51 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.46 MiB / <span class="m">4</span>.46 MiB <span class="o">[=========]</span> 0s
+Skipping blob 6f55b6e55d8a <span class="o">(</span>already present<span class="o">)</span>: <span class="m">6</span>.15 MiB / <span class="m">6</span>.15 MiB <span class="o">[=========]</span> 0s
+Skipping blob b211a7fc6e85 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">819</span>.00 KiB / <span class="m">819</span>.00 KiB <span class="o">[=====]</span> 0s
+Skipping blob 80ea48511c5d <span class="o">(</span>already present<span class="o">)</span>: <span class="m">1021</span>.00 KiB / <span class="m">1021</span>.00 KiB <span class="o">[===]</span> 0s
+Skipping blob 8d092d3e44bb <span class="o">(</span>already present<span class="o">)</span>: <span class="m">67</span>.20 MiB / <span class="m">67</span>.20 MiB <span class="o">[=======]</span> 0s
+Skipping blob 5f70bf18a086 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">1</span>.00 KiB / <span class="m">1</span>.00 KiB <span class="o">[=========]</span> 0s
+Skipping blob 492c5c55da84 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">4</span>.50 KiB / <span class="m">4</span>.50 KiB <span class="o">[=========]</span> 0s
+
+Skipping blob 6f55b6e55d8a <span class="o">(</span>already present<span class="o">)</span>: <span class="m">6</span>.15 MiB / <span class="m">6</span>.15 MiB <span class="o">[=========]</span> 0s
+
+Skipping blob 80ea48511c5d <span class="o">(</span>already present<span class="o">)</span>: <span class="m">1021</span>.00 KiB / <span class="m">1021</span>.00 KiB <span class="o">[===]</span> 0s
+
+Skipping blob 5f70bf18a086 <span class="o">(</span>already present<span class="o">)</span>: <span class="m">1</span>.00 KiB / <span class="m">1</span>.00 KiB <span class="o">[=========]</span> 0s
+
+Copying config 354752b97084: <span class="m">0</span> B / <span class="m">5</span>.26 KiB <span class="o">[</span>----------------------------------<span class="o">]</span>
+Copying config 354752b97084: <span class="m">5</span>.26 KiB / <span class="m">5</span>.26 KiB <span class="o">[==========================]</span> 0s
+Writing manifest to image destination
+Storing signatures
+354752b97084fcf349a28a2f66839d270e728559883dd1edb5ec22e8c9c6adb9
+Image <span class="s1">&#39;a-very-nice-image&#39;</span> was built successfully <span class="se">\o</span>/
+</pre></div>
+</div>
+</div>
+<div class="section" id="listing-builds">
+<h2>Listing builds<a class="headerlink" href="#listing-builds" title="Permalink to this headline">¶</a></h2>
+<p>We can list builds we have done:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ansible-bender list-builds
+  BUILD ID  IMAGE NAME         STATUS    DATE                        BUILD TIME
+----------  -----------------  --------  --------------------------  --------------
+         <span class="m">1</span>  a-very-nice-image  <span class="k">done</span>      <span class="m">2019</span>-03-02 <span class="m">16</span>:07:47.471912  <span class="m">13</span> minutes
+         <span class="m">2</span>  a-very-nice-image  <span class="k">done</span>      <span class="m">2019</span>-03-02 <span class="m">16</span>:07:58.858699  <span class="m">7</span> minutes
+</pre></div>
+</div>
+</div>
+<div class="section" id="getting-logs-of-a-build">
+<h2>Getting logs of a build<a class="headerlink" href="#getting-logs-of-a-build" title="Permalink to this headline">¶</a></h2>
+<p>Wanna check build logs sometime later? No problem!</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ansible-bender get-logs <span class="m">2</span>
+
+PLAY <span class="o">[</span>Demonstration of ansible-bender functionality<span class="o">]</span> *********************************
+
+TASK <span class="o">[</span>Gathering Facts<span class="o">]</span> ***************************************************************
+ok: <span class="o">[</span>a-very-nice-image-20190302-160751828671-cont<span class="o">]</span>
+
+TASK <span class="o">[</span>Run a sample command<span class="o">]</span> **********************************************************
+loaded from cache: <span class="s1">&#39;cd27cfb71a161f3333232b97cc6b2a89354ff52de71bce9058c52cdf536735f9&#39;</span>
+skipping: <span class="o">[</span>a-very-nice-image-20190302-160751828671-cont<span class="o">]</span>
+
+TASK <span class="o">[</span>Stat a file<span class="o">]</span> *******************************************************************
+loaded from cache: <span class="s1">&#39;89ba4efc31358d688f035bf8159d900f1552314f0af6bf6c338b4897da593ccf&#39;</span>
+skipping: <span class="o">[</span>a-very-nice-image-20190302-160751828671-cont<span class="o">]</span>
+
+PLAY RECAP ***************************************************************************
+a-very-nice-image-20190302-160751828671-cont : <span class="nv">ok</span><span class="o">=</span><span class="m">1</span>    <span class="nv">changed</span><span class="o">=</span><span class="m">0</span>    <span class="nv">unreachable</span><span class="o">=</span><span class="m">0</span>    <span class="nv">failed</span><span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locating-built-images-with-podman">
+<h2>Locating built images with podman<a class="headerlink" href="#locating-built-images-with-podman" title="Permalink to this headline">¶</a></h2>
+<p>Once they are built, you can use them with podman right away:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ podman images a-very-nice-image
+REPOSITORY                    TAG      IMAGE ID       CREATED         SIZE
+localhost/a-very-nice-image   latest   5202048d9a0e   <span class="m">2</span> minutes ago   <span class="m">83</span>.5 MB
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cacheandlayer.html" class="btn btn-neutral float-right" title="Caching and Layering mechanism" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Tomas Tomecek
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
