@@ -367,7 +367,7 @@ class PbVarsParser:
             # validation to error out unknown keys in /vars/ansible_bender
             jsonschema.validate(bender_data, PLAYBOOK_SCHEMA)
         except jsonschema.ValidationError as validation_error:
-            if validation_error.validator is "type":
+            if validation_error.validator == "type":
                 # error is due to invalid value datatype
                 path = "/" + "/".join(validation_error.path)
                 expected_types = validation_error.validator_value
