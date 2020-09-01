@@ -127,6 +127,7 @@ class Build:
         self.playbook_path = None
         self.build_volumes = []  # volumes for the build container
         self.build_user = None
+        self.build_entrypoint = None
         self.metadata = None  # Image metadata
         self.state = BuildState.NEW
         self.build_start_time = None
@@ -188,6 +189,7 @@ class Build:
         """ update current object with data provided from Ansible vars """
         self.build_volumes += graceful_get(data, "working_container", "volumes", default=[])
         self.build_user = graceful_get(data, "working_container", "user")
+        self.build_entrypoint = graceful_get(data, "working_container", "entrypoint")
         self.base_image = graceful_get(data, "base_image")
         self.target_image = graceful_get(data, "target_image", "name")
         # self.builder_name = None
@@ -208,6 +210,7 @@ class Build:
         b.playbook_path = j.get("playbook_path", None)
         b.build_volumes = j["build_volumes"]
         b.build_user = graceful_get(j, "build_user")
+        b.build_entrypoint = graceful_get(j, "build_entrypoint")
         b.metadata = ImageMetadata.from_json(j["metadata"])
         b.state = BuildState(j["state"])
         b.build_start_time = None

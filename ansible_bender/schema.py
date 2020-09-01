@@ -302,6 +302,13 @@ PLAYBOOK_SCHEMA = {
                     "examples": [
                         "leonardo"
                     ],
+                },
+                "entrypoint": {
+                    "type": ["string", "null"],
+                    "title": "entrypoint used during build to prevent certain containers, with processes running forever, getting stuck.",
+                    "examples": [
+                        "echo"
+                    ]
                 }
             }
         },

@@ -330,6 +330,8 @@ class CLI:
             build.ansible_extra_args = self.args.extra_ansible_args
         if self.args.python_interpreter:
             build.python_interpreter = self.args.python_interpreter
+        if self.args.podman_entrypoint:
+            build.build_entrypoint = self.args.podman_entrypoint
 
         self.app.build(build)
 
