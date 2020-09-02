@@ -40,6 +40,7 @@ only from the first play. All the plays will end up in a single container image.
 |----------------------|-----------------|----------------------------------------------------------------------|
 | `volumes`            | list of strings | volumes mappings for the working container (`HOST:CONTAINER:PARAMS`) |
 | `user`               | string          | UID or username to invoke the container during build (run ansible)   |
+| `entrypoint`         | string          | entrypoint script/command used by the working container              | 
 
 #### `target_image`
 
@@ -71,6 +72,7 @@ Example of a playbook with variables:
       working_container:
         volumes:
           - "{{ playbook_dir }}:/src"
+        entrypoint: ls
 
       target_image:
         name: challet

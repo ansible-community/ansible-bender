@@ -12,6 +12,7 @@
       working_container:
         volumes:
           - /c:/d
+        entrypoint: ls
 
       target_image:
         name: funky-mona-lisa
