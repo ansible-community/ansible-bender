@@ -230,6 +230,7 @@ class BuildahBuilder(Builder):
             labels=self.build.metadata.labels,  # labels are not applied when they are configured
                                                 # before doing commit
             annotations=self.build.metadata.annotations,
+            entrypoint=self.build.build_entrypoint,
             debug=self.debug
         )
 
