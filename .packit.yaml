@@ -10,16 +10,14 @@ jobs:
 - job: copr_build
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
+    - fedora-stable
     # - fedora-rawhide-x86_64
   trigger: pull_request
 - job: tests
   trigger: pull_request
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
+    - fedora-stable
     # - fedora-rawhide-x86_64
 - job: propose_downstream
   trigger: release
