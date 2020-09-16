@@ -125,6 +125,10 @@ class CLI:
             help="the container gets invoked with this user during build"
         )
         self.build_parser.add_argument(
+            "--build-entrypoint",
+            help="the container will be invoked with this entrypoint during the build"
+        )
+        self.build_parser.add_argument(
             "-w", "--workdir",
             help="path to an implicit working directory in the container"
         )
@@ -330,6 +334,8 @@ class CLI:
             build.ansible_extra_args = self.args.extra_ansible_args
         if self.args.python_interpreter:
             build.python_interpreter = self.args.python_interpreter
+        if self.args.build_entrypoint:
+            build.build_entrypoint = self.args.build_entrypoint
 
         self.app.build(build)
 

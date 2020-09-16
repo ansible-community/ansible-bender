@@ -1,8 +1,5 @@
 downstream_package_name: ansible-bender
 specfile_path: ansible-bender.spec
-synced_files:
-- ansible-bender.spec
-- .packit.yaml
 upstream_package_name: ansible-bender
 current_version_command: ["python3", "setup.py", "--version"]
 create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
@@ -10,17 +7,13 @@ jobs:
 - job: copr_build
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    # - fedora-rawhide-x86_64
+    - fedora-all
   trigger: pull_request
 - job: tests
   trigger: pull_request
   metadata:
     targets:
-    - fedora-30-x86_64
-    - fedora-31-x86_64
-    # - fedora-rawhide-x86_64
+    - fedora-all
 - job: propose_downstream
   trigger: release
   metadata:

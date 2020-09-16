@@ -61,6 +61,7 @@ def test_set_all_params():
     assert not b.cache_tasks
     assert b.ansible_extra_args == "--some --args"
     assert b.build_volumes == ["/c:/d"]
+    assert b.build_entrypoint == "ls"
     assert b.target_image == "funky-mona-lisa"
 
     assert m.env_vars == {"z": "value"}
