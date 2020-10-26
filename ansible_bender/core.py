@@ -320,7 +320,8 @@ class PbVarsParser:
                 {
                     "copy": {
                         "dest": json_data_path,
-                        "content": jinja_pb_vars_key
+                        "content": jinja_pb_vars_key,
+                        "mode": "preserve"
                     }
                 }
             ]
