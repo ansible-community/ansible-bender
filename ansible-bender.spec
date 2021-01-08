@@ -84,14 +84,20 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 
 %changelog
-* Fri Jan  8 17:16:24 CET 2021 Tomas Tomecek <ttomecek@redhat.com> - 0.9.0-1
-- new upstream release: 0.9.0
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Thu Dec 12 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.8.1-1
-- new upstream release: 0.8.1
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.8.1-3
+- Rebuilt for Python 3.9
 
-* Tue Nov 19 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.8.0-1
-- new upstream release: 0.8.0
+* Mon May 18 2020 Gordon Messmer <gordon.messmer@gmail.com> - 0.8.1-2
+- Rebuild with fix for missing python modules.
+
+* Mon Apr 27 2020 Gordon Messmer <gordon.messmer@gmail.com> - 0.8.1-1
+- Build 0.8.1
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.7.0-4
 - Rebuilt for Python 3.8.0rc1 (#1748018)
