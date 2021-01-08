@@ -4,7 +4,7 @@ PY_PACKAGE := ansible-bender
 # container image with ab inside
 CONT_IMG := $(PY_PACKAGE)
 ANSIBLE_BENDER := python3 -m ansible_bender.cli
-PYTEST_EXEC := pytest-3
+PYTEST_EXEC := pytest
 
 build-ab-img: contrib/pre-setup.yml
 	$(ANSIBLE_BENDER) build -- ./contrib/pre-setup.yml $(BASE_IMAGE) $(CONT_IMG)
