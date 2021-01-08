@@ -1,8 +1,10 @@
-downstream_package_name: ansible-bender
 specfile_path: ansible-bender.spec
-upstream_package_name: ansible-bender
-current_version_command: ["python3", "setup.py", "--version"]
-create_tarball_command: ["python3", "setup.py", "sdist", "--dist-dir", "."]
+actions:
+  create-archive:
+    - "python3 setup.py sdist --dist-dir ."
+    - "sh -c 'echo ansible-bender-$(python3 setup.py --version).tar.gz'"
+  get-current-version:
+    - "python3 setup.py --version"
 jobs:
 - job: copr_build
   metadata:
