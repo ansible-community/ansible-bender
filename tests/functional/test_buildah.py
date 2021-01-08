@@ -12,11 +12,8 @@ import pytest
 
 from ansible_bender.builders.buildah_builder import buildah, inspect_resource, \
     podman_run_cmd
-from ..spellbook import basic_playbook_path, base_image, bad_playbook_path, random_word, basic_playbook_path_w_bv
 from ..conftest import ab
-
-import datetime
-from ansible_bender.constants import TIMESTAMP_FORMAT
+from ..spellbook import basic_playbook_path, base_image, bad_playbook_path, random_word, basic_playbook_path_w_bv
 
 logger = logging.getLogger("ansible_bender")
 
