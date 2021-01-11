@@ -147,13 +147,11 @@ def test_file_caching_mechanism(tmpdir, application, build):
     assert build.layers[0].cached
     assert not build.layers[1].cached
 
-    # ideally this would be cached, but isn't now
     application.build(cached_build)
     cached_build = application.db.get_build(cached_build.build_id)
     assert len(cached_build.layers) == 2
     assert cached_build.layers[0].cached
-    # since ansible doesn't track files and whether they changed, let's just make sure it works we expect it to work
-    assert not cached_build.layers[1].cached
+    assert cached_build.layers[1].cached
 
     # and now we test that if we change the file, it's not loaded from cache
     fun_content = "Much more fun, fun, fun!"
@@ -168,6 +166,50 @@ def test_file_caching_mechanism(tmpdir, application, build):
     out = builder.run(second_build.target_image, ["cat", "/fun"])
     assert out == fun_content
 
+def test_dir_caching(tmpdir, application, build):
+    """ make sure that we don't load from cache when files within multi level directories change """
+    t = str(tmpdir)
+    pb_name = "file_caching.yaml"
+    test_dir_name = "a_directory_of_fun"
+    file_caching_pb = os.path.join(data_dir, pb_name)
+    p = os.path.join(t, pb_name)
+    test_dir = os.path.join(data_dir, test_dir_name)
+    f = os.path.join(t, test_dir_name)
+    sub_f = os.path.join(f, "fun_subdir", "fun_subfile")
+
+    shutil.copy(file_caching_pb, p)
+    shutil.copytree(test_dir, f)
+
+    with open(p) as fd:
+        d = yaml.safe_load(fd)
+        d[0]["tasks"][0]["copy"]["src"] = f
+    with open(p, "w") as fd:
+        yaml.safe_dump(d, fd)
+
+    build.playbook_path = p
+    second_build = Build.from_json(build.to_dict())
+    cached_build = Build.from_json(build.to_dict())
+
+    application.build(build)
+    build = application.db.get_build(build.build_id)
+    assert len(build.layers) == 2
+    assert build.layers[0].cached
+    assert not build.layers[1].cached
+
+    application.build(cached_build)
+    cached_build = application.db.get_build(cached_build.build_id)
+    assert len(cached_build.layers) == 2
+    assert cached_build.layers[0].cached
+    assert cached_build.layers[1].cached
+
+    # and now we test that if we change a subfile, it's not loaded from cache
+    fun_content = "Much more fun, fun, fun!"
+    with open(sub_f, "w") as fd:
+        fd.write(fun_content)
+
+    application.build(second_build)
+    second_build = application.db.get_build(second_build.build_id)
+    assert not second_build.layers[1].cached
 
 def test_caching_non_ex_image(tmpdir, application, build):
     """
