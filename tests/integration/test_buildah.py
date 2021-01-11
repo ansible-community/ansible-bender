@@ -25,7 +25,8 @@ OS/Arch:         linux/amd64
 
 
 @pytest.mark.parametrize("image_name,found", [
-    ("registry.fedoraproject.org/fedora:29", True),
+    ("registry.fedoraproject.org/fedora:33", True),
+    ("registry.access.redhat.com/ubi8/python-38", True),
     (base_image, True),
     ("docker.io/library/busybox", False),
     ])
