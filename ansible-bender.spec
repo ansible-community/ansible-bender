@@ -6,7 +6,7 @@
 %bcond_with     privileged_tests
 
 Name:           ansible-bender
-Version:        0.8.1
+Version:        0.9.0
 Release:        1%{?dist}
 Summary:        Build container images using Ansible playbooks
 
@@ -84,11 +84,20 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 
 %changelog
-* Thu Dec 12 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.8.1-1
-- new upstream release: 0.8.1
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Tue Nov 19 2019 Tomas Tomecek <ttomecek@redhat.com> - 0.8.0-1
-- new upstream release: 0.8.0
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.8.1-3
+- Rebuilt for Python 3.9
+
+* Mon May 18 2020 Gordon Messmer <gordon.messmer@gmail.com> - 0.8.1-2
+- Rebuild with fix for missing python modules.
+
+* Mon Apr 27 2020 Gordon Messmer <gordon.messmer@gmail.com> - 0.8.1-1
+- Build 0.8.1
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.7.0-4
 - Rebuilt for Python 3.8.0rc1 (#1748018)

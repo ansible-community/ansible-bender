@@ -1,7 +1,6 @@
 - hosts: all
   vars:
     key: value
-    key2: '{{ ansible_user }}'
     ansible_bender:
       base_image: mona_lisa
       layering: true

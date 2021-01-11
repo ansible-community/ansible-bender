@@ -1,3 +1,19 @@
+# 0.9.0
+
+## Features
+
+* Make it possible to set entrypoint for a working_container, by [@Smeds](https://github.com/Smeds), [#232](https://github.com/ansible-community/ansible-bender/pull/232)
+
+* Add sphinx based docs with read-the-docs theme for ansible-bender, by [@kmehant](https://github.com/kmehant), [#215](https://github.com/ansible-community/ansible-bender/pull/215)
+  * Available at https://ansible-community.github.io/ansible-bender/build/html/index.html
+
+## Fixes
+
+* Make `buildah_from_extra_args` actually work, by [@TomasTomecek](https://github.com/TomasTomecek), [#217](https://github.com/ansible-community/ansible-bender/pull/217)
+
+* Python packaging was polished, by [@gordonmessmer](https://github.com/gordonmessmer), [#227](https://github.com/ansible-community/ansible-bender/pull/227), [224](https://github.com/ansible-community/ansible-bender/pull/224), [#225](https://github.com/ansible-community/ansible-bender/pull/225)
+
+
 # 0.8.1
 
 ## Fixes
