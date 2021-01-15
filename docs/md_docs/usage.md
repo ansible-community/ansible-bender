@@ -72,8 +72,6 @@ This is how the playbook looks:
       target_image:
         name: a-very-nice-image
         working_dir: /src
-        labels:
-          built-by: '{{ ansible_user }}'
         environment:
           FILE_TO_PROCESS: README.md
   tasks:
