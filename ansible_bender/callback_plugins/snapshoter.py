@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import traceback
+import pathlib
 
 from ansible.executor.task_result import TaskResult
 from ansible.playbook.task import Task
@@ -69,6 +70,7 @@ class CallbackModule(CallbackBase):
 
     @staticmethod
     def get_task_content(task: Task):
+        sha512 = hashlib.sha512()
         serialized_data = task.get_ds()
         if not serialized_data:
             # ansible 2.8
@@ -76,10 +78,53 @@ class CallbackModule(CallbackBase):
         if not serialized_data:
             logger.error("unable to obtain task content from ansible: caching will not work")
             return
-        c = json.dumps(serialized_data, sort_keys=True).encode("utf-8")
+        c = json.dumps(serialized_data, sort_keys=True)
+
         logger.debug("content = %s", c)
-        m = hashlib.sha512(c)
-        return m.hexdigest()
+        sha512.update(c.encode("utf-8"))
+
+        # If task is a file action, cache the src.
+        #
+        # Take the file stats of the src (if directory, get the stats
+        # of every file within) and concatinate it with the task config
+        # (assigned under serialized_data)
+        #
+        # The idea is that, if a file is changed, so will its modification time,
+        # which will force the layer to be reloaded. Otherwise, load from cache.
+        #
+        # Note: serialized_data was grabbed above.
+        task_config = task.dump_attrs()
+        if( ('args' in task_config) and ('src' in task_config['args']) ):
+            src = task_config['args']['src']
+            src_path = os.path.join(task.get_search_path()[0], "files", src)
+
+            if(not(os.path.exists(src_path))):
+                src_path = os.path.join(task.get_search_path()[0], src)
+
+            if os.path.isdir(src_path):
+                dir_hash = CallbackModule.get_dir_fingerprint(src_path)
+                sha512.update(dir_hash.encode("utf-8"))
+            elif os.path.isfile(src_path):
+                the_file = pathlib.Path(src_path)
+                date_modified = str(the_file.stat().st_mtime)
+                sha512.update(date_modified.encode("utf-8"))
+
+        return sha512.hexdigest()
+
+    @staticmethod
+    def get_dir_fingerprint(directory):
+        sha512 = hashlib.sha512()
+        for root, dirs, files in os.walk(directory):
+            for filename in files:
+                the_file = pathlib.Path(os.path.join(directory, root, filename))
+
+                if not the_file.exists():
+                    continue
+
+                date_modified = str(the_file.stat().st_mtime)
+                sha512.update(date_modified.encode("utf-8"))
+
+        return sha512.hexdigest()
 
     def _maybe_load_from_cache(self, task):
         """
@@ -105,11 +150,6 @@ class CallbackModule(CallbackBase):
             a.db.record_build(build)
             return
         if not build.was_last_layer_cached():
-            return
-        if task.action in FILE_ACTIONS:
-            # the task is a file action: unfortunately we can't cache that
-            # also ansible doesn't help here since it says changed=True even if the file didn't change
-            # let's abort caching
             return
         if not build.is_layering_on():
             return
