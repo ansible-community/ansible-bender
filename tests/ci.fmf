@@ -1,16 +1,9 @@
-/bender:
-  prepare:
-    how: ansible
-    playbooks:
-    - ci.yaml
-  /smoke:
-    execute:
-      how: shell
-      script:
-      - /usr/bin/ansible-bender --help
-      - /usr/bin/ansible-bender -V
-  /full:
-    execute:
-      how: shell
-      script:
-      - pwd; cd ~/git-source && pwd && make --debug=v check
+summary:
+  Unit, integration & functional tests.
+prepare:
+  how: ansible
+  playbooks:
+  - ci.yaml
+execute:
+  script:
+  - make check
