@@ -57,7 +57,7 @@ Ansible-bender was recently moved to the ansible-community organization. \o/
 * The tool tries to find python interpreter inside the base image.
 * You can push images you built to remote locations such as:
   * a registry, a tarball, docker daemon, ...
-  * [podman push](https://github.com/containers/libpod/blob/master/docs/podman-push.1.md) is used to perform the push.
+  * [podman push](https://github.com/containers/podman/blob/main/docs/source/markdown/podman-push.1.md) is used to perform the push.
 
 
 ## Documentation
