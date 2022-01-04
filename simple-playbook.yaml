@@ -3,7 +3,7 @@
   hosts: all
   vars:
     ansible_bender:
-      base_image: python:3-alpine
+      base_image: docker.io/python:3-alpine
 
       working_container:
         volumes:
