@@ -22,6 +22,7 @@ binaries to be present on your host system:
 
 * [Podman](https://podman.io/getting-started/installation)
 * [Buildah](https://github.com/containers/buildah/blob/master/install.md)
+* [crun](https://github.com/containers/crun)
 * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   * Ansible needs to be built against python 3
 * Python 3.6 or later (python 3.5 or earlier are not supported and known not
