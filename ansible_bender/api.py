@@ -86,8 +86,10 @@ class Application:
             build.build_start_time = datetime.datetime.now()
             self.db.record_build(build, build_state=BuildState.IN_PROGRESS)
 
+            build.python_interpreter = build.python_interpreter or self.db.load_python_interpreter(base_image_id)
             if not build.python_interpreter:
                 build.python_interpreter = builder.find_python_interpreter()
+                self.db.record_python_interpreter(base_image_id, build.python_interpreter)
 
             builder.create()
         except Exception:

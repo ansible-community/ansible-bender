@@ -264,3 +264,30 @@ class Database:
                 raise RuntimeError("There is no such build with ID %s" % build_id)
             finally:
                 self._save(data)
+
+    def load_python_interpreter(self, base_image_id):
+        """
+        loads the python interpreter path from the base image. Works for the top-level base image only, layer image ids will not be found.
+
+        :param base_image_id: str, id/hash of the base image
+        :return: python interpreter path if found, None otherwise
+        """
+        with self.acquire():
+            data = self._load()
+            store = data["store"]
+            store.setdefault(base_image_id, {})
+            return store[base_image_id].get("python_interpreter")
+
+    def record_python_interpreter(self, base_image_id, python_interpreter):
+        """
+        records/caches the python interpreter path for later use.
+
+        :param base_image_id: str, id/hash of the base image
+        :param python_interpreter: str, path of the python interpreter on the base image
+        """
+        with self.acquire():
+            data = self._load()
+            store = data["store"]
+            store.setdefault(base_image_id, {})
+            store[base_image_id]["python_interpreter"] = python_interpreter
+            self._save(data)

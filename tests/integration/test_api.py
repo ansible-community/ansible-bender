@@ -6,6 +6,7 @@ import shutil
 import subprocess
 
 import yaml
+import pytest
 from flexmock import flexmock
 
 from ansible_bender.api import Application
@@ -298,3 +299,31 @@ def test_pb_with_role(build, application):
         assert len(build.layers) == 8
     finally:
         run_cmd(["buildah", "rmi", im], ignore_status=True, print_output=True)
+
+
+@pytest.mark.parametrize("image_name,interpreter", [
+    ("registry.fedoraproject.org/fedora:35", "/usr/bin/python3"),
+    ("docker.io/library/python:2.7-alpine", "/usr/local/bin/python2"),
+    ("registry.access.redhat.com/ubi8/ubi:8.2", "/usr/libexec/platform-python")
+])
+def test_cache_python_interpreter(application, build, image_name, interpreter):
+    builder = application.get_builder(build)
+    build.base_image = image_name
+
+    # base image might not have been pulled. Need id to be able to read some data
+    builder.pull()
+    base_image_id = builder.get_image_id(build.base_image)
+
+    # check that no python interpreter is found before run
+    assert application.db.load_python_interpreter(base_image_id) == None
+
+    # build app once
+    application.build(build)
+
+    # check that python interpreter is now saved for later use
+    assert application.db.load_python_interpreter(base_image_id) == interpreter
+
+    # run a second time to see that it now don't try to record the python interpreter location
+    build.python_interpreter = None
+    flexmock(application.db).should_call("record_python_interpreter").never()
+    application.build(build)
