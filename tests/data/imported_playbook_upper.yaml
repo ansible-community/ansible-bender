@@ -1,0 +1,9 @@
+- hosts: all
+  tasks:
+    - debug:
+        msg: hello there
+- import_playbook: imported_playbook.yaml
+- hosts: all
+  tasks:
+    - debug:
+        msg: more hello
