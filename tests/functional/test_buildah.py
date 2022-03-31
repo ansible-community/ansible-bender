@@ -126,7 +126,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
     out = inspect_resource("image", target_image)
-    assert out['ImageAnnotations'] == {'bohemian': 'rhapsody'}
+    assert out['ImageAnnotations']['bohemian'] == 'rhapsody'
     co = out["Docker"]["config"]
     assert co["WorkingDir"] == workdir_path
     assert co["Labels"]["A"] == "B"
