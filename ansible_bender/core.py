@@ -176,7 +176,7 @@ class AnsibleRunner:
 
     def _correct_host_entries(self, playbook_path, tmpDir):
         """ Correct the host entries in the playbook and all imported playbooks """
-        tmp_pb_path = os.path.join(tmpDir, str(uuid.uuid4()) + ".yaml")
+        tmp_pb_path = os.path.join(tmpDir, "ab_" + str(uuid.uuid4()) + ".yaml")
 
         with open(playbook_path, "r") as fd_r:
             pb_dict = yaml.safe_load(fd_r)
@@ -186,6 +186,7 @@ class AnsibleRunner:
             if imported_playbook:
                 import_base_path = os.path.dirname(playbook_path)
                 imported_playbook_path = os.path.join(import_base_path, imported_playbook)
+                logger.debug("Encountered import_playbook, correcting hosts entries in imported file: %s", imported_playbook_path)
                 doc["import_playbook"] = self._correct_host_entries(imported_playbook_path, tmpDir)
             else:
                 host = doc["hosts"]
