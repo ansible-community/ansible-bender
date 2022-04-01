@@ -15,7 +15,7 @@ from ansible_bender.conf import Build
 from ansible_bender.utils import random_str, run_cmd
 from tests.spellbook import (dont_cache_playbook_path, change_layering_playbook, data_dir,
                              dont_cache_playbook_path_pre, non_ex_pb, multiplay_path, role_pb_path, roles_dir)
-from ..spellbook import small_basic_playbook_path
+from ..spellbook import small_basic_playbook_path, import_playbook_basic, import_playbook_recursive
 
 
 def test_build_db_metadata(application, build):
@@ -327,3 +327,17 @@ def test_cache_python_interpreter(application, build, image_name, interpreter):
     build.python_interpreter = None
     flexmock(application.db).should_call("record_python_interpreter").never()
     application.build(build)
+
+
+# test a few playbooks that uses import_playbook to verify that it works without exceptions/errors.
+# Also checks that the correct number of layers are created as a minimum verification (based upon the instruction from all imported playbooks)
+@pytest.mark.parametrize("playbook,num_layers", [
+    (import_playbook_basic, 2),
+    (import_playbook_recursive, 5)
+])
+def test_import_playbook_basic(application, build, playbook, num_layers):
+    build.playbook_path = playbook
+    application.build(build)
+
+    build = application.db.get_build(build.build_id)
+    assert len(build.layers) == num_layers

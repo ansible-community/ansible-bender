@@ -40,6 +40,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+import uuid
 
 import jsonschema
 import yaml
@@ -173,6 +174,30 @@ class AnsibleRunner:
         # hence, let's add the site ab is installed in to sys.path
         return os.path.dirname(os.path.dirname(ansible_bender.__file__))
 
+    def _correct_host_entries(self, playbook_path, tmpDir):
+        """ Correct the host entries in the playbook and all imported playbooks """
+        tmp_pb_path = os.path.join(tmpDir, "ab_" + str(uuid.uuid4()) + ".yaml")
+
+        with open(playbook_path, "r") as fd_r:
+            pb_dict = yaml.safe_load(fd_r)
+            
+        for idx, doc in enumerate(pb_dict):
+            imported_playbook = doc.get("import_playbook")
+            if imported_playbook:
+                import_base_path = os.path.dirname(playbook_path)
+                imported_playbook_path = os.path.join(import_base_path, imported_playbook)
+                logger.debug("Encountered import_playbook, correcting hosts entries in imported file: %s", imported_playbook_path)
+                doc["import_playbook"] = self._correct_host_entries(imported_playbook_path, tmpDir)
+            else:
+                host = doc["hosts"]
+                logger.debug("play[%s], host = %s", idx, host)
+                doc["hosts"] = self.builder.ansible_host
+
+        with open(tmp_pb_path, "w") as fd:
+            yaml.safe_dump(pb_dict, fd)
+
+        return tmp_pb_path
+    
     def build(self, db_path):
         """
         run the playbook against the container
@@ -204,15 +229,7 @@ class AnsibleRunner:
             with open(a_cfg_path, "w") as fd:
                 self._create_ansible_cfg(fd)
 
-            tmp_pb_path = os.path.join(tmp, "p.yaml")
-            with open(self.pb, "r") as fd_r:
-                pb_dict = yaml.safe_load(fd_r)
-            for idx, doc in enumerate(pb_dict):
-                host = doc["hosts"]
-                logger.debug("play[%s], host = %s", idx, host)
-                doc["hosts"] = self.builder.ansible_host
-            with open(tmp_pb_path, "w") as fd:
-                yaml.safe_dump(pb_dict, fd)
+            tmp_pb_path = self._correct_host_entries(self.pb, tmp)
             playbook_base = os.path.basename(self.pb).split(".", 1)[0]
             timestamp = datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
             symlink_name = f".{playbook_base}-{timestamp}-{random_str()}.yaml"

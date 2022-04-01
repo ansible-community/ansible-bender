@@ -1,0 +1,6 @@
+- import_playbook: imported_playbook.yaml
+  vars:
+    ansible_bender:
+      base_image: python:3.5-stretch
+      target_image:
+        name: test_img

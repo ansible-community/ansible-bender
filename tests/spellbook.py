@@ -23,6 +23,8 @@ bad_playbook_path = os.path.join(data_dir, "bad_playbook.yaml")
 role_pb_path = os.path.join(data_dir, "role.yaml")
 playbook_with_unknown_keys = os.path.join(data_dir, "playbook_with_unknown_keys.yaml")
 playbook_wrong_type = os.path.join(data_dir, "pb_wrong_type.yaml")
+import_playbook_basic = os.path.join(data_dir, "import_playbook_basic.yaml")
+import_playbook_recursive = os.path.join(data_dir, "import_playbook_recursive.yaml")
 
 base_image = "docker.io/library/python:3-alpine"
 
