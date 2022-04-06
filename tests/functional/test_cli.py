@@ -29,7 +29,7 @@ def test_inspect_cmd(tmpdir, target_image):
     ab(cmd, str(tmpdir))
     out = ab(["inspect"], str(tmpdir), return_output=True)
 
-    assert "base_image: docker.io/library/python:3-alpine" in out
+    assert "base_image: quay.io/biocontainers/python:3" in out
     assert "build_container: " in out
     assert "build_finished_time: " in out
     assert "build_start_time: " in out

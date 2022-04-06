@@ -303,7 +303,7 @@ def test_pb_with_role(build, application):
 
 @pytest.mark.parametrize("image_name,interpreter", [
     ("registry.fedoraproject.org/fedora:35", "/usr/bin/python3"),
-    ("docker.io/library/python:2.7-alpine", "/usr/local/bin/python2"),
+    ("quay.io/biocontainers/python:2.7", "/usr/local/bin/python2"),
     ("registry.access.redhat.com/ubi8/ubi:8.2", "/usr/libexec/platform-python")
 ])
 def test_cache_python_interpreter(application, build, image_name, interpreter):
