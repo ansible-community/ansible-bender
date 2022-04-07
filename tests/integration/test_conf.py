@@ -17,7 +17,7 @@ from tests.spellbook import b_p_w_vars_path, basic_playbook_path, full_conf_pb_p
 def test_expand_pb_vars():
     p = PbVarsParser(b_p_w_vars_path)
     data = p.expand_pb_vars()
-    assert data["base_image"] == "docker.io/library/python:3-alpine"
+    assert data["base_image"] == "quay.io/biocontainers/python:3"
     assert data["verbose_layer_names"]
     playbook_dir = os.path.dirname(b_p_w_vars_path)
     assert data["working_container"]["volumes"] == [f"{playbook_dir}:/src:Z"]

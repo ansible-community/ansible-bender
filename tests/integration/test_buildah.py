@@ -28,7 +28,7 @@ OS/Arch:         linux/amd64
     ("registry.fedoraproject.org/fedora:33", True),
     ("registry.access.redhat.com/ubi8/python-38", True),
     (base_image, True),
-    ("docker.io/library/busybox", False),
+    ("quay.io/quay/busybox", False),
     ])
 def test_find_py_intrprtr_in_fedora_image(image_name, found):
     build = Build()

@@ -26,7 +26,7 @@ playbook_wrong_type = os.path.join(data_dir, "pb_wrong_type.yaml")
 import_playbook_basic = os.path.join(data_dir, "import_playbook_basic.yaml")
 import_playbook_recursive = os.path.join(data_dir, "import_playbook_recursive.yaml")
 
-base_image = "docker.io/library/python:3-alpine"
+base_image = "quay.io/biocontainers/python:3"
 
 
 C7_AP_VER_OUT = """\

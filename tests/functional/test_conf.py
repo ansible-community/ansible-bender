@@ -24,7 +24,7 @@ def test_basic(tmpdir):
         cmd = ["inspect", "--json"]
         ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
 
-        assert ab_inspect_data["base_image"] == "docker.io/library/python:3-alpine"
+        assert ab_inspect_data["base_image"] == "quay.io/biocontainers/python:3"
         assert ab_inspect_data["build_id"] == "1"
         assert ab_inspect_data['build_volumes'] == [f'{data_dir}:/src:Z']
         assert ab_inspect_data['builder_name'] == "buildah"
@@ -65,7 +65,7 @@ def test_with_vars_files(tmpdir):
         cmd = ["inspect", "--json"]
         ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
 
-        assert ab_inspect_data["base_image"] == "docker.io/library/python:3-alpine"
+        assert ab_inspect_data["base_image"] == "quay.io/biocontainers/python:3"
         assert ab_inspect_data["build_id"] == "1"
         assert ab_inspect_data['builder_name'] == "buildah"
         assert len(ab_inspect_data['layers']) == 3

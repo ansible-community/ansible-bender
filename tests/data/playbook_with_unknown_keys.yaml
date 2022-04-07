@@ -6,7 +6,7 @@
         name: unknown_key
 
       verbose_layer_names: true
-      base_image: "docker.io/library/python:3-alpine"
+      base_image: "quay.io/biocontainers/python:3"
 
       working_container:
         volumes:
