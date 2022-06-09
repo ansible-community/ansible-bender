@@ -26,7 +26,7 @@ def test_build_db_metadata(application, build):
     assert build.build_start_time is not None
     assert build.log_lines is not None
     logs = "\n".join([l for l in build.log_lines if l])
-    assert logs.startswith("PLAY [registry")
+    assert "PLAY [registry" in logs
     assert "TASK [Gathering Facts]" in logs
     assert "failed=0" in logs
 

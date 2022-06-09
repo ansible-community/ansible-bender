@@ -149,7 +149,7 @@ def test_build_failure(tmpdir):
     with pytest.raises(subprocess.CalledProcessError):
         ab(cmd, str(tmpdir))
     out = ab(["get-logs"], str(tmpdir), return_output=True).lstrip()
-    assert out.startswith("PLAY [registry")
+    assert "PLAY [registry" in out
 
     # regex string for target image
     image_name_regex = "%s+[-]+[0-9]+[-]+[0-9]+-failed" %(target_image)
