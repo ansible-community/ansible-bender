@@ -87,7 +87,7 @@ def test_build_basic_image_with_build_volumes(tmpdir, target_image):
     with open(os.path.join(real_tmp, "file.txt"), "w") as fd:
         fd.write("Hello, hello!")
     container_mount = "/asdqwe"
-    vol_spec = "%s:%s" % (real_tmp, container_mount)
+    vol_spec = "%s:%s:Z" % (real_tmp, container_mount)
     cmd = ["build", "--build-volumes", vol_spec, "--",
            basic_playbook_path_w_bv, base_image, target_image]
     ab(cmd, str(tmpdir))
