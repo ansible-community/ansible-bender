@@ -126,6 +126,11 @@ class Application:
             # commit the final image and apply all metadata
             b.final_layer_id = builder.commit(build.target_image, final_image=True)
 
+            if b.squash:
+                logger.debug("Squashing metadata into a single layer")
+                # reset layers if squashing
+                b.wipe_layers()
+                self.record_progress(b, None, b.final_layer_id)
             if not b.is_layering_on():
                 self.record_progress(b, None, b.final_layer_id)
             else:

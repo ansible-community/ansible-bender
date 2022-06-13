@@ -55,12 +55,16 @@ from ansible_bender.utils import run_cmd, ap_command_exists, random_str, gracefu
     is_ansibles_python_2
 
 logger = logging.getLogger(__name__)
+# callback_whitelist got renamed to callbacks_enabled in ansible
+# drop callback_whitelist once 2.15 is released
+# https://docs.ansible.com/ansible/latest/reference_appendices/config.html#callbacks-enabled
 A_CFG_TEMPLATE = """\
 [defaults]
 # when user is changed, ansible might not be able to write to /.ansible
 remote_tmp = /tmp
 callback_plugins={0}
 callback_whitelist=snapshoter\n
+callbacks_enabled=snapshoter\n
 """
 
 

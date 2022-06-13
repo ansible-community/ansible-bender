@@ -255,6 +255,11 @@ class Build:
         self.layers.append(layer)
         self.layer_index[layer_id] = layer
 
+    def wipe_layers(self):
+        """ remove all layers from the DB: used by squash """
+        self.layers = []
+        self.layer_index = {}
+
     def get_top_layer_id(self):
         """
         return id of the top layer, or None

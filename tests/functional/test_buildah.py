@@ -87,7 +87,7 @@ def test_build_basic_image_with_build_volumes(tmpdir, target_image):
     with open(os.path.join(real_tmp, "file.txt"), "w") as fd:
         fd.write("Hello, hello!")
     container_mount = "/asdqwe"
-    vol_spec = "%s:%s" % (real_tmp, container_mount)
+    vol_spec = "%s:%s:Z" % (real_tmp, container_mount)
     cmd = ["build", "--build-volumes", vol_spec, "--",
            basic_playbook_path_w_bv, base_image, target_image]
     ab(cmd, str(tmpdir))
@@ -126,7 +126,7 @@ def test_build_basic_image_with_all_params(tmpdir, target_image):
            basic_playbook_path, base_image, target_image]
     ab(cmd, str(tmpdir))
     out = inspect_resource("image", target_image)
-    assert out['ImageAnnotations'] == {'bohemian': 'rhapsody'}
+    assert out['ImageAnnotations']['bohemian'] == 'rhapsody'
     co = out["Docker"]["config"]
     assert co["WorkingDir"] == workdir_path
     assert co["Labels"]["A"] == "B"
@@ -149,7 +149,7 @@ def test_build_failure(tmpdir):
     with pytest.raises(subprocess.CalledProcessError):
         ab(cmd, str(tmpdir))
     out = ab(["get-logs"], str(tmpdir), return_output=True).lstrip()
-    assert out.startswith("PLAY [registry")
+    assert "PLAY [registry" in out
 
     # regex string for target image
     image_name_regex = "%s+[-]+[0-9]+[-]+[0-9]+-failed" %(target_image)
@@ -296,3 +296,16 @@ def test_two_build_vols(tmpdir, target_image):
 
     assert vol_spec1 in build_volumes
     assert vol_spec2 in build_volumes
+
+
+def test_squash(target_image, tmpdir):
+    cmd = ["build", "--squash", basic_playbook_path, base_image, target_image]
+
+    ab(cmd, str(tmpdir))
+
+    p_inspect_data = json.loads(subprocess.check_output(["podman", "inspect", "-t", "image", target_image]))[0]
+    assert len(p_inspect_data["RootFS"]["Layers"]) == 1
+
+    cmd = ["inspect", "--json"]
+    ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
+    assert len(ab_inspect_data["layers"]) == 1

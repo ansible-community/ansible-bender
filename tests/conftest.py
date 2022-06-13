@@ -58,7 +58,7 @@ def ab(args, tmpdir_path, return_output=False, ignore_result=False, env=None):
 
     :return:
     """
-    # put --debug in there for debugging
+    # put --debug in args for debugging
     cmd = ["python3", "-m", "ansible_bender.cli", "--database-dir", tmpdir_path] + args
     logger.debug("cmd = %s", cmd)
     if ignore_result:

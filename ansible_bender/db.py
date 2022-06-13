@@ -175,7 +175,6 @@ class Database:
         else:
             raise Exception(f'Database seems to be corrupted. Build {next_build_id} already exists.')
 
-
     def record_build(self, build_i, build_id=None, build_state=None, set_finish_time=False):
         """
         record build into database
