@@ -279,7 +279,7 @@ def test_multiplay(build, application):
     application.build(build)
     try:
         build = application.db.get_build(build.build_id)
-        podman_run_cmd(im, ["ls", "/queen"])  # the file has to be in there
+        podman_run_cmd(im, ["ls", "/queen"], [])  # the file has to be in there
         assert len(build.layers) == 3
     finally:
         run_cmd(["buildah", "rmi", im], ignore_status=True, print_output=True)
@@ -293,7 +293,7 @@ def test_pb_with_role(build, application):
     application.build(build)
     try:
         build = application.db.get_build(build.build_id)
-        podman_run_cmd(im, ["ls", "/officer"])  # the file has to be in there
+        podman_run_cmd(im, ["ls", "/officer"], [])  # the file has to be in there
         # base image + 2 from roles: [] + 2 from import_role
         # + 3 from include_role (include_role is a task)
         assert len(build.layers) == 8

@@ -52,7 +52,7 @@ def does_image_exist(container_image):
     run_cmd(cmd, print_output=False)
 
 
-def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
+def podman_run_cmd(container_image, cmd, extra_args, log_stderr=True, return_output=False):
     """
     run provided command in selected container image using podman; raise exc when command fails
 
@@ -62,7 +62,7 @@ def podman_run_cmd(container_image, cmd, log_stderr=True, return_output=False):
     :param return_output: bool, if True, return output of the command
     :return: stdout output
     """
-    return run_cmd(["podman", "run", "--rm", container_image] + cmd,
+    return run_cmd(["podman", "run", "--rm"] + extra_args + [container_image] + cmd,
                    return_output=return_output, log_stderr=log_stderr)
 
 
@@ -72,7 +72,8 @@ def buildah_run_cmd(
         cmd: List[str],
         log_stderr: bool = True,
         log_output: bool = False,
-        extra_from_args: Optional[List[str]] = None,
+        extra_from_args: Optional[str] = None,
+        extra_run_args: Optional[List[str]] = None,
     ):
     """
     run provided command in selected container image using buildah; raise exc when command fails
@@ -83,7 +84,9 @@ def buildah_run_cmd(
     :param log_stderr: bool, log errors to stdout as ERROR level
     :param log_output: bool, print output of the command to logs
     :param extra_from_args: a list of extra arguments for `buildah from`
+    :param extra_run_args: a list of extra arguments for `buildah run`
     """
+    extra_run_args = extra_run_args if extra_run_args is not None else []
     container_name = "{}-{}".format(host_name, datetime.datetime.now().strftime(TIMESTAMP_FORMAT_TOGETHER))
     # was the temporary container created? if so, remove it
     created = False
@@ -91,7 +94,7 @@ def buildah_run_cmd(
         create_buildah_container(
             container_image, container_name, build_volumes=None, extra_from_args=extra_from_args, debug=False)
         created = True
-        run_cmd(["buildah", "run", container_name] + cmd, log_stderr=log_stderr, log_output=log_output)
+        run_cmd(["buildah", "run"] + extra_run_args + [container_name] + cmd, log_stderr=log_stderr, log_output=log_output)
     except subprocess.CalledProcessError:
         logger.error(f"Unable to create or run a container using {container_image} with buildah")
         raise
@@ -211,6 +214,12 @@ class BuildahBuilder(Builder):
         self.logs = []
         buildah_command_exists()
         podman_command_exists()
+        self.podman_run_args = []
+        if self.build.podman_run_extra_args:
+          self.podman_run_args = shlex.split(self.build.podman_run_extra_args)
+        self.buildah_run_args = []
+        if self.build.buildah_run_extra_args:
+          self.buildah_run_args = shlex.split(self.build.buildah_run_extra_args)
 
     def create(self):
         """
@@ -242,7 +251,7 @@ class BuildahBuilder(Builder):
         :param command: list of str
         :return: str (output)
         """
-        cmd = ["podman", "run", "--rm", image_name] + command
+        cmd = ["podman", "run", "--rm"] + self.podman_run_args + [image_name] + command
         return run_cmd(cmd, return_output=True)
 
     def swap_working_container(self):
@@ -361,8 +370,7 @@ class BuildahBuilder(Builder):
         for i in self.python_interpr_prio:
             cmd = ["ls", i]
             try:
-                run_cmd(["podman", "run", "--rm", self.build.base_image] + cmd,
-                        log_stderr=False, log_output=True)
+                podman_run_cmd(self.build.base_image, cmd, self.podman_run_args, log_stderr=False)
             except subprocess.CalledProcessError:
                 logger.info("python interpreter %s does not exist", i)
                 continue
@@ -392,7 +400,7 @@ class BuildahBuilder(Builder):
         logger.debug("Checking container creation using buildah")
         buildah_run_cmd(
             self.build.base_image, self.ansible_host, ["true"],
-            log_stderr=True, extra_from_args=self.build.buildah_from_extra_args)
+            log_stderr=True, extra_from_args=self.build.buildah_from_extra_args, extra_run_args=self.buildah_run_args)
 
     def get_buildah_version(self):
         out = run_cmd(["buildah", "version"], log_stderr=True, return_output=True, log_output=False)
@@ -410,4 +418,4 @@ class BuildahBuilder(Builder):
         check that containers can be created
         """
         logger.debug("trying to create a dummy container using podman")
-        podman_run_cmd(self.build.base_image, ["true"], log_stderr=True)
+        podman_run_cmd(self.build.base_image, ["true"], self.podman_run_args, log_stderr=True)

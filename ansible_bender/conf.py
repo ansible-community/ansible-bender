@@ -147,6 +147,8 @@ class Build:
         self.verbose = False
         self.pulled = False  # was the base image pulled?
         self.buildah_from_extra_args = None
+        self.buildah_run_extra_args = None
+        self.podman_run_extra_args = None
         self.ansible_extra_args = None
         self.python_interpreter = None
         self.verbose_layer_names = False
@@ -180,6 +182,8 @@ class Build:
             "verbose": self.verbose,
             "pulled": self.pulled,
             "buildah_from_extra_args": self.buildah_from_extra_args,
+            "buildah_run_extra_args": self.buildah_run_extra_args,
+            "podman_run_extra_args": self.podman_run_extra_args,
             "ansible_extra_args": self.ansible_extra_args,
             "python_interpreter": self.python_interpreter,
             "verbose_layer_names": self.verbose_layer_names,
@@ -197,6 +201,8 @@ class Build:
         self.layering = graceful_get(data, "layering", default=self.layering)
         self.squash = graceful_get(data, "squash", default=self.squash)
         self.buildah_from_extra_args = graceful_get(data, "buildah_from_extra_args")
+        self.buildah_run_extra_args = graceful_get(data, "buildah_run_extra_args")
+        self.podman_run_extra_args = graceful_get(data, "podman_run_extra_args")
         self.ansible_extra_args = graceful_get(data, "ansible_extra_args")
         self.verbose_layer_names = graceful_get(data, "verbose_layer_names")
         # we should probably get this from the official Ansible variable
@@ -238,6 +244,8 @@ class Build:
         b.pulled = j["pulled"]
         b.buildah_from_extra_args = j.get("buildah_from_extra_args", None)
         b.ansible_extra_args = j.get("ansible_extra_args", None)
+        b.buildah_run_extra_args = j.get("buildah_run_extra_args", None)
+        b.podman_run_extra_args = j.get("podman_run_extra_args", None)
         b.python_interpreter = j.get("python_interpreter", None)
         b.verbose_layer_names = graceful_get(j, "verbose_layer_names", default=False)
         return b

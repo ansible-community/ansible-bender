@@ -25,6 +25,8 @@ only from the first play. All the plays will end up in a single container image.
 |---------------------------|--------|---------------------------------------------------------
 | `base_image`              | string | name of the container image to use as a base
 | `buildah_from_extra_args` | string | extra CLI arguments to pass to buildah from command
+| `buildah_run_extra_args`  | string | extra CLI arguments to pass to buildah run command
+| `podman_run_extra_args`   | string | extra CLI arguments to pass to podman run command
 | `ansible_extra_args`      | string | extra CLI arguments to pass to ansible-playbook command
 | `working_container`       | dict   | settings for the container where the build occurs
 | `target_image`            | dict   | metadata of the final image which we built
