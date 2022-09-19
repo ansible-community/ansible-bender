@@ -179,6 +179,14 @@ class CLI:
             help="arguments passed to buildah from command (be careful!)"
         )
         self.build_parser.add_argument(
+            "--extra-buildah-run-args",
+            help="arguments passed to buildah run command (be careful!)"
+        )
+        self.build_parser.add_argument(
+            "--extra-podman-run-args",
+            help="arguments passed to podman run command (be careful!)"
+        )
+        self.build_parser.add_argument(
             "--extra-ansible-args",
             help="arguments passed to ansible-playbook command (be careful!)"
         )
@@ -330,6 +338,10 @@ class CLI:
             build.squash = self.args.squash
         if self.args.extra_buildah_from_args:
             build.buildah_from_extra_args = self.args.extra_buildah_from_args
+        if self.args.extra_buildah_run_args:
+            build.buildah_run_extra_args = self.args.extra_buildah_run_args
+        if self.args.extra_podman_run_args:
+            build.podman_run_extra_args = self.args.extra_podman_run_args
         if self.args.extra_ansible_args:
             build.ansible_extra_args = self.args.extra_ansible_args
         if self.args.python_interpreter:

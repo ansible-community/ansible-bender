@@ -417,5 +417,13 @@ PLAYBOOK_SCHEMA = {
             "type": "string",
             "title": "provide extra arguments for `buildah from` command"
         },
+        "buildah_run_extra_args": {
+            "type": "string",
+            "title": "provide extra arguments for `buildah run` command",
+        },
+        "podman_run_extra_args": {
+            "type": "string",
+            "title": "provide extra arguments for `podman run` command",
+        },
     },
 }

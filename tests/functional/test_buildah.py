@@ -55,7 +55,7 @@ def test_build_basic_image_with_env_vars(tmpdir, target_image):
     out = inspect_resource("image", target_image)
     assert a_b in out["OCIv1"]["config"]["Env"]
     assert x_y in out["OCIv1"]["config"]["Env"]
-    e = podman_run_cmd(target_image, ["env"], return_output=True)
+    e = podman_run_cmd(target_image, ["env"], [], return_output=True)
     assert a_b in e
     assert x_y in e
 
@@ -269,7 +269,7 @@ def test_tback_in_callback(tmpdir):
             assert re.match(image_name_regex, ab_inspect_data["target_image"])
             assert len(ab_inspect_data["layers"]) == 2
             with pytest.raises(subprocess.CalledProcessError) as ex:
-                podman_run_cmd(ab_inspect_data["target_image"], ["ls", "/fun"], return_output=True)
+                podman_run_cmd(ab_inspect_data["target_image"], ["ls", "/fun"], [], return_output=True)
             assert "No such file or directory" in ex.value.output
         finally:
             subprocess.call(["buildah", "rmi", ab_inspect_data["target_image"]])

@@ -7,6 +7,8 @@
       cache_tasks: false
       ansible_extra_args: "--some --args"
       buildah_from_extra_args: "--more --args"
+      buildah_run_extra_args: "--hostname=foo"
+      podman_run_extra_args: "--network=host -e=FOO=BAR"
 
       working_container:
         volumes:
