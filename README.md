@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/ansible-community/ansible-bender)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ansible-bender)
 
-This is a tool which bends containers using
+This tool bends containers using
 [Ansible](https://github.com/ansible/ansible)
 [playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html)
 and turns them into container images. It has a pluggable builder selection —
@@ -15,7 +15,7 @@ image. Right now the only supported builder is
 [More](http://github.com/ansible-community/ansible-bender/issues/25) [to
 come](http://github.com/ansible-community/ansible-bender/issues/26) in the future.
 Ansible-bender (ab) relies on [Ansible connection
-plugins](https://docs.ansible.com/ansible/2.6/plugins/connection.html) for
+plugins](https://docs.ansible.com/ansible/latest/plugins/connection.html) for
 performing builds.
 
 tl;dr Ansible is the frontend, buildah is the backend.
@@ -24,16 +24,13 @@ The concept is described in following blog posts:
 * [Building containers with buildah and ansible](https://blog.tomecek.net/post/building-containers-with-buildah-and-ansible/).
 * [Ansible and Podman Can Play Together Now](https://blog.tomecek.net/post/ansible-and-podman-can-play-together-now/).
 
-You may be asking: why not
-[ansible-container](https://github.com/ansible/ansible-container)? Ansible bender is
-actually heavily inspired by ansible-container: the main distinction is that
-ansible-container covers the complete lifecycle of a containerized application
-while ab takes care of image builds only.
 
+## Looking for maintainers ❤
 
-**Status**: ready to be used
+[This project doesn't have an active maintainer right now that](https://github.com/ansible-community/ansible-bender/issues/282) would watch issues daily.
 
-Ansible-bender was recently moved to the ansible-community organization. \o/
+If you are a user of ansible-bender and are familiar with Python, please consider becoming a maintainer.
+
 
 ## Features
 
