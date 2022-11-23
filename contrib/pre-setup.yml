@@ -44,7 +44,6 @@
       - python3-pip
       - python3-setuptools
       - python3-setuptools_scm
-      - python3-setuptools_scm_git_archive
       - python3-wheel  # for bdist_wheel
       - containers-common
       - buildah
