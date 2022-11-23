@@ -19,7 +19,6 @@ BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
-BuildRequires:  python%{python3_pkgversion}-setuptools_scm_git_archive
 %if %{with check}
 # These are required for tests:
 BuildRequires:  python%{python3_pkgversion}-pyyaml
