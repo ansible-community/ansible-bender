@@ -54,17 +54,6 @@ def mock_import_module(raise_exc=False):
         False
     ),
 ))
-def test_ansible_selinux_workaround(mock_r_t, mock_i_m, should_raise):
-    mock_r_t()
-    mock_i_m()
-    p = PbVarsParser("")
-    if should_raise:
-        with pytest.raises(RuntimeError) as ex:
-            p._check_selinux_iz_gud()
-        assert "libselinux" in str(ex.value)
-    else:
-        p._check_selinux_iz_gud()
-
 
 @pytest.mark.parametrize("di, error_message", (
     (
