@@ -265,38 +265,12 @@ class PbVarsParser:
         self.metadata = ImageMetadata()
         self.build.metadata = self.metadata
 
-    def _check_selinux_iz_gud(self):
-        """
-        This is a workaround for a weird behavior of ansible: if selinux is
-        in the enforcing mode and python3-libselinux is not installed, ansible freezes
-
-        https://bugzilla.redhat.com/show_bug.cgi?id=1696706
-        :return:
-        """
-        try:
-            enforcing_status = Path("/sys/fs/selinux/enforce").read_text()
-        except FileNotFoundError:
-            logger.debug("this system is not using selinux, /sys/fs/selinux/enforce is not present")
-            return
-        logger.debug(f"selinux enforce status = {enforcing_status}")
-        # it can be enforcing or not, selinux python module needs to be present
-        try:
-            importlib.import_module("selinux")
-        except ModuleNotFoundError:
-            raise RuntimeError(
-                "\nThis system is using selinux(8) and selinux python module is not installed. "
-                "There is a known issue in ansible that it freezes in this setup:\n"
-                "  https://bugzilla.redhat.com/show_bug.cgi?id=1696706\n"
-                "Please install libselinux python bindings (on Fedora the package name is python3-libselinux)."
-            )
-
     def expand_pb_vars(self):
         """
         populate vars from a playbook, defined in vars section
 
         :return: dict with the content of ansible_bender var
         """
-        self._check_selinux_iz_gud()
         with open(self.playbook_path) as fd:
             plays = yaml.safe_load(fd)
 
