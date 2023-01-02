@@ -1,0 +1,37 @@
+---
+- name: Set up environment for ansible-bender
+  hosts: all
+  tasks:
+  - name: Install all packages needed to hack on ab.
+    dnf:
+      name:
+      - git
+      - make
+      - python3-pip
+      - python3-setuptools
+      - python3-setuptools_scm
+      - python3-wheel  # for bdist_wheel
+      - containers-common
+      - buildah
+      - podman
+      - ansible
+      - python3-pytest
+      - python3-pytest-cov
+      - python3-flexmock
+      - python3-ipdb
+      - python3-jsonschema
+      - python3-tabulate
+      - docker
+  - name: Start dockerd
+    systemd:
+      name: docker
+      state: started
+  - name: Add vagrant user to docker group (required for tests/functional/test_buildah.py:test_push_to_dockerd)
+    user:
+      append: true
+      name: vagrant
+      groups: docker
+  - name: copy entrypoint script
+    copy:
+      src: entry.sh
+      dest: /entry.sh
