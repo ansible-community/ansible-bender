@@ -3,14 +3,8 @@
 
 Vagrant.configure("2") do |config|
   with_tests = ENV["WITH_TESTS"] || "no"
-  if with_tests == "yes"
-    config.vm.define "f30" do |f30|
-      f30.vm.box = "fedora/30-cloud-base"
-    end
-  end
-
-  config.vm.define "f31" do |f31|
-    f31.vm.box = "fedora/31-cloud-base"
+  config.vm.define "f36" do |f36|
+    f36.vm.box = "fedora/36-cloud-base"
   end
 
   config.vm.provider "libvirt" do |vb|
