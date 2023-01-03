@@ -20,3 +20,5 @@ pip-delete-this-directory.txt
 dmypy.json
 .pyre/
 
+# Vagrant artifacts
+.vagrant/**

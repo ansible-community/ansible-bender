@@ -26,35 +26,6 @@ def mock_import_module(raise_exc=False):
     else:
         flexmock(importlib, import_module=lambda name: None)
 
-
-@pytest.mark.parametrize("mock_r_t,mock_i_m,should_raise", (
-    (
-        partial(mock_read_text, "1"),
-        partial(mock_import_module, False),
-        False
-    ),
-    (
-        partial(mock_read_text, "1"),
-        partial(mock_import_module, True),
-        True
-    ),
-    (
-        partial(mock_read_text, "0"),
-        partial(mock_import_module, False),
-        False
-    ),
-    (
-        partial(mock_read_text, "0"),
-        partial(mock_import_module, True),
-        True
-    ),
-    (
-        partial(mock_read_text, None, True),
-        partial(mock_import_module, False),
-        False
-    ),
-))
-
 @pytest.mark.parametrize("di, error_message", (
     (
         {"target_image": {"user": {}}},
