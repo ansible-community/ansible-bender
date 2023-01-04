@@ -22,3 +22,6 @@ dmypy.json
 
 # Vagrant artifacts
 .vagrant/**
+
+# Virtual Environment
+venv/**
