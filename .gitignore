@@ -25,3 +25,6 @@ dmypy.json
 
 # Virtual Environment
 venv/**
+
+# VSCode artifacts
+.vscode/**
