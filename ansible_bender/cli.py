@@ -12,7 +12,7 @@ from tabulate import tabulate
 
 from ansible_bender.api import Application
 from ansible_bender.constants import ANNOTATIONS_KEY, PLAYBOOK_TEMPLATE
-from ansible_bender.core import PbVarsParser
+from ansible_bender.core import AnsibleVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
 
@@ -87,6 +87,12 @@ class CLI:
         self.build_parser.add_argument(
             "playbook_path", metavar="PLAYBOOK_PATH",
             help="path to Ansible playbook"
+        )
+        self.build_parser.add_argument(
+            "inventory_path", metavar="INVENTORY_PATH",
+            help="path to Ansible inventory",
+            default=None,
+            nargs="?"
         )
         self.build_parser.add_argument(
             "base_image", metavar="BASE_IMAGE",
@@ -289,7 +295,7 @@ class CLI:
         self.lb_parser.set_defaults(subcommand="clean")
 
     def _build(self):
-        pb_vars_p = PbVarsParser(self.args.playbook_path)
+        pb_vars_p = AnsibleVarsParser(self.args.playbook_path, self.args.inventory_path)
         build, metadata = pb_vars_p.get_build_and_metadata()
         build.metadata = metadata
         if self.args.workdir:
