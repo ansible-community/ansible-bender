@@ -406,7 +406,7 @@ class AnsibleVarsParser:
     """
 
     # Prefix for ansible_bender variables
-    _variable_prefix = "ansible_bender_"
+    _variable_prefix = "ansible_bender"
 
     _inventory_path = None
 
@@ -491,6 +491,36 @@ class AnsibleVarsParser:
 
         return parsed_host_information
 
+    def _get_variables(self, ansible_variables, variables):
+        """
+        Convinience function to get the variables from the variables dictionary
+        Gets the ansible_bender variables and the prepended variables
+        """
+
+        if variables is None:
+            return ansible_variables
+
+        for key, value in variables.items():
+            if str(key).startswith(self._variable_prefix):
+                    # Assume that ansible API has already 
+                    # pulled variables with correct precedence
+                new_key = key.replace(self._variable_prefix, "")
+
+                    # key can be prepended with ansible_bender_ or ansible_bender
+                    # if it is prepended with ansible_bender_, remove the _
+                if new_key.startswith("_"):
+                    new_key = new_key[1:]
+
+                    # If the new_key is blank
+                    # then the "ansible_bender" variable was used
+                    # Add the variables to the ansible_variables
+                if new_key == "":
+                    ansible_variables.update(value)
+                else:
+                    ansible_variables[new_key] = value
+
+        return ansible_variables
+
     def _get_vars_from_playbook(self, host_name) -> dict:
         """
         Parse the playbook variables related to the ansible_bender information
@@ -500,10 +530,7 @@ class AnsibleVarsParser:
         try:
             for host in self._hosts_in_playbook:
                 if host.get("hosts") == host_name:
-                    for key, value in host.items():
-                        if str(key).startswith(self._variable_prefix):
-                            new_key = key.replace(self._variable_prefix, "")
-                            playbook_variables[new_key] = value
+                    playbook_variables = self._get_variables(playbook_variables, host.get("vars"))
         except Exception as e:
             print("Error getting playbook variables for host: " + host_name + " - " + str(e))
             pass
@@ -521,12 +548,8 @@ class AnsibleVarsParser:
                                                             include_hostvars=True, 
                                                             include_delegate_to=True)
 
-            for key, value in all_vars_for_host.items():
-                if str(key).startswith(self._variable_prefix):
-                    # Assume that ansible API has already 
-                    # pulled variables with correct precedence
-                    new_key = key.replace(self._variable_prefix, "")
-                    ansible_variables[new_key] = value                                             
+            # find prepended variables
+            self._get_variables(ansible_variables, all_vars_for_host)                
         except Exception as e:
             print("Error getting host and group vars for host: " + host_name + " - " + str(e))
             pass
@@ -536,6 +559,7 @@ class AnsibleVarsParser:
 
         return ansible_variables
 
+    
     def get_build_and_metadata(self):
         """
         Find all hosts in the playbook and get their variables

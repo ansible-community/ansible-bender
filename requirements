@@ -1,0 +1,5 @@
+ansible
+ansible-runner
+tabulate
+jsonschema
+pytest

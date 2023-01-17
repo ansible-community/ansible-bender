@@ -1,0 +1,13 @@
+- hosts: host1
+  vars:
+    name: "Mr. Host1"
+  tasks:
+    - debug:
+        msg: "I am host1"
+
+- hosts: host2
+  vars:
+    name: "Mrs. Host2"
+  tasks:
+    - debug:
+        msg: "I am host2"
