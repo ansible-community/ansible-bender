@@ -412,11 +412,19 @@ class AnsibleVarsParser:
 
     _playbook_path = None
 
+    _loader: DataLoader = None
+
+    _inventory: InventoryManager = None
+
+    _variable_manager: VariableManager = None
+
+    _hosts_in_playbook: list = None
+
+    _hosts: dict = {}
+
     build: Build = Build()
 
     metadata: ImageMetadata = ImageMetadata()
-
-    _hosts: dict = {}
 
     def __init__(self, playbook_path, inventory_path = None) -> None:
         self._base_dir = os.path.dirname(playbook_path)
@@ -495,7 +503,7 @@ class AnsibleVarsParser:
 
         return parsed_host_information
 
-    def _get_variables(self, ansible_variables, variables):
+    def _extract_variables(self, ansible_variables, variables):
         """
         Convinience function to get the variables from the variables dictionary
         Gets the ansible_bender variables and the prepended variables
@@ -534,7 +542,7 @@ class AnsibleVarsParser:
         try:
             for host in self._hosts_in_playbook:
                 if host.get("hosts") == host_name:
-                    playbook_variables = self._get_variables(playbook_variables, host.get("vars"))
+                    playbook_variables = self._extract_variables(playbook_variables, host.get("vars"))
         except Exception as e:
             print("Error getting playbook variables for host: " + host_name + " - " + str(e))
             pass
@@ -553,7 +561,7 @@ class AnsibleVarsParser:
                                                             include_delegate_to=True)
 
             # find prepended variables
-            self._get_variables(ansible_variables, all_vars_for_host)                
+            self._extract_variables(ansible_variables, all_vars_for_host)                
         except Exception as e:
             print("Error getting host and group vars for host: " + host_name + " - " + str(e))
             pass
