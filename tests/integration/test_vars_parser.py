@@ -1,5 +1,3 @@
-import pytest
-
 from ansible_bender.core import AnsibleVarsParser
 
 def test_can_parse_vars_with_no_inventory_no_config():
