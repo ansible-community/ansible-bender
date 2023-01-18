@@ -2,15 +2,6 @@ import pytest
 
 from ansible_bender.core import AnsibleVarsParser
 
-# def test_host_can_parse_playbook_vars():
-#     playbook_path = "tests/data/test_playbook/playbook_vars/playbook.yml"
-#     hosts = Hosts(playbook_path)
-#     host = hosts.first()
-#     assert host.get_vars() == {}
-
-# def test_host_can_parse_group_and_host_vars():
-#     assert False
-
 def test_can_parse_vars_with_no_inventory_no_config():
     playbook_path = "tests/data/projects/playbook_only/playbook.yml"
     vars_parser = AnsibleVarsParser(playbook_path)
