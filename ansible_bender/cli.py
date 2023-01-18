@@ -89,12 +89,6 @@ class CLI:
             help="path to Ansible playbook"
         )
         self.build_parser.add_argument(
-            "inventory_path", metavar="INVENTORY_PATH",
-            help="path to Ansible inventory",
-            default=None,
-            nargs="?"
-        )
-        self.build_parser.add_argument(
             "base_image", metavar="BASE_IMAGE",
             help="name of a container image to use as a base",
             nargs="?"
@@ -129,6 +123,11 @@ class CLI:
         self.build_parser.add_argument(
             "--build-user",
             help="the container gets invoked with this user during build"
+        )
+        self.build_parser.add_argument(
+            "--inventory_path",
+            help="path to Ansible inventory",
+            default=None,
         )
         self.build_parser.add_argument(
             "--build-entrypoint",

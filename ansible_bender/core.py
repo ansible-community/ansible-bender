@@ -474,6 +474,10 @@ class AnsibleVarsParser:
         config.read(ansible_cfg_path)
         inv_path = config.get("defaults", "inventory", fallback=None)
 
+        # Possible to have an ansible.cfg file without an inventory path
+        if inv_path is None:
+            return None
+
         # Inventory path can be absolute or relative in ansible.cfg
         if os.path.isabs(inv_path):
             return inv_path
