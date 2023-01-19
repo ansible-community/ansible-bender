@@ -20,3 +20,6 @@ jobs:
   trigger: release
   metadata:
     dist-git-branch: master
+srpm_build_deps:
+  - python3-pip # "python3 setup.py --version" needs it
+  - python3-setuptools_scm
