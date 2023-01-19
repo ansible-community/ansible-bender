@@ -125,7 +125,7 @@ class CLI:
             help="the container gets invoked with this user during build"
         )
         self.build_parser.add_argument(
-            "--inventory_path",
+            "--inventory",
             help="path to Ansible inventory",
             default=None,
         )
@@ -294,7 +294,7 @@ class CLI:
         self.lb_parser.set_defaults(subcommand="clean")
 
     def _build(self):
-        pb_vars_p = AnsibleVarsParser(self.args.playbook_path, self.args.inventory_path)
+        pb_vars_p = AnsibleVarsParser(self.args.playbook_path, self.args.inventory)
         build, metadata = pb_vars_p.get_build_and_metadata()
         build.metadata = metadata
         if self.args.workdir:

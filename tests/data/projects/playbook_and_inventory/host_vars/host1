@@ -1,0 +1,5 @@
+  ansible_bender_target_image:
+    name: a-very-nice-image
+    working_dir: /tmp
+    environment:
+      FILE_TO_PROCESS: README.md
