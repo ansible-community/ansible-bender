@@ -6,7 +6,7 @@ ansible_bender:
       - '{{ playbook_dir }}:/src:Z'
 
   target_image:
-    name: a-very-nice-image
+    name: cfg-specifies-inventory
     working_dir: /src
     environment:
       FILE_TO_PROCESS: README.md

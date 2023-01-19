@@ -25,10 +25,10 @@ def test_can_specify_playbook_and_inventory():
     build, metadata = vars_parser.get_build_and_metadata()
 
     assert build.base_image == "docker.io/python:3-alpine"
-    assert build.target_image == "a-very-nice-image"
-    assert len(build.build_volumes) == 1
+    assert build.target_image == "playbook-and-inventory"
+    assert len(build.build_volumes) == 0
 
-    assert metadata.working_dir == "/src"
+    assert metadata.working_dir == "/tmp"
     assert len(metadata.env_vars) == 1
 
 def test_can_parse_vars_with_no_inventory_no_config():
@@ -38,7 +38,7 @@ def test_can_parse_vars_with_no_inventory_no_config():
     build, metadata = vars_parser.get_build_and_metadata()
     
     assert build.base_image == "docker.io/python:3-alpine"
-    assert build.target_image == "a-very-nice-image"
+    assert build.target_image == "no-inv-no-cfg"
     assert len(build.build_volumes) == 1
 
     assert metadata.working_dir == "/src"
@@ -51,7 +51,7 @@ def test_can_parse_vars_when_cfg_specifies_inventory():
     build, metadata = vars_parser.get_build_and_metadata()
 
     assert build.base_image == "docker.io/python:3-alpine"
-    assert build.target_image == "a-very-nice-image"
+    assert build.target_image == "cfg-specifies-inventory"
     assert len(build.build_volumes) == 1
 
     assert metadata.working_dir == "/src"
@@ -67,5 +67,5 @@ def test_can_parse_host_and_group_vars():
     assert build.target_image == "host_var_host1"
     assert len(build.build_volumes) == 1
 
-    assert metadata.working_dir == "/tmp"
+    assert metadata.working_dir == "/tmp/host_and_group_vars"
     assert len(metadata.env_vars) == 1

@@ -422,14 +422,17 @@ class AnsibleVarsParser:
 
     _hosts: dict = {}
 
-    build: Build = Build()
+    build: Build = None
 
-    metadata: ImageMetadata = ImageMetadata()
+    metadata: ImageMetadata = None
 
     def __init__(self, playbook_path, inventory_path = None) -> None:
         self._base_dir = os.path.dirname(playbook_path)
         self._playbook_path = playbook_path
         self._inventory_path = inventory_path if inventory_path else self._find_inventory_path()
+        self.build = Build()
+        self.metadata = ImageMetadata()
+        self.build.metadata = self.metadata
 
     def __getitem__(self, key):
         return self._hosts[key]

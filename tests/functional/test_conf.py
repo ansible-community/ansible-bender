@@ -91,10 +91,10 @@ def test_with_inventory_file(tmpdir):
         ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
 
         assert ab_inspect_data["base_image"] == "docker.io/python:3-alpine"
-        assert ab_inspect_data["target_image"] == "a-very-nice-image"
+        assert ab_inspect_data["target_image"] == "playbook-and-inventory"
     finally:
         try:
-            buildah("rmi", ["a-very-nice-image"])  # FIXME: use builder interface instead for sake of other backends
+            buildah("rmi", ["playbook-and-inventory"])  # FIXME: use builder interface instead for sake of other backends
         except subprocess.CalledProcessError as ex:
             print(ex)
 

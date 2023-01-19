@@ -1,5 +1,5 @@
   ansible_bender_target_image:
-    name: a-very-nice-image
+    name: playbook-and-inventory
     working_dir: /tmp
     environment:
       FILE_TO_PROCESS: README.md

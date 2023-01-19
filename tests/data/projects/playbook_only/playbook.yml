@@ -8,7 +8,7 @@
           - '{{ playbook_dir }}:/src:Z'
 
       target_image:
-        name: a-very-nice-image
+        name: no-inv-no-cfg
         working_dir: /src
         environment:
           FILE_TO_PROCESS: README.md
