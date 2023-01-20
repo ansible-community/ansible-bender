@@ -12,7 +12,7 @@ from tabulate import tabulate
 
 from ansible_bender.api import Application
 from ansible_bender.constants import ANNOTATIONS_KEY, PLAYBOOK_TEMPLATE
-from ansible_bender.core import PbVarsParser
+from ansible_bender.core import AnsibleVarsParser
 from ansible_bender.db import PATH_CANDIDATES
 from ansible_bender.okd import build_inside_openshift
 
@@ -123,6 +123,11 @@ class CLI:
         self.build_parser.add_argument(
             "--build-user",
             help="the container gets invoked with this user during build"
+        )
+        self.build_parser.add_argument(
+            "--inventory",
+            help="path to Ansible inventory",
+            default=None,
         )
         self.build_parser.add_argument(
             "--build-entrypoint",
@@ -289,7 +294,7 @@ class CLI:
         self.lb_parser.set_defaults(subcommand="clean")
 
     def _build(self):
-        pb_vars_p = PbVarsParser(self.args.playbook_path)
+        pb_vars_p = AnsibleVarsParser(self.args.playbook_path, self.args.inventory)
         build, metadata = pb_vars_p.get_build_and_metadata()
         build.metadata = metadata
         if self.args.workdir:

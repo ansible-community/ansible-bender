@@ -80,6 +80,24 @@ def test_with_vars_files(tmpdir):
         except subprocess.CalledProcessError as ex:
             print(ex)
 
+def test_with_inventory_file(tmpdir):
+    playbook_path = data_dir + "/projects/playbook_and_inventory/playbook.yml"
+    inventory_path = data_dir + "/projects/playbook_and_inventory/hosts.ini"
+    cmd = ["build", "--inventory", inventory_path, playbook_path]
+    ab(cmd, str(tmpdir))
+
+    try:
+        cmd = ["inspect", "--json"]
+        ab_inspect_data = json.loads(ab(cmd, str(tmpdir), return_output=True))
+
+        assert ab_inspect_data["base_image"] == "docker.io/python:3-alpine"
+        assert ab_inspect_data["target_image"] == "playbook-and-inventory"
+    finally:
+        try:
+            buildah("rmi", ["playbook-and-inventory"])  # FIXME: use builder interface instead for sake of other backends
+        except subprocess.CalledProcessError as ex:
+            print(ex)
+
 
 def test_basic_build_errr(tmpdir):
     cmd = ["build", basic_playbook_path]

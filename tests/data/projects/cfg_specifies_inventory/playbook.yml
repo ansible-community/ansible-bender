@@ -1,0 +1,4 @@
+- hosts: host1
+  tasks:
+    - debug:
+        msg: "Hello, world"

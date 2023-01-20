@@ -1,0 +1,17 @@
+- hosts: host1
+  vars:
+    ansible_bender:
+      base_image: docker.io/python:3-alpine
+
+      working_container:
+        volumes:
+          - '{{ playbook_dir }}:/src:Z'
+
+      target_image:
+        name: no-inv-no-cfg
+        working_dir: /src
+        environment:
+          FILE_TO_PROCESS: README.md
+  tasks:
+    - debug:
+        msg: "Hello, world"

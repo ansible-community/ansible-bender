@@ -1,0 +1,12 @@
+ansible_bender:
+  base_image: docker.io/python:3-alpine
+
+  working_container:
+    volumes:
+      - '{{ playbook_dir }}:/src:Z'
+
+  target_image:
+    name: cfg-specifies-inventory
+    working_dir: /src
+    environment:
+      FILE_TO_PROCESS: README.md

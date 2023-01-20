@@ -5,19 +5,89 @@
 With dockerfiles, this is being usually done with instructions such as `LABEL`,
 `ENV` or `EXPOSE`. Bender supports two ways of configuring the metadata:
 
-* Setting specific Ansible variables inside your playbook.
-* CLI options of `ansible-bender build`.
+* Setting specific Ansible variables
+* CLI options of `ansible-bender build`
 
 
-### Via playbook vars
+### Via ansible vars
 
-Configuration is done using a top-level Ansible variable `ansible_bender`. All
-the values are nested under it. The values are processed before a build starts.
-The changes to values are not reflected during a playbook run.
+Configuration can be done using ansible variables. Variables can be specified in 
+the playbook, host_vars or group_vars. If using host or group vars, you also
+need to specify the inventory for your ansible project, either through cli
+parameter, `--inventory`, or in `ansible.cfg`.
 
-If your playbook has multiple plays, the `ansible_bender` variable is processed
-only from the first play. All the plays will end up in a single container image.
+The values are processed before a build starts. The changes to values are not reflected 
+during a playbook run. If your playbook has multiple plays, the `ansible_bender` variable is processed only from the first play.
 
+The `ansible_bender` variables can be specified in one of two ways:
+
+1. a top-level Ansible variable `ansible_bender` with all the values nested under it 
+1. prepended with `ansible_bender_*`. This is convenient if you want to split your variables across several files.
+For example, you have a group of hosts with a common base container. You could specify the base container
+in the groups `group_vars` file and the host specific container information in the `host_vars` file.
+
+#### Top level ansible_bender variable
+
+The ansible bender configuration variables can specified under a single variable.
+For example,
+
+##### playbook.yml
+```
+---
+- name: Single variable configuration
+  hosts: all
+  vars:
+    ansible_bender:
+      base_image: docker.io/python:3-alpine
+
+      working_container:
+        volumes:
+          - '{{ playbook_dir }}:/src:Z'
+
+      target_image:
+        name: a-very-nice-image
+        working_dir: /src
+        environment:
+          FILE_TO_PROCESS: README.md
+```
+
+#### Prepended variables
+
+Variables can also be split out amoung different files.
+
+In this example, there are two hosts in the inventory, belonging to a single group.
+
+##### inventory.yml
+```yaml
+[group1]
+host1
+host2
+```
+
+You can define a common base container in
+the `group_vars` file using the `base_image` variable prepended with `ansible_bender_`
+
+##### group_vars/group1
+```
+ansible_bender_base_image: docker.io/python:3-alpine
+```
+
+Next you can define host specific ansible builder variables in the host_vars
+
+##### host_vars/host1
+```
+ansible_bender_target_image:
+  name: host_var_host1
+  working_dir: /tmp
+  environment:
+    FILE_TO_PROCESS: README.md
+```
+
+There are three variables that can be prepended:
+
+1. ansible_bender_base_image
+1. ansible_bender_target_image
+1. ansible_bender_working_container
 
 #### Top-level keys
 

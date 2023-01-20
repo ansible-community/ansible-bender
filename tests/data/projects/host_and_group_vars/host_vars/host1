@@ -1,0 +1,5 @@
+ansible_bender_target_image:
+  name: host_var_host1
+  working_dir: /tmp/host_and_group_vars
+  environment:
+    FILE_TO_PROCESS: README.md

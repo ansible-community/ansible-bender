@@ -1,0 +1,5 @@
+ansible_bender_target_image:
+  name: host_var_host2
+  working_dir: /src
+  environment:
+    FILE_TO_PROCESS: TODO.md

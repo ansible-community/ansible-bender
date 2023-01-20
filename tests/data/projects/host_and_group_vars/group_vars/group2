@@ -1,0 +1,4 @@
+ansible_bender_base_image: docker.io/python:3-alpine
+ansible_bender_working_container:
+    volumes:
+    - '{{ playbook_dir }}:/tmp/tmp2:Z'

@@ -1,0 +1,1 @@
+ansible_bender_base_image: docker.io/python:3-alpine
