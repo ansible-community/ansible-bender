@@ -6,7 +6,7 @@
 %bcond_with     privileged_tests
 
 Name:           ansible-bender
-Version:        0.9.0
+Version:        0.10.0
 Release:        1%{?dist}
 Summary:        Build container images using Ansible playbooks
 
@@ -83,6 +83,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 
 %changelog
+* Fri Feb 03 2023 Tomas Tomecek <ttomecek@redhat.com> - 0.10.0-1
+- 0.10.0 upstream release
+
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
