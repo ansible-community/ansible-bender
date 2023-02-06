@@ -1,3 +1,8 @@
+# 0.10.1
+
+* A fixup release: twine refused an upload due to incorrect URL (fix: 216ff3f101494daf1bdaf4f427fe17fa108e100d)
+
+
 # 0.10.0
 
 ## Features
