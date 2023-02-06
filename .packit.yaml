@@ -7,19 +7,16 @@ actions:
     - "python3 setup.py --version"
 jobs:
 - job: copr_build
-  metadata:
-    targets:
-    - fedora-all
+  targets:
+  - fedora-all
   trigger: pull_request
 - job: tests
   trigger: pull_request
-  metadata:
-    targets:
-    - fedora-all
+  targets:
+  - fedora-all
 - job: propose_downstream
   trigger: release
-  metadata:
-    dist-git-branch: master
+  dist_git_branches: [rawhide]
 srpm_build_deps:
   - python3-pip # "python3 setup.py --version" needs it
   - python3-setuptools_scm
