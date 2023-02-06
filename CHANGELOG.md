@@ -1,3 +1,21 @@
+# 0.10.0
+
+## Features
+
+* File operations are now also cached (examples: "file", "copy", "synchronize", "unarchive", and "template"), by [@kjohnson0451](https://github.com/kjohnson0451), [#246](https://github.com/ansible-community/ansible-bender/pull/246)
+* Use `AnsibleVarsParser` class to process ansible variables, by [@quietjoy](https://github.com/quietjoy), [#287](https://github.com/ansible-community/ansible-bender/pull/287)
+  * It allows `ansible_bender` variables to be specified across group and host var files.
+* Enable passing extra args to `podman run` and `ansible run`, by [@ArmaanT](https://github.com/ArmaanT), [#278](https://github.com/ansible-community/ansible-bender/pull/278)
+* `import_playbook` statements are now supported, by [@themkat](https://github.com/themkat), [#268](https://github.com/ansible-community/ansible-bender/pull/268)
+* Python interpreter locations are now cached for each base image, by [@themkat](https://github.com/themkat), [#267](https://github.com/ansible-community/ansible-bender/pull/267)
+
+## Fixes
+
+* SELinux checks are now dropped since they are no longer relevant, by [@quietjoy](https://github.com/quietjoy), [#285](https://github.com/ansible-community/ansible-bender/pull/285)
+* Vagrant development environment now works again, by [@quietjoy](https://github.com/quietjoy), [#286](https://github.com/ansible-community/ansible-bender/pull/286)
+* Qualified image names are now used to reference images instead of short-names, by [@tpo](https://github.com/tpo), [#263](https://github.com/ansible-community/ansible-bender/pull/263)
+
+
 # 0.9.0
 
 ## Features
