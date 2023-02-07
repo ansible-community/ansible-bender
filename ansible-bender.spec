@@ -28,12 +28,13 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-flexmock
 BuildRequires:  python%{python3_pkgversion}-pytest-xdist
 BuildRequires:  python%{python3_pkgversion}-libselinux
-BuildRequires:  ansible
+BuildRequires:  ansible-core
 BuildRequires:  podman
 BuildRequires:  buildah
 BuildRequires:  git
 %endif
-Requires:       ansible
+Requires:       (ansible-core or ansible)
+Suggests:       ansible-core
 Requires:       buildah
 
 %description
@@ -60,8 +61,7 @@ tl;dr Ansible is the frontend, buildah is the backend.
 
 %if %{with check}
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-  pytest-3 \
+%pytest \
   -v \
   --disable-pytest-warnings \
   --numprocesses=auto \
@@ -88,6 +88,38 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Fri Feb 03 2023 Tomas Tomecek <ttomecek@redhat.com> - 0.10.0-1
 - 0.10.0 upstream release
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.9.0-7
+- Rebuilt for Python 3.11
+
+* Sun Apr 24 2022 Gordon Messmer <gordon.messmer@gmail.com> - 0.9.0-6
+- Suggest ansible-core
+- Use %pytest macro
+
+* Tue Feb 22 2022 Maxwell G <gotmax@e.email> - 0.9.0-5
+- Allow users to choose between ansible and ansible-core.
+- Switch BR to ansible-core.
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.9.0-2
+- Rebuilt for Python 3.10
+
+* Sat Jan 30 2021 Gordon Messmer <gordon.messmer@gmail.com> - 0.9.0-1
+- Build 0.9.0
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
