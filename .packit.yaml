@@ -8,15 +8,15 @@ actions:
 jobs:
 - job: copr_build
   targets:
-  - fedora-all
+  - fedora-rawhide
+  # fedora 36 has old setuptools
+  - fedora-37
   trigger: pull_request
 - job: tests
   trigger: pull_request
   targets:
-  - fedora-all
-- job: propose_downstream
-  trigger: release
-  dist_git_branches: [rawhide]
+  - fedora-rawhide
+  - fedora-37
 srpm_build_deps:
   - python3-build
   - python3-setuptools

@@ -16,9 +16,10 @@ Source0:        %{pypi_source}
 
 BuildArch:      noarch
 
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-setuptools_scm
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
+BuildRequires: pyproject-rpm-macros
+
 %if %{with check}
 # These are required for tests:
 BuildRequires:  python%{python3_pkgversion}-pyyaml
@@ -27,7 +28,6 @@ BuildRequires:  python%{python3_pkgversion}-jsonschema
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-flexmock
 BuildRequires:  python%{python3_pkgversion}-pytest-xdist
-BuildRequires:  python%{python3_pkgversion}-libselinux
 BuildRequires:  ansible-core
 BuildRequires:  podman
 BuildRequires:  buildah
@@ -36,6 +36,9 @@ BuildRequires:  git
 Requires:       (ansible-core or ansible)
 Suggests:       ansible-core
 Requires:       buildah
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %description
 This is a tool which bends containers using Ansible playbooks and
@@ -52,11 +55,12 @@ tl;dr Ansible is the frontend, buildah is the backend.
 
 
 %build
-%py3_build
+%pyproject_wheel
 
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files ansible_bender
 
 
 %if %{with check}
@@ -73,13 +77,10 @@ tl;dr Ansible is the frontend, buildah is the backend.
 %endif
 
 
-%files
-%{python3_sitelib}/ansible_bender-*.egg-info/
-%{python3_sitelib}/ansible_bender/
+%files -f %{pyproject_files}
 %{_bindir}/ansible-bender
 %license LICENSE
 %doc docs/* README.md
-
 
 
 %changelog
