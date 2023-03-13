@@ -1,22 +1,23 @@
 specfile_path: ansible-bender.spec
 actions:
   create-archive:
-    - "python3 setup.py sdist --dist-dir ."
-    - "sh -c 'echo ansible-bender-$(python3 setup.py --version).tar.gz'"
+  - "python3 -m build"
+  - "sh -c 'ls -1 dist/ansible-bender-$(python3 -m setuptools_scm).tar.gz'"
   get-current-version:
-    - "python3 setup.py --version"
+  - "python3 -m setuptools_scm"
 jobs:
 - job: copr_build
   targets:
-  - fedora-all
+  - fedora-rawhide
+  # fedora 36 has old setuptools
+  - fedora-37
   trigger: pull_request
 - job: tests
   trigger: pull_request
   targets:
-  - fedora-all
-- job: propose_downstream
-  trigger: release
-  dist_git_branches: [rawhide]
+  - fedora-rawhide
+  - fedora-37
 srpm_build_deps:
-  - python3-pip # "python3 setup.py --version" needs it
-  - python3-setuptools_scm
+- python3-build
+- python3-setuptools
+- python3-setuptools_scm

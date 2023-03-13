@@ -1,0 +1,63 @@
+[project]
+name = "ansible-bender"
+authors = [
+  {name = "Tomas Tomecek", email = "tomas@tomecek.net"},
+]
+description = "A tool which builds container images using Ansible playbooks"
+readme = "README.md"
+requires-python = ">= 3.6"
+keywords = [
+  "ansible",
+  "containers",
+  "linux",
+  "buildah",
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "PyYAML",
+    "tabulate",
+    "jsonschema",
+    "setuptools",
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/ansible-community/ansible-bender"
+documentation = "https://ansible-community.github.io/ansible-bender/build/html/index.html"
+
+[project.optional-dependencies]
+testing = [
+  "pytest",
+  "flexmock",
+  "pytest-cov",
+]
+
+[project.scripts]
+ansible-bender = "ansible_bender.cli:main"
+
+# reference for usage:
+# https://github.com/pypa/setuptools_scm/#pyprojecttoml-usage
+[tool.setuptools_scm]
+
+# references for minimum version selection:
+# setuptools: https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+# setuptools-scm: https://github.com/pypa/setuptools_scm/#pyprojecttoml-usage
+[build-system]
+requires = ["setuptools>=61", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
