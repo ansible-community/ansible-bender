@@ -1,7 +1,7 @@
 specfile_path: ansible-bender.spec
 actions:
   create-archive:
-  - "python3 -m build"
+  - "python3 -m build -s"
   - "sh -c 'ls -1 dist/ansible-bender-$(python3 -m setuptools_scm).tar.gz'"
   get-current-version:
   - "python3 -m setuptools_scm"
