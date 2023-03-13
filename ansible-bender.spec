@@ -12,7 +12,7 @@ Summary:        Build container images using Ansible playbooks
 
 License:        MIT
 URL:            https://github.com/ansible-community/ansible-bender
-Source0:        %{pypi_source}
+Source0:        %{pypi_source ansible-bender}
 
 BuildArch:      noarch
 
