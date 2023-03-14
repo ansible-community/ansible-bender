@@ -6,10 +6,10 @@ import argparse
 import json
 import sys
 import subprocess
-import pkg_resources
 import yaml
 from tabulate import tabulate
 
+from ansible_bender import __version__
 from ansible_bender.api import Application
 from ansible_bender.constants import ANNOTATIONS_KEY, PLAYBOOK_TEMPLATE
 from ansible_bender.core import AnsibleVarsParser
@@ -421,9 +421,9 @@ class CLI:
         subcommand = getattr(self.args, "subcommand", "nope")
         try:
             if self.args.version:
-                try:
-                    print(pkg_resources.get_distribution("ansible-bender").version)
-                except pkg_resources.DistributionNotFound:
+                if __version__ is not None:
+                    print(__version__)
+                else:
                     print("Ansible-bender is not installed, therefore we can't print the version.")
                     print("Please run `python3 setup.py --version` instead.")
                     return 18
