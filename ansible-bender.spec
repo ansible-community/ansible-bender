@@ -12,7 +12,7 @@ Summary:        Build container images using Ansible playbooks
 
 License:        MIT
 URL:            https://github.com/ansible-community/ansible-bender
-Source0:        %{pypi_source}
+Source0:        %{pypi_source ansible-bender}
 
 BuildArch:      noarch
 
@@ -22,12 +22,6 @@ BuildRequires: pyproject-rpm-macros
 
 %if %{with check}
 # These are required for tests:
-BuildRequires:  python%{python3_pkgversion}-pyyaml
-BuildRequires:  python%{python3_pkgversion}-tabulate
-BuildRequires:  python%{python3_pkgversion}-jsonschema
-BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-flexmock
-BuildRequires:  python%{python3_pkgversion}-pytest-xdist
 BuildRequires:  ansible-core
 BuildRequires:  podman
 BuildRequires:  buildah
@@ -37,8 +31,6 @@ Requires:       (ansible-core or ansible)
 Suggests:       ansible-core
 Requires:       buildah
 
-%generate_buildrequires
-%pyproject_buildrequires
 
 %description
 This is a tool which bends containers using Ansible playbooks and
@@ -52,6 +44,13 @@ tl;dr Ansible is the frontend, buildah is the backend.
 
 %prep
 %autosetup
+# Coverage tests should not be run in the RPM build according to the Python
+# Packaging Guidelines
+sed -i '/pytest-cov/d' setup.cfg
+
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_check:-x testing}
 
 
 %build
