@@ -4,6 +4,7 @@
 ![PyPI - Status](https://img.shields.io/pypi/status/ansible-bender)
 ![GitHub](https://img.shields.io/github/license/ansible-community/ansible-bender)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/ansible-bender)
+[![Documentation](https://img.shields.io/badge/Documentation-yes-green.svg)](https://ansible-community.github.io/ansible-bender/build/html/)
 
 This tool bends containers using
 [Ansible](https://github.com/ansible/ansible)
