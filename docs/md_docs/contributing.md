@@ -3,7 +3,7 @@
 ## Setting up your local development environment
 
 Please make sure to follow bender's installation process:
-https://github.com/ansible-community/ansible-bender#installation
+https://ansible-community.github.io/ansible-bender/build/html/installation.html
 
 For local development, you'll need a few more packages. All of them are
 listed in
