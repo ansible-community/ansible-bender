@@ -98,8 +98,10 @@ class Database:
                 except FileExistsError:
                     continue
         # logger.debug("this stack has the lock: %s", traceback.extract_stack())
-        yield True
-        self.release()
+        try:
+            yield True
+        finally:
+            self.release()
 
     def release(self):
         """ release lock """
